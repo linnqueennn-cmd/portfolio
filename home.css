@@ -53,6 +53,22 @@
 .home-gem-slot img { position: absolute; width: 319.43%; height: 187.1%; max-width: none; left: -109.72%; top: -45.16%; }
 .home-portrait { left: calc(627 * var(--u)); top: calc(-3 * var(--u)); width: calc(580 * var(--u)); pointer-events: none; }
 .home-person { position: relative; width: 100%; aspect-ratio: 580 / 756; }
+.home-portrait-6221 :is(.home-shadow-left, .home-shadow-right) { display: none; }
+.home-portrait-arrival { position: absolute; display: block; max-width: none; height: auto; opacity: 0; }
+.home-portrait-arrival-ready { opacity: 1; }
+.home-portrait-shine {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(145deg, transparent 43%, rgb(255 250 235 / .27) 50%, transparent 57%) center / 100% 300% no-repeat;
+  mask: url("assets/home/portrait.png") center / 100% 100% no-repeat;
+}
+.home-portrait-shine-video {
+  mask:
+    url("assets/home/portrait.png") center / 100% 100% no-repeat,
+    var(--shine-video-mask) var(--shine-video-left) var(--shine-video-top) / var(--shine-video-width) var(--shine-video-height) no-repeat;
+  mask-composite: intersect;
+}
 .home-portrait-video {
   position: absolute;
   display: block;

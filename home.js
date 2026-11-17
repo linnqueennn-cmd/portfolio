@@ -50,6 +50,9 @@ function homeScreen(t, person, cv) {
 function setupPortraitArrival(startText) {
   const portrait = document.querySelector('.home-portrait');
   const image = portrait.querySelector('.home-person');
+  const mode = new URLSearchParams(location.search).get('portrait');
+  const useNewArrival = !mode || mode === '6221';
+  if (useNewArrival) portrait.classList.add('home-portrait-6221');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let stopVideo = () => {};
   const showPortrait = () => {
@@ -73,10 +76,115 @@ function setupPortraitArrival(startText) {
       });
       portrait.classList.replace('home-portrait-pending', 'home-portrait-materializing');
     };
-    const mode = new URLSearchParams(location.search).get('portrait');
-    if (mode === 'classic') classic();
+    if (useNewArrival) stopVideo = playPortraitArrival(portrait, image, showPortrait, startText);
+    else if (mode === 'classic') classic();
     else stopVideo = playPortraitVideo(portrait, showPortrait, classic, mode, startText);
   }, showPortrait);
+}
+
+function playPortraitArrival(portrait, image, finish, startText) {
+  const video = document.createElement('video');
+  video.className = 'home-portrait-arrival';
+  video.muted = true;
+  video.playsInline = true;
+  video.setAttribute('aria-hidden', 'true');
+  let stopped = false;
+  let frame;
+  let shineIn;
+  let shine;
+  let entryOffset, left;
+  const timeout = setTimeout(finish, 2200);
+
+  function measure() {
+    const rect = image.getBoundingClientRect();
+    const scale = rect.height / 1024;
+    const videoScale = scale * 1.001;
+    const width = 1920 * videoScale;
+    // Align the same point on the last video frame and the static PNG.
+    left = 381 * rect.width / 768 - 1200 * videoScale;
+    video.style.width = `${width}px`;
+    video.style.top = `${-8 * scale}px`;
+    entryOffset = Math.max(0, document.documentElement.clientWidth - rect.left - left - width);
+    position(video.currentTime);
+  }
+
+  function position(time) {
+    // Keep the cut edge against the viewport until the full silhouette clears it.
+    const progress = Math.max(0, Math.min(1, (time - .400) / (1.383333 - .400)));
+    const remaining = 1 - progress * progress * (3 - 2 * progress);
+    video.style.left = `${left + entryOffset * remaining}px`;
+  }
+
+  function updateFrame(_now, {mediaTime}) {
+    position(mediaTime);
+    frame = video.requestVideoFrameCallback(updateFrame);
+  }
+
+  function updateTime() { position(video.currentTime); }
+
+  video.addEventListener('playing', () => {
+    if (stopped) return;
+    clearTimeout(timeout);
+    // Some decoders play the color plane but ignore WebM's alpha channel.
+    const probe = document.createElement('canvas');
+    probe.width = probe.height = 1;
+    const context = probe.getContext('2d', {willReadFrequently: true});
+    context.drawImage(video, 8, 8, 1, 1, 0, 0, 1, 1);
+    if (context.getImageData(0, 0, 1, 1).data[3] !== 0) return finish();
+    measure();
+    video.classList.add('home-portrait-arrival-ready');
+    startText();
+    window.addEventListener('resize', measure);
+    if (video.requestVideoFrameCallback) frame = video.requestVideoFrameCallback(updateFrame);
+    else video.addEventListener('timeupdate', updateTime);
+  }, {once: true});
+  video.addEventListener('ended', () => {
+    const silhouette = document.createElement('canvas');
+    silhouette.width = video.videoWidth;
+    silhouette.height = video.videoHeight;
+    const context = silhouette.getContext('2d');
+    if (!context || !CSS.supports('mask-composite', 'intersect')) return finish();
+
+    context.drawImage(video, 0, 0);
+    const still = image.getBoundingClientRect();
+    const lastFrame = video.getBoundingClientRect();
+    shine = document.createElement('span');
+    shine.className = 'home-portrait-shine home-portrait-shine-video';
+    shine.setAttribute('aria-hidden', 'true');
+    shine.style.setProperty('--shine-video-mask', `url("${silhouette.toDataURL()}")`);
+    shine.style.setProperty('--shine-video-left', `${(lastFrame.left - still.left) / (still.width - lastFrame.width) * 100}%`);
+    shine.style.setProperty('--shine-video-top', `${(lastFrame.top - still.top) / (still.height - lastFrame.height) * 100}%`);
+    shine.style.setProperty('--shine-video-width', `${lastFrame.width / still.width * 100}%`);
+    shine.style.setProperty('--shine-video-height', `${lastFrame.height / still.height * 100}%`);
+    portrait.append(shine);
+
+    // Swap as the light crosses the upper body, where the two poses differ most.
+    const handoff = {backgroundPosition: '50% 58.33%'};
+    shineIn = shine.animate([{backgroundPosition: '50% 100%'}, handoff], {duration: 125, fill: 'forwards'});
+    shineIn.finished.then(() => {
+      const highlight = shine;
+      shine = null;
+      highlight.classList.remove('home-portrait-shine-video');
+      highlight.animate([handoff, {backgroundPosition: '50% 0%'}], {duration: 175, fill: 'forwards'})
+        .onfinish = () => highlight.remove();
+      finish();
+    }, () => {});
+  }, {once: true});
+  video.addEventListener('error', () => { if (!stopped) finish(); }, {once: true});
+  video.src = 'assets/home/portrait-6221.webm';
+  portrait.append(video);
+  video.play().catch(() => { if (!stopped) finish(); });
+
+  return () => {
+    stopped = true;
+    clearTimeout(timeout);
+    shineIn?.cancel();
+    shine?.remove();
+    if (frame !== undefined) video.cancelVideoFrameCallback(frame);
+    window.removeEventListener('resize', measure);
+    video.pause();
+    video.remove();
+  };
 }
 
 function playPortraitVideo(portrait, finish, fallback, mode, startText) {
