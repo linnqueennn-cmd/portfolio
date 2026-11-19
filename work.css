@@ -142,3 +142,9 @@
   }
   .work-case::after { inset: 0 0 0 auto; transform: scaleX(-1); }
 }
+.work-case-arrow { display: none; }
+@media (max-width: 900px) {
+  .work-label { position: relative; }
+  .work-label h3 { padding-right: 40px; }
+  .work-case-arrow { display: block; position: absolute; right: 0; bottom: 0; width: 28px; height: 28px; color: #282828; }
+}

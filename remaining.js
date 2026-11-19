@@ -4,7 +4,7 @@ function remainingSections(t) {
   const tr = pair => phrase(t(...pair));
   const scramble = value => `<span class="home-scramble" data-scramble>${value}</span>`;
   const heading = (id, index) => `<h2 class="remaining-heading" id="${id}-title" data-reveal>${scramble(tr(copy.titles[index]))}<span class="crystal-stop" aria-hidden="true"></span></h2>`;
-  const action = (label, url) => `<a class="remaining-action home-cta" href="${url}">${scramble('[' + label + ']')}</a>`;
+  const action = (label, url, fullWidth = false) => `<a class="remaining-action home-cta${fullWidth ? ' pricing-cta' : ''}" href="${url}">${fullWidth ? `<span class="home-cta-bracket home-cta-bracket-left" aria-hidden="true">[</span>${scramble(label)}<span class="home-cta-bracket home-cta-bracket-right" aria-hidden="true">]</span>` : scramble('[' + label + ']')}</a>`;
   const serviceImages = ['roma', 'vinyl', 'brand', 'retail'];
   return `
     <section id="services" class="remaining-section" aria-labelledby="services-title">
@@ -38,7 +38,7 @@ function remainingSections(t) {
       <dl class="rate-list">${copy.prices.map(([ru, english, amount]) => `
         <div class="rate-slot scroll-window-slot"><div class="rate-row scroll-window"><dt>[${tr([ru, english])}]</dt><dd>${amount ? t('от ','from ') + amount.replace(' ', ' ') + ' ₽' : t('по запросу','on request')}</dd></div></div>`).join('')}</dl>
       <div class="pricing-bottom">
-      ${action(tr(copy.discuss), '#contacts')}
+      ${action(tr(copy.discuss), '#contacts', true)}
       </div>
     </section>
     <section id="contacts" class="remaining-section" aria-labelledby="contacts-title">
@@ -55,7 +55,7 @@ function setupRemainingSections() {
   const rows = [...document.querySelectorAll('.service-option')];
   const images = [...document.querySelectorAll('.service-media img')];
   const wide = matchMedia('(min-width: 900px)');
-  const mobile = matchMedia('(max-width: 540px)');
+  const mobile = matchMedia('(max-width: 540px), (max-width: 1100px) and (orientation: portrait)');
   const serviceSection = document.querySelector('#services');
   const story = serviceSection.querySelector('.service-story');
   const serviceHeading = serviceSection.querySelector('.remaining-heading');
@@ -80,7 +80,8 @@ function setupRemainingSections() {
         Number.parseFloat(getComputedStyle(serviceHeading).marginBottom);
       const start = serviceSection.getBoundingClientRect().top + storyOffset;
       const distance = serviceSection.offsetHeight - storyOffset - story.offsetHeight - 48;
-      const progress = Math.max(0, Math.min(1, (16 - start) / Math.max(1, distance)));
+      const stickyTop = Number.parseFloat(getComputedStyle(story).top);
+      const progress = Math.max(0, Math.min(1, (stickyTop - start) / Math.max(1, distance)));
       activate(Math.min(rows.length - 1, Math.floor(progress * rows.length)));
       return;
     }
@@ -96,10 +97,10 @@ function setupRemainingSections() {
 
   rows.forEach((row, i) => row.querySelector('button').addEventListener('click', () => {
     activate(i);
-    if (wide.matches) row.scrollIntoView({block: 'center'});
+    if (wide.matches && !mobile.matches) row.scrollIntoView({block: 'center'});
   }));
   rows.forEach((row, i) => row.querySelector('button').addEventListener('focus', () => {
-    if (!wide.matches) activate(i);
+    if (!wide.matches || mobile.matches) activate(i);
   }));
   addEventListener('scroll', schedule, {passive: true});
   addEventListener('resize', schedule);
@@ -107,6 +108,7 @@ function setupRemainingSections() {
   schedule();
 
   setupScrollWindows(document.querySelector('.rate-list'));
+  createScrambleJobs(document.querySelector('.pricing-bottom'));
 
   const like = document.querySelector('.sims-like');
   like.addEventListener('click', () => {
@@ -128,13 +130,15 @@ function setupProcessStack() {
       cards.forEach(card => {
         card.style.removeProperty('transform');
         card.style.removeProperty('opacity');
+        card.style.removeProperty('--process-content-opacity');
       });
       rail.style.height = '';
       return;
     }
     const pin = section.querySelector('.process-pin');
     section.style.setProperty('--process-pin-height', pin.offsetHeight + 'px');
-    const pinTop = 24;
+    const pinTop = Math.max(80, (innerHeight - pin.offsetHeight) / 2);
+    pin.style.top = pinTop + 'px';
     const step = rail.firstElementChild.offsetWidth - 12;
     const travel = Math.max(0, (cards.length - 1) * step + cards.at(-1).offsetWidth - rail.clientWidth);
     const scrollDistance = innerWidth <= 540
@@ -147,7 +151,9 @@ function setupProcessStack() {
       const offset = i - progress * travel / step;
       const x = offset < 0 ? offset * 22 : offset * step;
       card.style.transform = `translateX(${x}px)`;
-      card.style.opacity = offset < 0 ? String(Math.max(.35, 1 + offset * 1.5)) : '1';
+      // Keep the paper opaque so stacked cards cannot show each other's text.
+      card.style.opacity = '1';
+      card.style.setProperty('--process-content-opacity', offset < 0 ? String(Math.max(.35, 1 + offset * 1.5)) : '1');
     });
   }
   function schedule() {

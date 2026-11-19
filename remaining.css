@@ -71,7 +71,7 @@ body.home-page { background: #efefef; font-family: "Ubuntu Sans Mono", monospace
 .service-inline { display: none; }
 .process-lead { display: flex; align-items: center; justify-content: space-between; gap: 14px; margin-bottom: 24px; }
 #process { min-height: calc(var(--process-pin-height, 400px) + var(--process-scroll-distance, 640px) + 48px); padding-top: 24px; padding-bottom: 24px; }
-.process-pin { position: sticky; top: 24px; }
+.process-pin { position: sticky; top: max(80px, calc((100svh - var(--process-pin-height, 400px)) / 2)); }
 .process-top { display: grid; grid-template-columns: 1fr 22%; column-gap: 32px; }
 .process-note { font-size: var(--portfolio-body); }
 .process-rail { position: relative; overflow: clip; height: 240px; }
@@ -93,6 +93,7 @@ body.home-page { background: #efefef; font-family: "Ubuntu Sans Mono", monospace
 .process-step h3 { font-size: clamp(23px, 2.6vw, 38px); font-weight: 400; }
 .process-step p { margin-top: 18px; }
 .process-step p { color: #4f5049; }
+.process-step > .remaining-meta, .process-step > div { opacity: var(--process-content-opacity, 1); }
 .remaining-lead { margin-bottom: 24px; }
 .rate-list { margin: 0; border-top: 1px solid var(--section-rule); }
 .rate-list .rate-row {
@@ -204,8 +205,10 @@ body.home-page { background: #efefef; font-family: "Ubuntu Sans Mono", monospace
 @media (max-width: 540px) {
   .remaining-section { --section-gutter: 16px; }
   .remaining-heading { font-size: 22px; }
+}
+@media (max-width: 540px), (max-width: 1100px) and (orientation: portrait) {
   #services { position: relative; min-height: 260svh; }
-  .service-story { position: sticky; top: 16px; display: flex; flex-direction: column; gap: 24px; }
+  .service-story { position: sticky; top: 88px; display: flex; flex-direction: column; gap: 24px; }
   .service-options { order: 1; width: 100%; }
   .service-media { display: block; order: 2; position: relative; top: auto; width: 100%; aspect-ratio: 16 / 10; max-height: 24svh; }
   .service-option {
@@ -223,6 +226,8 @@ body.home-page { background: #efefef; font-family: "Ubuntu Sans Mono", monospace
   .service-option .service-inline { display: none; }
   .service-option button { min-height: 44px; }
   .service-inline { aspect-ratio: 16 / 10; }
+}
+@media (max-width: 540px) {
   .process-top { grid-template-columns: 1fr; }
   .process-note { max-width: 28ch; justify-self: start; margin-bottom: 0; text-align: left; }
   .process-top { gap: 12px; margin-bottom: 28px; }
@@ -303,4 +308,8 @@ body.home-page { background: #efefef; font-family: "Ubuntu Sans Mono", monospace
   #contacts .remaining-footer { flex-wrap: nowrap; gap: 8px; margin-top: 44px; }
   #contacts .remaining-footer p { flex: 1; min-width: 0; font-size: var(--portfolio-meta); }
   #contacts .sims-like { width: 48px; height: 48px; padding: 10px; }
+}
+@media (max-width: 540px), (max-width: 1100px) and (orientation: portrait) {
+  #services > .remaining-heading { position: sticky; top: 88px; z-index: 2; background: #efefef; }
+  #services .service-story { top: 158px; }
 }

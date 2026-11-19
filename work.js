@@ -31,7 +31,7 @@ function projectsScreen(t, caseUrl) {
     <div class="work-list">${webProjects(t).map(([id, name, meta, description]) => `
       <div class="work-slot scroll-window-slot"><a class="work-case scroll-window" href="${caseUrl(id)}">
         <img class="work-bracket work-bracket-left" src="assets/work/left.svg" alt="">
-        <div class="work-label"><p>${meta}</p><h3><span class="home-scramble" data-scramble>${name}</span></h3></div>
+        <div class="work-label"><p>${meta}</p><h3><span class="home-scramble" data-scramble>${name}</span></h3><svg class="work-case-arrow" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M6 26 26 6M6 6h20v20" stroke="currentColor" stroke-width="2"/></svg></div>
         <span class="work-preview" data-gif="assets/work/${id}.gif" aria-hidden="true"></span>
         <p class="work-description">${description}</p>
         <img class="work-bracket work-bracket-right" src="assets/work/right.svg" alt="">

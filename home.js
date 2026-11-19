@@ -14,7 +14,7 @@ function homeScreen(t, person, cv) {
         <button type="button" id="home-language" aria-label="${t('English version', 'Русская версия')}">${scramble(t('[en]', '[ru]'))}</button>
         <nav aria-label="${t('Навигация', 'Navigation')}">${items.map(([id, label]) =>
           `<a href="#${id}">${scramble('[' + label + ']')}</a>`).join('')}</nav>
-        <a class="home-menu-handle" href="https://t.me/linqueenn">${scramble('@linqueenn')}</a>
+        <a class="home-menu-handle" href="./">${scramble('[linqueenn]')}</a>
         <a class="home-menu-resume" href="${cv}" download><span>${t('скачать резюме', 'download résumé')}</span><img src="${art}download.svg" alt=""></a>
         </div>
       </header>
@@ -94,7 +94,12 @@ function playPortraitArrival(portrait, image, finish, startText) {
   let shineIn;
   let shine;
   let entryOffset, left;
-  const timeout = setTimeout(finish, 2200);
+  let surface = video;
+  let atlasStarted = false;
+  let atlasFrame;
+  let atlasTime = 0;
+  let sheets = [];
+  const timeout = setTimeout(startAtlas, 12000);
 
   function measure() {
     const rect = image.getBoundingClientRect();
@@ -103,17 +108,17 @@ function playPortraitArrival(portrait, image, finish, startText) {
     const width = 1920 * videoScale;
     // Align the same point on the last video frame and the static PNG.
     left = 381 * rect.width / 768 - 1200 * videoScale;
-    video.style.width = `${width}px`;
-    video.style.top = `${-8 * scale}px`;
+    surface.style.width = `${width}px`;
+    surface.style.top = `${-8 * scale}px`;
     entryOffset = Math.max(0, document.documentElement.clientWidth - rect.left - left - width);
-    position(video.currentTime);
+    position(atlasStarted ? atlasTime : video.currentTime);
   }
 
   function position(time) {
     // Keep the cut edge against the viewport until the full silhouette clears it.
     const progress = Math.max(0, Math.min(1, (time - .400) / (1.383333 - .400)));
     const remaining = 1 - progress * progress * (3 - 2 * progress);
-    video.style.left = `${left + entryOffset * remaining}px`;
+    surface.style.left = `${left + entryOffset * remaining}px`;
   }
 
   function updateFrame(_now, {mediaTime}) {
@@ -124,14 +129,15 @@ function playPortraitArrival(portrait, image, finish, startText) {
   function updateTime() { position(video.currentTime); }
 
   video.addEventListener('playing', () => {
-    if (stopped) return;
+    if (stopped || atlasStarted) return;
     clearTimeout(timeout);
     // Some decoders play the color plane but ignore WebM's alpha channel.
     const probe = document.createElement('canvas');
     probe.width = probe.height = 1;
     const context = probe.getContext('2d', {willReadFrequently: true});
+    if (!context) return startAtlas();
     context.drawImage(video, 8, 8, 1, 1, 0, 0, 1, 1);
-    if (context.getImageData(0, 0, 1, 1).data[3] !== 0) return finish();
+    if (!context || context.getImageData(0, 0, 1, 1).data[3] !== 0) return startAtlas();
     measure();
     video.classList.add('home-portrait-arrival-ready');
     startText();
@@ -139,16 +145,17 @@ function playPortraitArrival(portrait, image, finish, startText) {
     if (video.requestVideoFrameCallback) frame = video.requestVideoFrameCallback(updateFrame);
     else video.addEventListener('timeupdate', updateTime);
   }, {once: true});
-  video.addEventListener('ended', () => {
+  function completeArrival() {
+    if (stopped) return;
     const silhouette = document.createElement('canvas');
-    silhouette.width = video.videoWidth;
-    silhouette.height = video.videoHeight;
+    silhouette.width = 1920;
+    silhouette.height = 1038;
     const context = silhouette.getContext('2d');
     if (!context || !CSS.supports('mask-composite', 'intersect')) return finish();
 
-    context.drawImage(video, 0, 0);
+    context.drawImage(surface, 0, 0);
     const still = image.getBoundingClientRect();
-    const lastFrame = video.getBoundingClientRect();
+    const lastFrame = surface.getBoundingClientRect();
     shine = document.createElement('span');
     shine.className = 'home-portrait-shine home-portrait-shine-video';
     shine.setAttribute('aria-hidden', 'true');
@@ -170,15 +177,85 @@ function playPortraitArrival(portrait, image, finish, startText) {
         .onfinish = () => highlight.remove();
       finish();
     }, () => {});
-  }, {once: true});
-  video.addEventListener('error', () => { if (!stopped) finish(); }, {once: true});
-  video.src = 'assets/home/portrait-6221.webm';
-  portrait.append(video);
-  video.play().catch(() => { if (!stopped) finish(); });
+  }
+  video.addEventListener('ended', completeArrival, {once: true});
+  video.addEventListener('error', () => { if (!stopped) startAtlas(); }, {once: true});
+  // Safari can decode WebM's colour plane without its alpha. These lossless
+  // WebP frames come from the same processed video and need no autoplay permission.
+  async function startAtlas() {
+    if (stopped || atlasStarted) return;
+    atlasStarted = true;
+    clearTimeout(timeout);
+    video.pause();
+    if (frame !== undefined) video.cancelVideoFrameCallback(frame);
+    video.remove();
+    try {
+      const response = await fetch('assets/home/portrait-6221.json');
+      if (!response.ok) throw new Error('Portrait frames unavailable');
+      const atlas = await response.json();
+      sheets = Array.from({length: 1 + Math.max(...atlas.frames.map(item => item[1]))}, (_, index) => {
+        const sheet = new Image();
+        sheet.src = 'assets/home/portrait-6221-' + index + '.webp';
+        return sheet;
+      });
+      await Promise.all(sheets.map(sheet => sheet.decode()));
+      if (stopped) return;
+      surface = document.createElement('canvas');
+      surface.width = 1920;
+      surface.height = 1038;
+      surface.className = 'home-portrait-arrival home-portrait-arrival-ready';
+      surface.setAttribute('aria-hidden', 'true');
+      const context = surface.getContext('2d');
+      if (!context) return finish();
+      portrait.append(surface);
+      measure();
+      window.addEventListener('resize', measure);
+      startText();
+      let startedAt;
+      let current = -1;
+      function draw(now) {
+        if (stopped) return;
+        if (startedAt === undefined) startedAt = now;
+        const elapsed = Math.min(now - startedAt, atlas.end);
+        atlasTime = elapsed / 1000;
+        let next = current;
+        while (next + 1 < atlas.frames.length && atlas.frames[next + 1][0] <= elapsed) next++;
+        if (next !== current) {
+          current = next;
+          context.clearRect(0, 0, surface.width, surface.height);
+          if (current >= 0) {
+            const [, sheet, x, y, width, height, targetX, targetY] = atlas.frames[current];
+            context.drawImage(sheets[sheet], x, y, width, height, targetX, targetY, width, height);
+            // Release decoded sheets once their last frame has passed.
+            for (let i = 0; i < sheet; i++) if (sheets[i].src) sheets[i].removeAttribute('src');
+          }
+        }
+        position(atlasTime);
+        if (elapsed < atlas.end) atlasFrame = requestAnimationFrame(draw);
+        else completeArrival();
+      }
+      atlasFrame = requestAnimationFrame(draw);
+    } catch {
+      if (!stopped) finish();
+    }
+  }
+
+  const needsAtlas = /iPad|iPhone|iPod/.test(navigator.userAgent)
+    || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
+  if (needsAtlas) startAtlas();
+  else {
+    video.src = 'assets/home/portrait-6221.webm';
+    portrait.append(video);
+    video.play().catch(() => { if (!stopped) startAtlas(); });
+  }
 
   return () => {
     stopped = true;
     clearTimeout(timeout);
+    cancelAnimationFrame(atlasFrame);
+    sheets.forEach(sheet => sheet.removeAttribute('src'));
+    sheets = [];
+    if (surface !== video) surface.remove();
     shineIn?.cancel();
     shine?.remove();
     if (frame !== undefined) video.cancelVideoFrameCallback(frame);
@@ -271,31 +348,7 @@ function playPortraitVideo(portrait, finish, fallback, mode, startText) {
 const homeScrambleStagger = 34;
 
 function setupHomeScramble() {
-  const menu = document.querySelector('.home-menu');
-  const toggle = document.querySelector('.home-menu-toggle');
-  const closeMenu = () => toggle.setAttribute('aria-expanded', 'false');
-  toggle.onclick = () => toggle.setAttribute('aria-expanded', String(toggle.getAttribute('aria-expanded') === 'false'));
-  menu.addEventListener('click', event => { if (event.target.closest('a')) closeMenu(); });
-  toggle.closest('header').addEventListener('keydown', event => {
-    if (event.key !== 'Escape' || toggle.getAttribute('aria-expanded') !== 'true') return;
-    closeMenu();
-    toggle.focus();
-  });
-  const header = toggle.closest('header');
-  const homeSection = document.querySelector('.home-screen');
-  const homePosition = document.createComment('home navigation position');
-  header.before(homePosition);
-  new IntersectionObserver(([entry]) => {
-    const floating = !entry.isIntersecting && entry.boundingClientRect.bottom <= 0;
-    if (header.classList.contains('home-nav-floating') === floating) return;
-    closeMenu();
-    header.classList.toggle('home-nav-floating', floating);
-    if (floating) document.body.append(header);
-    else homePosition.after(header);
-  }).observe(homeSection);
-  document.addEventListener('pointerdown', event => {
-    if (!header.contains(event.target)) closeMenu();
-  });
+  setupPortfolioMenu(document.querySelector('.home-nav'), document.querySelector('.home-screen'));
   const jobs = createScrambleJobs(document.querySelector('.home-screen'));
   let started = false;
   return (remaining = 0) => {
@@ -307,10 +360,38 @@ function setupHomeScramble() {
   };
 }
 
+function setupPortfolioMenu(header, anchor) {
+  const menu = header.querySelector('.home-menu');
+  const toggle = header.querySelector('.home-menu-toggle');
+  const closeMenu = () => toggle.setAttribute('aria-expanded', 'false');
+  toggle.onclick = () => toggle.setAttribute('aria-expanded', String(toggle.getAttribute('aria-expanded') === 'false'));
+  menu.addEventListener('click', event => { if (event.target.closest('a')) closeMenu(); });
+  toggle.closest('header').addEventListener('keydown', event => {
+    if (event.key !== 'Escape' || toggle.getAttribute('aria-expanded') !== 'true') return;
+    closeMenu();
+    toggle.focus();
+  });
+  const homePosition = document.createComment('home navigation position');
+  header.before(homePosition);
+  new IntersectionObserver(([entry]) => {
+    const floating = !entry.isIntersecting && entry.boundingClientRect.bottom <= 0;
+    if (header.classList.contains('home-nav-floating') === floating) return;
+    closeMenu();
+    header.classList.toggle('home-nav-floating', floating);
+    if (floating) document.body.append(header);
+    else homePosition.after(header);
+  }).observe(anchor);
+  document.addEventListener('pointerdown', event => {
+    if (!header.contains(event.target)) closeMenu();
+  });
+  createScrambleJobs(header);
+}
+
 const scrambleJobCache = new WeakMap();
 function createScrambleJobs(root) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   return [...root.querySelectorAll('[data-scramble]')].map(element => {
+    if (element.closest('.home-menu-handle')) return () => {};
     if (scrambleJobCache.has(element)) return scrambleJobCache.get(element);
     const glyphs = [...element.textContent];
     const menuItem = element.closest('.home-nav a, .home-nav button');
@@ -355,7 +436,7 @@ function createScrambleJobs(root) {
       animation = requestAnimationFrame(frame);
     }
 
-    const heroButton = element.closest('.home-screen .home-cta');
+    const heroButton = element.closest('.home-screen .home-cta, #pricing .pricing-cta');
     if (heroButton) {
       const left = heroButton.querySelector('.home-cta-bracket-left');
       const right = heroButton.querySelector('.home-cta-bracket-right');

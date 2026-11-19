@@ -69,10 +69,18 @@ function setupMotion() {
 
 const zen = webProjects(t)[1];
 const project = projects.find(item => item[0] === caseId) || (caseId === 'zen' ? zen : null);
-if (project) {
+if (caseId === 'roma') {
+  document.body.classList.add('case-page');
+  document.documentElement.lang = 'ru';
+  document.title = 'Мама Рома — UX/UI-кейс | linqueenn';
+  document.querySelector('meta[name=description]').content = mamaRomaCase.summary;
+  app.innerHTML = caseStudyPage(mamaRomaCase);
+} else if (project) {
   const back = './?' + (en ? 'lang=en&' : '') + (projects.indexOf(project) > 2 ? 'work=graphic' : '') + '#work';
   document.title = project[1] + ' — linqueenn';
   document.querySelector('meta[name=description]').content = project[3];
   app.innerHTML = `<section class="section case"><a class="note" href="${back}">← ${t('Все проекты','All projects')}</a><h1 class="heading">${project[1]}</h1><p class="meta">${project[2]}</p>${caseId === 'zen' ? '' : cover(project)}<p>${project[3]}</p>${project[4] ? `<a class="cta" href="${behance}gallery/${project[4]}">${t('Смотреть на Behance','View on Behance')} ↗</a>` : ''}</section>`;
 } else renderHome();
+if (project) setupCasePage();
+setupBackToTop();
 if (location.hash) requestAnimationFrame(() => document.getElementById(location.hash.slice(1))?.scrollIntoView({behavior:'instant'}));

@@ -7,7 +7,7 @@ const port = Number(process.argv[2] || 4175);
 const types = {'.html': 'text/html; charset=utf-8', '.css': 'text/css',
   '.js': 'text/javascript', '.svg': 'image/svg+xml', '.png': 'image/png',
   '.jpg': 'image/jpeg', '.gif': 'image/gif', '.pdf': 'application/pdf',
-  '.ttf': 'font/ttf', '.webm': 'video/webm', '.glb': 'model/gltf-binary',
+  '.ttf': 'font/ttf', '.webm': 'video/webm', '.mp4': 'video/mp4', '.glb': 'model/gltf-binary',
   '.hdr': 'application/octet-stream', '.txt': 'text/plain'};
 http.createServer((request, response) => {
   const pathname = new URL(request.url, 'http://localhost').pathname;

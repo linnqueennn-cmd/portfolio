@@ -8,6 +8,7 @@
 *.MOV
 *.mp4
 *.MP4
+!/assets/cases/roma/10_mobile.mp4
 *.log
 *.tmp
 *.bak
@@ -21,8 +22,6 @@ Thumbs.db
 *.key
 
 # Unused exports; keep local files for comparison without publishing them.
-/assets/home/portrait-6221-*.webp
-/assets/home/portrait-6221.json
 /assets/home/portrait-walk.webm
 /assets/home/portrait-walk-hq.webm
 /assets/home/portrait-walk-6207.webm

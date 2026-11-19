@@ -21,6 +21,7 @@
   --type-rate: 28px;
   --type-contact-tablet: 28px;
   --type-contact-mobile: 22px;
+  --type-pricing-action: 40px;
   --type-hero-action: 60px;
   --portfolio-body: 22px;
   --portfolio-caption: 14px;
@@ -170,7 +171,7 @@ body.home-page { text-transform: lowercase; }
     mask-repeat: no-repeat;
     animation: cta-label-hide 1s cubic-bezier(.4, 0, .2, 1);
   }
-  .home-screen .home-cta-closing::before {
+  .home-screen .home-cta-closing::before, #pricing .home-cta-closing::before {
     transform-origin: center;
     animation: cta-glow-close 1s cubic-bezier(.4, 0, .2, 1);
   }
@@ -190,6 +191,26 @@ body.home-page { text-transform: lowercase; }
     0%, 100% { transform: scaleX(1); opacity: 1; }
     24%, 30% { transform: scaleX(0); opacity: 0; }
   }
+}
+/* Pricing reuses the hero's bracket, text-mask and glow animation. */
+#pricing .pricing-bottom { grid-template-columns: minmax(0, 1fr); }
+html[lang] #pricing .pricing-cta {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  width: 100%;
+  min-height: 48px;
+  padding: 0;
+  font-size: var(--type-pricing-action);
+  white-space: nowrap;
+  color: #282828;
+}
+#pricing .pricing-cta > .home-scramble { flex: 1; text-align: center; }
+#pricing .pricing-cta::before { inset: 11px; height: 30px; filter: blur(30.05px); }
+#pricing .pricing-cta:not(.home-cta-closing)::before { animation: none; }
+@media (min-width: 541px) {
+  #process .process-note, #pricing .pricing-top .remaining-note { justify-self: end; text-align: right; }
 }
 /* 1440 layout: column eight is the shared right-hand text axis. */
 @media (width: 1440px) {
@@ -221,3 +242,53 @@ body.home-page { text-transform: lowercase; }
 }
 body.home-page, .home-screen, .work-screen, .about-screen,
 .remaining-section, .section-transition-hold { background-color: var(--site-background); }
+
+/* Desktop hero: fit geometry to the available height, keeping the type scale intact.
+   PNG width remains the single reference used by the existing video handoff. */
+@media (min-width: 1101px) and (orientation: landscape),
+       (min-width: 901px) and (orientation: landscape) and (pointer: fine) {
+  .home-screen .home-stage {
+    --hero-v: min(var(--u), calc(100svh / 765));
+    --hero-person-height: min(calc(756 * var(--u)), calc(100svh - 16px));
+    --hero-digital-y: calc(117 * var(--hero-v));
+    --hero-visual-y: calc(317 * var(--hero-v));
+    --hero-grid-unit: min(1px, calc((100vw - 72px) / 1276));
+    --hero-grid-left: calc((100% - 1276 * var(--hero-grid-unit)) / 2);
+    --hero-right-x: min(calc(var(--hero-grid-left) + 938 * var(--hero-grid-unit)), calc(100% - 326px));
+    height: min(calc(765 * var(--u)), 100svh);
+  }
+  .home-screen .home-portrait {
+    width: calc(var(--hero-person-height) * 580 / 756);
+    height: auto;
+    left: calc(917 * var(--u) - var(--hero-person-height) * 580 / 1512);
+    top: 0;
+    right: auto;
+    bottom: auto;
+    transform: none;
+  }
+  .home-screen .home-line-digital { top: var(--hero-digital-y); left: calc(var(--hero-grid-left) + 70 * var(--hero-grid-unit)); }
+  .home-screen .home-line-web { top: calc(217 * var(--hero-v)); left: calc(var(--hero-grid-left) + 134 * var(--hero-grid-unit)); }
+  .home-screen .home-line-visual { top: var(--hero-visual-y); }
+  .home-screen .home-profile { left: var(--hero-right-x); }
+  /* Ubuntu Sans Mono: baseline .94em; cap top .247em in a 1.2 line box. */
+  .home-screen .home-intro {
+    left: var(--hero-right-x);
+    top: calc(var(--hero-visual-y) + var(--type-hero) * .94 - var(--type-intro) * .247);
+  }
+  .home-screen .home-philosophy {
+    position: relative;
+    display: flow-root;
+    inset: auto;
+    width: max-content;
+    margin: 16px 0 0 calc(136 * var(--u));
+  }
+  .home-screen .home-philosophy::before { height: calc(82 * var(--hero-v)); }
+  .home-screen .home-philosophy span { margin-top: calc(65 * var(--hero-v)); }
+  .home-screen .home-cta { top: calc(502 * var(--hero-v)); }
+  .home-screen .home-resume-note {
+    height: max(24px, calc(var(--hero-digital-y) + var(--type-hero) * .94 - 67 * var(--u)));
+  }
+  .home-screen .home-resume-note img { zoom: 1; width: calc(43 * var(--u)); height: 100%; }
+}
+@media (max-width: 900px) { html[lang] #pricing .pricing-cta { font-size: 30px; } }
+@media (max-width: 540px) { html[lang] #pricing .pricing-cta { font-size: 24px; } }
