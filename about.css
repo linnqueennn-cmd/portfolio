@@ -1,5 +1,5 @@
 .about-screen {
-  overflow: clip;
+  overflow: visible;
   background: #efefef;
   color: #282828;
   padding: clamp(48px, 8.54vw, 123px) 36px 15px;

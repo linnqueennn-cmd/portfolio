@@ -15,6 +15,7 @@ function homeScreen(t, person, cv) {
         <nav aria-label="${t('Навигация', 'Navigation')}">${items.map(([id, label]) =>
           `<a href="#${id}">${scramble('[' + label + ']')}</a>`).join('')}</nav>
         <a class="home-menu-handle" href="https://t.me/linqueenn">${scramble('@linqueenn')}</a>
+        <a class="home-menu-resume" href="${cv}" download><span>${t('скачать резюме', 'download résumé')}</span><img src="${art}download.svg" alt=""></a>
         </div>
       </header>
       <h1 class="home-title" id="home-title">
@@ -35,7 +36,7 @@ function homeScreen(t, person, cv) {
       </div>
       <a class="home-cv" href="${cv}" download>${scramble('CV')}<img src="${art}download.svg" alt=""></a>
       <div class="home-resume-note"><span>${t('моё резюме тут', 'my résumé is here')}</span><img src="${art}resume.svg" alt=""></div>
-      <a class="home-cta" href="#contacts">${scramble(t('[Обсудить проект]', '[Discuss a project]'))}</a>
+      <a class="home-cta" href="#contacts" aria-label="${t('Обсудить проект', 'Discuss a project')}"><span class="home-cta-bracket home-cta-bracket-left" aria-hidden="true">[</span>${scramble(t('Обсудить проект', 'Discuss a project'))}<span class="home-cta-bracket home-cta-bracket-right" aria-hidden="true">]</span></a>
       <div class="home-intro">
         <h2>${scramble(t('привет, я Лина', 'hi, I’m Lina'))}</h2>
         <p>${t('создаю сайты, цифровые интерфейсы и&nbsp;визуальные решения для&nbsp;брендов.', 'I design websites, digital interfaces and visual systems for brands.')}</p>
@@ -280,6 +281,21 @@ function setupHomeScramble() {
     closeMenu();
     toggle.focus();
   });
+  const header = toggle.closest('header');
+  const homeSection = document.querySelector('.home-screen');
+  const homePosition = document.createComment('home navigation position');
+  header.before(homePosition);
+  new IntersectionObserver(([entry]) => {
+    const floating = !entry.isIntersecting && entry.boundingClientRect.bottom <= 0;
+    if (header.classList.contains('home-nav-floating') === floating) return;
+    closeMenu();
+    header.classList.toggle('home-nav-floating', floating);
+    if (floating) document.body.append(header);
+    else homePosition.after(header);
+  }).observe(homeSection);
+  document.addEventListener('pointerdown', event => {
+    if (!header.contains(event.target)) closeMenu();
+  });
   const jobs = createScrambleJobs(document.querySelector('.home-screen'));
   let started = false;
   return (remaining = 0) => {
@@ -291,9 +307,11 @@ function setupHomeScramble() {
   };
 }
 
+const scrambleJobCache = new WeakMap();
 function createScrambleJobs(root) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   return [...root.querySelectorAll('[data-scramble]')].map(element => {
+    if (scrambleJobCache.has(element)) return scrambleJobCache.get(element);
     const glyphs = [...element.textContent];
     const menuItem = element.closest('.home-nav a, .home-nav button');
     const letters = glyphs.filter(glyph => /[\p{L}\p{N}]/u.test(glyph)).length;
@@ -307,14 +325,14 @@ function createScrambleJobs(root) {
     element.append(overlay);
     let animation;
 
-    function play(delay = 0) {
+    function play(delay = 0, activeDuration = duration) {
       if (reduced.matches) return;
       cancelAnimationFrame(animation);
       const start = performance.now() + delay;
       let lastTick = -1;
       function frame(now) {
         const elapsed = now - start;
-        if (reduced.matches || elapsed >= duration) {
+        if (reduced.matches || elapsed >= activeDuration) {
           element.classList.remove('home-scrambling');
           overlay.textContent = '';
           return;
@@ -322,7 +340,7 @@ function createScrambleJobs(root) {
         const tick = Math.floor(elapsed / 42);
         if (elapsed >= 0 && tick !== lastTick) {
           lastTick = tick;
-          const progress = elapsed / duration;
+          const progress = elapsed / activeDuration;
           const locked = Math.floor(glyphs.length * Math.max(0, (progress - .17) / .83));
           const visible = Math.ceil(glyphs.length * Math.min(1, .28 + progress * 2));
           overlay.textContent = glyphs.map((glyph, i) => {
@@ -337,6 +355,32 @@ function createScrambleJobs(root) {
       animation = requestAnimationFrame(frame);
     }
 
+    const heroButton = element.closest('.home-screen .home-cta');
+    if (heroButton) {
+      const left = heroButton.querySelector('.home-cta-bracket-left');
+      const right = heroButton.querySelector('.home-cta-bracket-right');
+      function animateButton() {
+        if (reduced.matches || heroButton.classList.contains('home-cta-closing')) return;
+        const box = heroButton.getBoundingClientRect();
+        const leftBox = left.getBoundingClientRect();
+        const rightBox = right.getBoundingClientRect();
+        const center = box.left + box.width / 2;
+        heroButton.style.setProperty('--bracket-left-shift', center - leftBox.left - leftBox.width * .75 + 'px');
+        heroButton.style.setProperty('--bracket-right-shift', center - rightBox.left - rightBox.width * .25 + 'px');
+        heroButton.classList.add('home-cta-closing');
+        play(300, 700);
+      }
+      heroButton.addEventListener('pointerenter', event => {
+        if (event.pointerType === 'mouse') animateButton();
+      });
+      heroButton.addEventListener('focus', () => {
+        if (heroButton.matches(':focus-visible')) animateButton();
+      });
+      left.addEventListener('animationend', () => heroButton.classList.remove('home-cta-closing'));
+      reduced.addEventListener('change', () => {
+        if (reduced.matches) heroButton.classList.remove('home-cta-closing');
+      });
+    }
     if (menuItem) {
       menuItem.addEventListener('pointerenter', event => {
         if (event.pointerType !== 'touch') play();
@@ -345,6 +389,7 @@ function createScrambleJobs(root) {
         if (menuItem.matches(':focus-visible')) play();
       });
     }
+    scrambleJobCache.set(element, play);
     return play;
   });
 }

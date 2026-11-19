@@ -7,7 +7,8 @@ const types = {
   '.html': 'text/html; charset=utf-8', '.css': 'text/css; charset=utf-8',
   '.js': 'text/javascript; charset=utf-8', '.svg': 'image/svg+xml',
   '.png': 'image/png', '.jpg': 'image/jpeg', '.gif': 'image/gif', '.pdf': 'application/pdf',
-  '.ttf': 'font/ttf', '.webm': 'video/webm'
+  '.ttf': 'font/ttf', '.webm': 'video/webm', '.glb': 'model/gltf-binary',
+  '.hdr': 'application/octet-stream'
 };
 
 http.createServer((request, response) => {

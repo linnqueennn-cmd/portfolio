@@ -31,30 +31,6 @@ const projects = [
   ['social',t('Графика для соцсетей','Social Media & Digital Graphics'),t('Подборка в подготовке','Collection in progress'),t('Digital-графика и визуальные системы для социальных сетей.','Digital graphics and visual systems for social media.')],
   ['brand',t('Айдентика и печать','Brand & Print Design'),t('Подборка в подготовке','Collection in progress'),t('Айдентика, печатные носители и коммерческая графика.','Visual identity, print and commercial graphics.')]
 ];
-const services = [
-  [t('Сайты под ключ','Web design & development'),t('Аналитика, структура, дизайн, адаптация и запуск лендингов и многостраничных сайтов. Подбираю технологии под задачу.','Research, structure, responsive design and launch for landing pages and multi-page sites. I choose the stack to suit the project.'),'roma'],
-  [t('UX/UI-дизайн','UX/UI design'),t('Исследую пользовательские сценарии, проектирую структуру, прототипы, интерфейсы и дизайн-системы.','I research user journeys and design structures, prototypes, interfaces and design systems.'),'vinyl'],
-  [t('Айдентика и графика','Visual identity & graphics'),t('Разрабатываю визуальные концепции, айдентику, рекламные материалы и digital-графику.','I create visual concepts, identities, campaign assets and digital graphics.'),'brand'],
-  [t('Digital-проект под ключ','End-to-end digital project'),t('От стратегии и сайта до запуска. При необходимости подключаю партнёров по SEO, разработке и продвижению.','From strategy and website design to launch. I bring in SEO, development and marketing partners as needed.'),'retail']
-];
-const steps = [
-  [t('Знакомство','Introduction'),t('Обсуждаем проект, задачу, сроки и ожидания.','We discuss the project, goals, timeline and expectations.')],
-  [t('Погружение','Discovery'),t('Изучаю бизнес, аудиторию, конкурентов и материалы.','I study the business, audience, competitors and existing materials.')],
-  [t('Структура','Structure'),t('Проектирую логику продукта, сценарии и прототипы.','I define the product structure, user journeys and prototypes.')],
-  [t('Визуальная концепция','Visual direction'),t('Подбираю референсы и формулирую принципы интерфейса.','I gather references and define the core visual and UI principles.')],
-  [t('Дизайн и адаптивы','Responsive design'),t('Разрабатываю финальные экраны, компоненты и версии для разных устройств.','I design final screens, components and layouts for different devices.')],
-  [t('Реализация и запуск','Build & launch'),t('Передаю в разработку или организую сборку, тестирование и публикацию.','I hand off to developers or coordinate the build, testing and launch.')]
-];
-const prices = [
-  [t('Лендинг под ключ','Landing page'),100,t('Структура, дизайн, адаптивы, запуск.','Structure, design, responsive layouts and launch.')],
-  [t('Многостраничный сайт','Multi-page website'),160,t('Архитектура, ключевые страницы, адаптивы, запуск.','Architecture, key pages, responsive layouts and launch.')],
-  [t('UX/UI-дизайн','UX/UI design'),60,t('Проектирование и интерфейсы.','Product structure and interface design.')],
-  [t('Айдентика','Visual identity'),60,t('Визуальная система и базовые носители.','Visual system and core brand assets.')],
-  [t('Digital и графический дизайн','Digital & graphic design'),15,t('Рекламные материалы или небольшой пакет графики.','Campaign assets or a small graphics package.')],
-  [t('Комплексный digital-проект','End-to-end digital project'),0,t('Сайт, SEO и продвижение с партнёрами.','Website, SEO and marketing with specialist partners.')]
-];
-const cta = () => `<a class="cta" href="#contacts">${t('Обсудить проект','Discuss a project')} <span aria-hidden="true">↗</span></a>`;
-const title = (id,label,heading,extra='') => `<div class="section-top"><div><p class="eyebrow">${label}</p><h2 id="${id}-title" class="heading" data-reveal>${heading}</h2></div>${extra}</div>`;
 const cover = ([id,name]) => id === 'choreo'
   ? `<div class="cover mock">${name}<br>${t('Обложка готовится','Cover pending')}</div>`
   : `<img class="cover" src="assets/${id}.jpg" alt="" loading="lazy">`;
@@ -70,47 +46,11 @@ function renderHome() {
   ${homeScreen(t, person, cv)}
   ${projectsScreen(t, caseUrl)}
   ${aboutScreen(t, person)}
-  <section id="services" class="section">
-    ${title('services',t('Услуги','Services'),t('Чем могу помочь','How I can help'))}
-    <div class="service-grid">
-      <figure class="service-figure"><img class="cover" id="service-image" src="assets/roma.jpg" alt=""><figcaption class="meta" id="service-caption"></figcaption></figure>
-      <div id="service-list">${services.map(([name,body],i) => `<article class="service-row"><button type="button" aria-expanded="false" aria-controls="service-${i}">${name}<span class="meta" aria-hidden="true">+</span></button><p id="service-${i}">${body}</p></article>`).join('')}</div>
-    </div>
-  </section>
-  <section id="process" class="section dark">
-    ${title('process',t('Процесс','Process'),t('Как я работаю','How I work'),`<div class="arrows"><button type="button" data-step="-1" aria-label="${t('Назад','Previous')}">←</button><button type="button" data-step="1" aria-label="${t('Вперёд','Next')}">→</button></div>`)}
-    <div class="steps" tabindex="0" aria-labelledby="process-title">${steps.map(([name,body],i) => `<article class="step"><div class="orb" aria-hidden="true"></div><div><span class="meta">0${i+1} / 06</span><h3>${name}</h3><p>${body}</p></div></article>`).join('')}</div>
-  </section>
-  <section id="pricing" class="section">
-    ${title('pricing',t('Цены','Pricing'),t('Стоимость','Starting rates'))}
-    ${prices.map(([name,price,body]) => `<article class="price"><h3>${name}</h3><strong>${price ? t('от ','from ') + price + ' 000 ₽' : t('по запросу','on request')}</strong><p>${body}</p></article>`).join('')}
-    <p class="price-note">${t('Стоимость зависит от задачи, объёма и сложности проекта. После короткого обсуждения подготовлю индивидуальное предложение.','The final quote depends on the scope and complexity. After a short discussion, I’ll prepare a proposal for your project.')}</p>
-    ${cta()}
-  </section>
-  <section id="contacts" class="section contacts">
-    ${title('contacts',t('Контакты','Contact'),t('Давайте сделаем что-то хорошее.','Let’s make something good together.'))}
-    <p>${t('Есть идея, проект или предложение о сотрудничестве? Буду рада обсудить.','Have an idea, a project or a collaboration in mind? I’d love to talk.')}</p>
-    <div class="contact-links"><a href="https://t.me/linqueenn">Telegram ↗</a><a href="mailto:linnqueenn@yandex.ru">Email ↗</a><a href="${behance}linnqueenn">Behance ↗</a><a href="https://instagram.com/lin.queenn">Instagram ↗</a></div>
-    <footer class="footer meta"><a href="#">[linqueenn] ↑</a><span>${t('Веб · UX/UI · Графика','Web · UX/UI · Graphics')}</span></footer>
-  </section>`;
+  ${remainingSections(t)}
+  `;
 
   setupProjectsScreen();
-  const rows = [...document.querySelectorAll('.service-row')];
-  const activate = index => {
-    rows.forEach((row,i) => {
-      row.classList.toggle('active',i === index);
-      const button = row.querySelector('button');
-      button.setAttribute('aria-expanded',i === index);
-      button.querySelector('span').textContent = i === index ? '−' : '+';
-    });
-    document.querySelector('#service-image').src = 'assets/' + services[index][2] + '.jpg';
-    document.querySelector('#service-caption').textContent = services[index][0];
-  };
-  rows.forEach((row,i) => row.querySelector('button').onclick = () => activate(i));
-  activate(0);
-  const rail = document.querySelector('.steps');
-  document.querySelectorAll('[data-step]').forEach(button => button.onclick = () =>
-    rail.scrollBy({left:Number(button.dataset.step) * (rail.firstElementChild.offsetWidth + 12)}));
+  setupRemainingSections();
   document.querySelector('#home-language').onclick = language.onclick;
   setupPortraitArrival(setupHomeScramble());
   setupAboutScreen();
@@ -122,9 +62,9 @@ function setupMotion() {
   const observer = new IntersectionObserver(entries => entries.forEach(({target,isIntersecting}) => {
     if (!isIntersecting) return;
     target.classList.add('enter');
-    observer.unobserve(target);
-  }), {threshold:.18});
-  document.querySelectorAll('[data-reveal]').forEach(el => observer.observe(el));
+    if (target.matches('.remaining-heading, .remaining-actions, .pricing-bottom')) createScrambleJobs(target).forEach(play => play());
+  }), {threshold:.18, rootMargin:'0px 0px -12% 0px'});
+  document.querySelectorAll('[data-reveal], #contacts .remaining-actions, #pricing .pricing-bottom').forEach(el => observer.observe(el));
 }
 
 const zen = webProjects(t)[1];

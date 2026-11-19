@@ -20,13 +20,13 @@ function webProjects(t) {
 }
 
 function projectsScreen(t, caseUrl) {
-  return `<section id="work" class="work-screen" aria-labelledby="work-title">
+  return `<section id="work" class="work-screen" aria-label="${t('Кейсы','Selected work')}">
     <div class="work-tabs">
-      <h2 class="work-tab work-tab-active" id="work-title">
+      <button type="button" class="work-tab work-tab-active" aria-pressed="true" data-work-tab="web">
         <span class="home-scramble" data-scramble>[WEB &amp; UX/UI]</span>
         <span class="work-gem" aria-hidden="true"><img src="assets/home/gem.png" alt=""></span>
-      </h2>
-      <button class="work-tab" type="button" disabled aria-label="${t('Графический дизайн — позже','Graphic design — coming later')}"><span class="home-scramble" data-scramble>[GRAPHI]</span></button>
+      </button>
+      <button class="work-tab" type="button" aria-pressed="false" data-work-tab="graphic"><span class="home-scramble" data-scramble>[GRAPHI]</span></button>
     </div>
     <div class="work-list">${webProjects(t).map(([id, name, meta, description]) => `
       <div class="work-slot scroll-window-slot"><a class="work-case scroll-window" href="${caseUrl(id)}">
@@ -43,9 +43,22 @@ function setupProjectsScreen() {
   const screen = document.querySelector('.work-screen');
   const tabs = screen.querySelector('.work-tabs');
   const jobs = createScrambleJobs(tabs);
+  const buttons = [...tabs.querySelectorAll('button')];
+  const gem = tabs.querySelector('.work-gem');
+  function select(button) {
+    buttons.forEach(tab => {
+      tab.classList.toggle('work-tab-active', tab === button);
+      tab.setAttribute('aria-pressed', tab === button);
+    });
+    button.append(gem);
+  }
+  if (new URLSearchParams(location.search).get('work') === 'graphic') select(buttons[1]);
+  buttons.forEach((button, i) => button.addEventListener('click', () => {
+    select(button);
+    jobs[i]?.();
+  }));
   const enter = new IntersectionObserver(([entry]) => {
     if (!entry.isIntersecting) return;
-    enter.disconnect();
     jobs.forEach((play, i) => play(i * 70));
   }, {threshold: .5});
   enter.observe(tabs);

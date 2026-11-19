@@ -18,7 +18,7 @@ function aboutScreen(t, person) {
     <div class="about-scene">${cards.map(([heading, body], i) => `
       <div class="about-slot scroll-window-slot">
         <article class="about-panel scroll-window">
-          <h2><span class="home-scramble" data-scramble>0${i + 1} / ${heading}</span>${i === 0 ? '<span class="about-gem" aria-hidden="true"><img src="assets/home/gem.png" alt=""></span>' : ''}</h2>
+          <h2><span class="home-scramble" data-scramble>0${i + 1} / ${heading}</span><span class="about-gem" aria-hidden="true">${i === 0 ? '<img src="assets/home/gem.png" alt="">' : ''}</span></h2>
           <p>${body}</p>
           ${i === 0 ? `<img class="about-photo" src="assets/about/portrait.png" alt="${person}" loading="lazy">` : ''}
         </article>
@@ -50,7 +50,9 @@ function setupScrollWindows(scene, {layered = false} = {}) {
     let moving = false;
 
     slots.forEach((slot, i) => {
-      const target = Math.max(0, Math.min(1, (height * .82 - slot.getBoundingClientRect().top) / travel));
+      const box = slot.getBoundingClientRect();
+      const visible = box.bottom > 0 && box.top < height * .88;
+      const target = Math.max(0, Math.min(1, (height * .82 - box.top) / travel));
       const focused = slot.matches(':focus-within');
       const ready = i === 0 || progress[i - 1] >= .75 || target <= progress[i];
       const next = reduced.matches || focused ? 1 : ready ? target : 0;
@@ -58,11 +60,11 @@ function setupScrollWindows(scene, {layered = false} = {}) {
       progress[i] = Math.abs(difference) < .008 || reduced.matches || focused ? next : progress[i] + difference * easing;
       moving ||= !reduced.matches && Math.abs(next - progress[i]) >= .008;
       panels[i].style.setProperty('--window-progress', progress[i]);
-      if (progress[i] >= .68 && !didScramble[i] && !reduced.matches) {
+      if (visible && progress[i] >= .68 && !didScramble[i] && !reduced.matches) {
         didScramble[i] = true;
         titles[i].forEach(play => play());
       }
-      if (progress[i] < .05) didScramble[i] = false;
+      if (!visible || progress[i] < .05) didScramble[i] = false;
     });
     if (layered) panels.forEach((panel, i) => panel.style.setProperty('--window-behind', progress[i + 1] ?? 0));
     if (moving) schedule();

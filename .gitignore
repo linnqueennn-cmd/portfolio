@@ -1,1 +1,33 @@
 /assets/cv.pdf
+
+# Local processing, source footage and generated publishing output.
+/.portrait-processing/
+/dist/
+/node_modules/
+*.mov
+*.MOV
+*.mp4
+*.MP4
+*.log
+*.tmp
+*.bak
+*.zip
+.DS_Store
+Thumbs.db
+.env
+.env.*
+!.env.example
+*.pem
+*.key
+
+# Unused exports; keep local files for comparison without publishing them.
+/assets/home/portrait-6221-*.webp
+/assets/home/portrait-6221.json
+/assets/home/portrait-walk.webm
+/assets/home/portrait-walk-hq.webm
+/assets/home/portrait-walk-6207.webm
+/assets/home/portrait-walk-6209.webm
+/assets/home/plumbob.glb
+/assets/home/plumbob-green-v3.glb
+/assets/vendor/three/RoomEnvironment.js
+/assets/vendor/three/RGBELoader.js
