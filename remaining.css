@@ -208,9 +208,10 @@ body.home-page { background: #efefef; font-family: "Ubuntu Sans Mono", monospace
 }
 @media (max-width: 540px), (max-width: 1100px) and (orientation: portrait) {
   #services { position: relative; min-height: 260svh; }
-  .service-story { position: sticky; top: 88px; display: flex; flex-direction: column; gap: 24px; }
+  .service-pin { position: sticky; top: 88px; }
+  .service-story { position: static; display: flex; flex-direction: column; gap: 24px; }
   .service-options { order: 1; width: 100%; }
-  .service-media { display: block; order: 2; position: relative; top: auto; width: 100%; aspect-ratio: 16 / 10; max-height: 24svh; }
+  .service-media { display: block; order: 2; position: relative; top: auto; width: 100%; aspect-ratio: 16 / 10; max-height: min(24svh, max(80px, calc(100svh - 580px))); }
   .service-option {
     grid-template-columns: minmax(0, 1fr);
     min-height: 0;
@@ -310,6 +311,12 @@ body.home-page { background: #efefef; font-family: "Ubuntu Sans Mono", monospace
   #contacts .sims-like { width: 48px; height: 48px; padding: 10px; }
 }
 @media (max-width: 540px), (max-width: 1100px) and (orientation: portrait) {
-  #services > .remaining-heading { position: sticky; top: 88px; z-index: 2; background: #efefef; }
-  #services .service-story { top: 158px; }
+  #services .service-pin > .remaining-heading { margin-bottom: 28px; }
+}
+
+@media (max-width: 540px) and (max-height: 740px) {
+  #services { --type-service: 24px; }
+  #services .service-option { padding-block: 8px; gap: 8px; }
+  #services .service-story { gap: 16px; }
+  #services .service-pin > .remaining-heading { margin-bottom: 20px; }
 }

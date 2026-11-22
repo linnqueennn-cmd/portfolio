@@ -52,7 +52,7 @@ function setupPortraitArrival(startText) {
   const portrait = document.querySelector('.home-portrait');
   const image = portrait.querySelector('.home-person');
   const mode = new URLSearchParams(location.search).get('portrait');
-  const useNewArrival = !mode || mode === '6221';
+  const useNewArrival = !mode || mode === '6221' || mode === 'frames';
   if (useNewArrival) portrait.classList.add('home-portrait-6221');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let stopVideo = () => {};
@@ -88,6 +88,9 @@ function playPortraitArrival(portrait, image, finish, startText) {
   video.className = 'home-portrait-arrival';
   video.muted = true;
   video.playsInline = true;
+  video.setAttribute('muted', '');
+  video.setAttribute('playsinline', '');
+  video.preload = 'auto';
   video.setAttribute('aria-hidden', 'true');
   let stopped = false;
   let frame;
@@ -137,7 +140,7 @@ function playPortraitArrival(portrait, image, finish, startText) {
     const context = probe.getContext('2d', {willReadFrequently: true});
     if (!context) return startAtlas();
     context.drawImage(video, 8, 8, 1, 1, 0, 0, 1, 1);
-    if (!context || context.getImageData(0, 0, 1, 1).data[3] !== 0) return startAtlas();
+    if (context.getImageData(0, 0, 1, 1).data[3] !== 0) return startAtlas();
     measure();
     video.classList.add('home-portrait-arrival-ready');
     startText();
@@ -213,9 +216,19 @@ function playPortraitArrival(portrait, image, finish, startText) {
       startText();
       let startedAt;
       let current = -1;
+      let previousTime;
       function draw(now) {
         if (stopped) return;
         if (startedAt === undefined) startedAt = now;
+        // Background tabs must not skip the walk and jump straight to the PNG.
+        if (document.hidden) {
+          startedAt += previousTime === undefined ? 0 : now - previousTime;
+          previousTime = now;
+          atlasFrame = requestAnimationFrame(draw);
+          return;
+        }
+        if (previousTime !== undefined && now - previousTime > 250) startedAt += now - previousTime;
+        previousTime = now;
         const elapsed = Math.min(now - startedAt, atlas.end);
         atlasTime = elapsed / 1000;
         let next = current;
@@ -240,7 +253,8 @@ function playPortraitArrival(portrait, image, finish, startText) {
     }
   }
 
-  const needsAtlas = /iPad|iPhone|iPod/.test(navigator.userAgent)
+  const needsAtlas = new URLSearchParams(location.search).get('portrait') === 'frames'
+    || /iPad|iPhone|iPod/.test(navigator.userAgent)
     || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   if (needsAtlas) startAtlas();
   else {

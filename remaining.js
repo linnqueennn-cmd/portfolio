@@ -8,6 +8,7 @@ function remainingSections(t) {
   const serviceImages = ['roma', 'vinyl', 'brand', 'retail'];
   return `
     <section id="services" class="remaining-section" aria-labelledby="services-title">
+      <div class="service-pin">
       ${heading('services', 0)}
       <div class="service-story">
         <figure class="service-media" aria-hidden="true">${serviceImages.map((image, i) =>
@@ -18,6 +19,7 @@ function remainingSections(t) {
             <img src="assets/${serviceImages[i]}.jpg" alt="" loading="lazy" class="service-inline">
             <p>${tr([ru, english])}</p>
           </article>`).join('')}</div>
+      </div>
       </div>
     </section>
     <section id="process" class="remaining-section" aria-labelledby="process-title">
@@ -58,7 +60,18 @@ function setupRemainingSections() {
   const mobile = matchMedia('(max-width: 540px), (max-width: 1100px) and (orientation: portrait)');
   const serviceSection = document.querySelector('#services');
   const story = serviceSection.querySelector('.service-story');
-  const serviceHeading = serviceSection.querySelector('.remaining-heading');
+  const servicePin = serviceSection.querySelector('.service-pin');
+  let servicePinHeight = 0;
+  function measureServices() {
+    story.style.removeProperty('min-height');
+    if (!mobile.matches) return;
+    const original = selected;
+    let height = 0;
+    rows.forEach((_, index) => { activate(index); height = Math.max(height, story.offsetHeight); });
+    activate(original);
+    story.style.minHeight = height + 'px';
+    servicePinHeight = servicePin.offsetHeight;
+  }
   let selected = 0;
   let frame = 0;
 
@@ -76,11 +89,12 @@ function setupRemainingSections() {
   function update() {
     frame = 0;
     if (mobile.matches) {
-      const storyOffset = serviceHeading.offsetTop + serviceHeading.offsetHeight +
-        Number.parseFloat(getComputedStyle(serviceHeading).marginBottom);
-      const start = serviceSection.getBoundingClientRect().top + storyOffset;
-      const distance = serviceSection.offsetHeight - storyOffset - story.offsetHeight - 48;
-      const stickyTop = Number.parseFloat(getComputedStyle(story).top);
+      const sectionStyle = getComputedStyle(serviceSection);
+      const paddingTop = Number.parseFloat(sectionStyle.paddingTop);
+      const start = serviceSection.getBoundingClientRect().top + paddingTop;
+      const distance = serviceSection.offsetHeight - paddingTop -
+        Number.parseFloat(sectionStyle.paddingBottom) - servicePinHeight;
+      const stickyTop = Number.parseFloat(getComputedStyle(servicePin).top);
       const progress = Math.max(0, Math.min(1, (stickyTop - start) / Math.max(1, distance)));
       activate(Math.min(rows.length - 1, Math.floor(progress * rows.length)));
       return;
@@ -103,8 +117,9 @@ function setupRemainingSections() {
     if (!wide.matches || mobile.matches) activate(i);
   }));
   addEventListener('scroll', schedule, {passive: true});
-  addEventListener('resize', schedule);
-  new ResizeObserver(schedule).observe(story);
+  addEventListener('resize', () => { measureServices(); schedule(); });
+  document.fonts.ready.then(() => { measureServices(); schedule(); });
+  measureServices();
   schedule();
 
   setupScrollWindows(document.querySelector('.rate-list'));
