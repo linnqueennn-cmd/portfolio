@@ -98,3 +98,25 @@
 }
 
 .about-resume-label { font-family: var(--type-cv-font); text-transform: uppercase; }
+
+/* Keep the callout line directly below CV, rather than at the far right. */
+.about-resume-note { margin-right: 0; padding-top: 56px; margin-top: 16px; }
+.about-resume-note::after { display: none; }
+.about-resume-label > .home-scramble::after { content: ""; position: absolute; right: 0; top: calc(100% + 12px); width: 36px; height: 56px; border-right: 1px solid #4d4d4d; border-bottom: 1px solid #4d4d4d; }
+.about-resume-mobile-note { display: none; }
+@media (max-width: 600px) {
+ .about-resume { grid-row: 4; justify-self: stretch; display: flex; align-items: center; justify-content: space-between; gap: 16px; margin: 28px 0 0; padding: 12px 16px; min-height: 60px; border: 1px solid #777; border-radius: 5px; }
+ .about-resume-label { font-size: var(--type-cv); }
+ .about-resume-note { margin: 0; padding: 0; font-size: var(--portfolio-body); }
+ .about-resume-label > .home-scramble::after, .about-resume-desktop-note { display: none; }
+ .about-resume-mobile-note { display: inline; }
+}
+
+/* Centre the caption on the horizontal stroke, with the hero callout gap. */
+@media (min-width: 601px) {
+ .about-resume { display: grid; grid-template-columns: max-content 28px; grid-template-rows: auto 68px; column-gap: 12px; }
+ .about-resume-label { display: contents; }
+ .about-resume-label > .home-scramble { grid-column: 1; grid-row: 1; }
+ .about-resume-label > img { grid-column: 2; grid-row: 1; align-self: center; }
+ .about-resume-note { position: absolute; grid-column: 1; grid-row: 2; right: 80px; bottom: 0; width: max-content; padding: 0; margin: 0; white-space: nowrap; transform: translateY(50%); }
+}

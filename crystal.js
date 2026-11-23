@@ -20,9 +20,17 @@ async function setupCrystal(host) {
   const scene = new THREE.Scene();
   // Tint the existing HDR reflections; preserve their soft spatial distribution.
   const pixels = environment.image.data;
+  const halfFloat = environment.type === THREE.HalfFloatType;
+  const decode = value => halfFloat ? THREE.DataUtils.fromHalfFloat(value) : value;
+  const encode = value => halfFloat ? THREE.DataUtils.toHalfFloat(value) : value;
   for (let i = 0; i < pixels.length; i += 4) {
-    const blue = environment.type === THREE.HalfFloatType ? THREE.DataUtils.fromHalfFloat(pixels[i + 2]) : pixels[i + 2];
-    pixels[i + 2] = environment.type === THREE.HalfFloatType ? THREE.DataUtils.toHalfFloat(blue * .65) : blue * .65;
+    const red = decode(pixels[i]), green = decode(pixels[i + 1]), blue = decode(pixels[i + 2]);
+    // Compress HDR peaks without changing the reflection layout or relative hue.
+    const peak = Math.max(red, green, blue);
+    const gain = peak > 3 ? (3 + Math.log1p(peak - 3) * .8) / peak : 1;
+    pixels[i] = encode(red * gain);
+    pixels[i + 1] = encode(green * gain);
+    pixels[i + 2] = encode(blue * gain * .65);
   }
   environment.mapping = THREE.EquirectangularReflectionMapping;
   const pmrem = new THREE.PMREMGenerator(renderer);
@@ -40,9 +48,9 @@ async function setupCrystal(host) {
       material.envMapIntensity = .8;
       material.metalness = 0;
       material.transmission = .86;
-      material.roughness = .19;
-      material.clearcoat = .2;
-      material.clearcoatRoughness = .24;
+      material.roughness = .23;
+      material.clearcoat = .12;
+      material.clearcoatRoughness = .34;
     });
   });
   const bounds = new THREE.Box3().setFromObject(model);
@@ -53,6 +61,8 @@ async function setupCrystal(host) {
   model.position.copy(center).multiplyScalar(-2 / size.y);
   const pivot = new THREE.Group();
   pivot.add(model);
+  // A fixed, slight front tilt exposes depth while the long axis stays upright.
+  pivot.rotation.x = .1;
   pivot.rotation.y = .35;
   scene.add(pivot);
 
@@ -88,17 +98,28 @@ async function setupCrystal(host) {
   const observer = new ResizeObserver(render);
   observer.observe(host);
   const canvas = renderer.domElement;
+  const journey = setupCrystalJourney(host, canvas);
   let pointer;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let previousTime;
   renderer.setAnimationLoop(now => {
     const elapsed = previousTime === undefined ? 0 : Math.min((now - previousTime) / 1000, .05);
     previousTime = now;
+    const motion = journey.update(now, elapsed);
     if (document.hidden || reduced.matches || pointer) return;
-    const bounds = host.getBoundingClientRect();
-    if (bounds.bottom < 0 || bounds.top > innerHeight) return;
-    pivot.rotation.y += elapsed * Math.PI * 2 / 3;
+    if (motion.visible === false) return;
+    if (!motion.active) {
+      const bounds = host.getBoundingClientRect();
+      if (bounds.bottom < 0 || bounds.top > innerHeight) return;
+    }
+    if (motion.active && !motion.spinning && !motion.moving) {
+      // Settle on a readable faceted view, rather than stopping edge-on.
+      const rest = Math.round((pivot.rotation.y - .35) / (Math.PI * 2)) * Math.PI * 2 + .35;
+      if (Math.abs(rest - pivot.rotation.y) < .0001) return;
+      pivot.rotation.y += (rest - pivot.rotation.y) * (1 - Math.exp(-elapsed * 9));
+    } else pivot.rotation.y += elapsed * Math.PI * 2 / 3 * motion.speed;
     renderer.render(scene, camera);
+    motion.afterRender?.();
   });
   canvas.addEventListener('pointerdown', event => {
     if (!event.isPrimary || event.button !== 0) return;
@@ -108,7 +129,7 @@ async function setupCrystal(host) {
   canvas.addEventListener('pointermove', event => {
     if (!pointer || event.pointerId !== pointer.id) return;
     pivot.rotation.y += (event.clientX - pointer.x) * .015;
-    pivot.rotation.x += (event.clientY - pointer.y) * .015;
+    pivot.rotation.x = THREE.MathUtils.clamp(pivot.rotation.x + (event.clientY - pointer.y) * .006, -.18, .18);
     pointer.x = event.clientX;
     pointer.y = event.clientY;
     render();
@@ -123,4 +144,297 @@ async function setupCrystal(host) {
   });
   renderer.domElement.addEventListener('webglcontextrestored', render);
   render();
+}
+
+// Keep the original slot in the layout and move just its canvas.
+// One renderer, original lighting/material, no scroll interception or new library.
+function setupCrystalJourney(host, canvas) {
+  const desktop = matchMedia('(min-width: 1101px) and (hover: hover) and (pointer: fine)');
+  const compact = matchMedia('(max-width: 600px), (max-width: 1100px) and (orientation: portrait)');
+  const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const layer = document.createElement('span');
+  layer.className = 'crystal-journey';
+  layer.setAttribute('aria-hidden', 'true');
+  document.body.append(layer);
+  const tabs = document.querySelector('.work-tabs');
+  const work = [...document.querySelectorAll('.work-slot')];
+  const about = [...document.querySelectorAll('.about-slot')];
+  const services = [...document.querySelectorAll('.service-option')];
+  const process = document.querySelector('#process');
+  const pricing = document.querySelector('#pricing');
+  const contacts = document.querySelector('#contacts');
+  const processStop = document.querySelector('#process-title .crystal-stop');
+  const pricingStop = document.querySelector('#pricing-title .crystal-stop');
+  const footer = document.querySelector('#contacts-title .home-scramble');
+  const tabGem = document.querySelector('.work-gem');
+  const local = setupLocalCrystals(canvas, about, services, contacts);
+  let compactMode = false;
+  let active = false, current, position, from, started = 0, lastScroll = scrollY;
+  let dirtyUntil = 0, previousMotion = {active: false, speed: 1};
+  const invalidate = () => { dirtyUntil = performance.now() + 900; };
+  addEventListener('scroll', invalidate, {passive: true});
+  addEventListener('resize', invalidate);
+  tabs?.addEventListener('click', invalidate);
+  const serviceObserver = new MutationObserver(invalidate);
+  services.forEach(row => serviceObserver.observe(row, {attributes: true, attributeFilter: ['class']}));
+  const clamp = value => Math.max(0, Math.min(1, value));
+  const ease = value => value * value * (3 - 2 * value);
+  const box = element => element.getBoundingClientRect();
+  const point = (element, height, side = 'left') => {
+    const r = box(element);
+    return {x: side === 'inside' ? r.left + r.width / 2 : side === 'right' ? r.right + height * .32 + 8 : r.left - height * .32 - 8,
+      y: r.top + r.height / 2, height};
+  };
+  const passed = element => box(element).top <= innerHeight * .58;
+  function update(now, elapsed) {
+    const mobile = compact.matches;
+    const enabled = (desktop.matches || mobile) && !reduced.matches && !!contacts;
+    if (enabled !== active || mobile !== compactMode) {
+      active = enabled;
+      compactMode = mobile;
+      document.body.classList.toggle('crystal-journey-enabled', active);
+      document.body.classList.toggle('crystal-local-enabled', active && mobile);
+      (active ? layer : host).append(canvas);
+      layer.hidden = !active;
+      local.reset();
+      current = null;
+      position = null;
+      invalidate();
+    }
+    if (!active) return {active: false, speed: 1};
+    // Layout is read only while scrolling, resizing or settling a transition.
+    if (now > dirtyUntil && position) return {...previousMotion, moving: false, speed: previousMotion.spinning ? 1 : 0};
+    const scrollDelta = scrollY - lastScroll;
+    lastScroll = scrollY;
+    const hero = box(host);
+    let target = {x: hero.left + hero.width / 2, y: hero.top + hero.height / 2, height: hero.height};
+    let key = host, spinning = true, continuous = false;
+    const tabRect = box(tabGem);
+    const tabEnd = Math.max(1, box(tabs).top + scrollY - innerHeight * .56);
+    if (scrollY > 0 && scrollY < tabEnd) {
+      // A soft right-hand bend connects the hero to the selected work tab.
+      const t = ease(clamp(scrollY / tabEnd));
+      target.x += (tabRect.left + tabRect.width / 2 - target.x) * t + Math.sin(Math.PI * t) * (mobile ? innerWidth <= 600 ? 0 : 24 : 150);
+      target.y += (tabRect.top + tabRect.height / 2 - target.y) * t;
+      target.height += (tabRect.height - target.height) * t;
+      continuous = true;
+    } else if (scrollY >= tabEnd) {
+      target = point(tabGem, tabRect.height, 'inside'); key = tabs;
+      if (!mobile) {
+      work.forEach(slot => {
+        if (!passed(slot)) return;
+        target = point(slot.querySelector('h3'), 27); key = slot; spinning = false;
+      });
+      about.forEach(slot => {
+        if (!passed(slot)) return;
+        const gem = slot.querySelector('.about-gem');
+        target = point(gem, Math.min(32, box(gem).height), 'inside'); key = slot; spinning = false;
+      });
+      if (services.length && passed(services[0])) {
+        const row = services.find(item => item.classList.contains('is-active')) || services[0];
+        target = point(row.querySelector('h3'), 36); key = row; spinning = false;
+      }
+      if (passed(process)) {
+        target = point(processStop, 36, 'inside');
+        key = process; spinning = true;
+      }
+      if (passed(pricing)) {
+        target = point(pricingStop, 36, 'inside');
+        key = pricing; spinning = true;
+      }
+      // Cross the pricing section diagonally, reaching the footer at its entrance.
+      const footerBox = box(footer);
+      if (key === pricing) {
+        const t = ease(clamp((innerHeight * 1.12 - footerBox.top) / (innerHeight * .54)));
+        if (t > 0) {
+          const end = point(footer, 48, 'right');
+          target.x += (end.x - target.x) * t;
+          target.y += (end.y - target.y) * t;
+          target.height += (end.height - target.height) * t;
+          continuous = true;
+        }
+      }
+      if (passed(contacts)) {
+        target = point(footer, 48, 'right');
+        key = contacts; spinning = true;
+      }
+      }
+    }
+    target.x = Math.max(18, Math.min(innerWidth - 24, target.x));
+    if (key !== current) {
+      from = position ? {...position} : null;
+      started = now;
+      current = key;
+    }
+    const t = clamp((now - started) / 620);
+    if (!position || continuous || !from || t === 1) position = {...target};
+    else {
+      from.y -= scrollDelta;
+      const blend = ease(t);
+      position = {x: from.x + (target.x - from.x) * blend,
+        y: from.y + (target.y - from.y) * blend - Math.sin(Math.PI * t) * (mobile ? innerWidth <= 600 ? 0 : 8 : 24),
+        height: from.height + (target.height - from.height) * blend};
+    }
+    // Scale the same canvas instead of reallocating the WebGL drawing buffer.
+    const scale = position.height / Math.max(1, hero.height);
+    layer.style.width = hero.width + 'px';
+    layer.style.height = hero.height + 'px';
+    layer.style.transform = `translate3d(${position.x - hero.width * scale / 2}px,${position.y - position.height / 2}px,0) scale(${scale})`;
+    layer.dataset.stop = key.id || (key === host ? 'home' : key === tabs ? 'work-tabs' : key.className.split(' ')[0]);
+    const moving = continuous || t < 1;
+    previousMotion = {active, spinning, moving, speed: moving ? 1.35 + Math.min(1, Math.abs(scrollDelta) / Math.max(1, elapsed * 1600)) : spinning ? 1 : 0};
+    if (mobile && innerWidth <= 600) previousMotion.speed = 1;
+    if (mobile) {
+      const mainVisible = position.y + position.height / 2 > 0 && position.y - position.height / 2 < innerHeight;
+      layer.hidden = !mainVisible;
+      const localsVisible = local.update(now, scrollDelta, hero);
+      previousMotion.visible = mainVisible || localsVisible;
+      previousMotion.afterRender = local.draw;
+    } else layer.hidden = false;
+    return previousMotion;
+  }
+  return {update};
+}
+
+// Local mobile/tablet accents share the same rendered frame and WebGL context.
+// Only visible 2D copies are painted: no extra model, HDR or rendering scenes.
+function setupLocalCrystals(source, about, services, contacts) {
+  const footerSlot = document.createElement('span');
+  footerSlot.className = 'compact-crystal-slot';
+  footerSlot.setAttribute('aria-hidden', 'true');
+  contacts?.querySelector('h2').append(footerSlot);
+  // Measure the actual text, not a button's enlarged touch target or flex column.
+  const serviceRanges = new Map(services.map(row => {
+    const range = document.createRange();
+    range.selectNodeContents(row.querySelector('button'));
+    return [row, range];
+  }));
+  const footerText = contacts?.querySelector('h2 .home-scramble')?.firstChild;
+  const footerWord = document.createRange();
+  if (footerText?.nodeType === Node.TEXT_NODE) {
+    const match = /\S+\s*$/.exec(footerText.textContent);
+    footerWord.setStart(footerText, match?.index ?? 0);
+    footerWord.setEnd(footerText, footerText.length);
+  }
+  const groups = ['about', 'services', 'contacts'].map(name => {
+    const layer = document.createElement('span');
+    layer.className = 'crystal-journey crystal-local';
+    layer.dataset.block = name;
+    layer.hidden = true;
+    layer.setAttribute('aria-hidden', 'true');
+    const canvas = document.createElement('canvas');
+    layer.append(canvas);
+    document.body.append(layer);
+    return {layer, canvas, context: canvas.getContext('2d'), current: null, pose: null, from: null, started: 0, visible: false};
+  });
+  const rect = element => element.getBoundingClientRect();
+  const pose = (element, height) => {
+    const r = rect(element);
+    return {x: r.left + r.width / 2, y: r.top + r.height / 2, height};
+  };
+  function update(now, scrollDelta, hero) {
+    const phone = innerWidth <= 600;
+    let card = about[0];
+    about.forEach(slot => { if (rect(slot).top < innerHeight * .6) card = slot; });
+    const row = services.find(item => item.classList.contains('is-active')) || services[0];
+    const targets = [card?.querySelector('.about-gem'), row?.querySelector('h3'), footerSlot];
+    groups.forEach((group, index) => {
+      const target = targets[index];
+      if (!target) return;
+      const r = rect(target);
+      const height = index === 0 ? Math.min(30, r.height) : index === 1 && innerWidth <= 600 ? 26 : 32;
+      const end = pose(target, height);
+      if (index === 1) { end.x = r.left - 13; end.y = r.top + Math.min(r.height, 44) / 2; }
+      if (phone && index === 1) {
+        const text = serviceRanges.get(row).getClientRects()[0] || serviceRanges.get(row).getBoundingClientRect();
+        end.y = text.top + text.height / 2;
+      }
+      if (phone && index === 2) {
+        const word = footerWord.getBoundingClientRect();
+        end.x = word.right + 14;
+        end.y = word.top + word.height / 2;
+      }
+      if (phone && index < 2) {
+        // Attach to the actual card/title: ordinary scrolling must never become
+        // a second animation of a fixed overlay following its animated parent.
+        const changed = target !== group.current;
+        const old = changed && group.current && !group.layer.hidden ? rect(group.layer) : null;
+        if (changed) {
+          group.layer.getAnimations().forEach(animation => animation.cancel());
+          target.append(group.layer);
+          group.current = target;
+        }
+        const localHeight = index === 0 ? target.clientHeight : height;
+        const width = localHeight * hero.width / hero.height;
+        group.anchored = true;
+        group.layer.style.position = 'absolute';
+        group.layer.style.width = width + 'px';
+        group.layer.style.height = localHeight + 'px';
+        group.layer.style.left = (index === 0 ? (target.clientWidth - width) / 2 : -13 - width / 2) + 'px';
+        group.layer.style.top = (index === 0 ? 0 : end.y - r.top - height / 2) + 'px';
+        group.layer.style.transform = 'none';
+        group.visible = r.bottom > 0 && r.top < innerHeight && r.width > 0;
+        group.layer.hidden = !group.visible;
+        if (changed && old && group.visible) {
+          const next = rect(group.layer);
+          group.layer.animate([
+            {transform: `translate(${old.left - next.left}px,${old.top - next.top}px)`},
+            {transform: 'translate(0,0)'}
+          ], {duration: 220, easing: 'ease-out'});
+        }
+        group.pose = end;
+        return;
+      }
+      if (group.anchored) {
+        document.body.append(group.layer);
+        group.layer.style.cssText = '';
+        group.layer.getAnimations().forEach(animation => animation.cancel());
+        group.anchored = false;
+        group.current = null;
+        group.pose = null;
+      }
+      if (target !== group.current) {
+        group.from = group.pose ? {...group.pose} : null;
+        group.started = now;
+        group.current = target;
+      }
+      const t = Math.min(1, (now - group.started) / (phone ? 220 : 620));
+      if (!group.from || t === 1) group.pose = end;
+      else {
+        group.from.y -= scrollDelta;
+        const blend = t * t * (3 - 2 * t);
+        group.pose = {x: group.from.x + (end.x - group.from.x) * blend,
+          y: group.from.y + (end.y - group.from.y) * blend - Math.sin(Math.PI * t) * (phone ? 0 : 12),
+          height: group.from.height + (end.height - group.from.height) * blend};
+      }
+      const p = group.pose;
+      group.visible = p.y + p.height > 0 && p.y - p.height < innerHeight && (r.width > 0 || (phone && index === 2));
+      group.layer.hidden = !group.visible;
+      if (!group.visible) return;
+      const scale = p.height / hero.height;
+      group.layer.style.width = hero.width + 'px';
+      group.layer.style.height = hero.height + 'px';
+      group.layer.style.transform = `translate3d(${p.x - hero.width * scale / 2}px,${p.y - p.height / 2}px,0) scale(${scale})`;
+    });
+    return groups.some(group => group.visible);
+  }
+  function draw() {
+    groups.forEach(group => {
+      if (!group.visible) return;
+      if (group.canvas.width !== source.width || group.canvas.height !== source.height) {
+        group.canvas.width = source.width;
+        group.canvas.height = source.height;
+      }
+      group.context.clearRect(0, 0, source.width, source.height);
+      group.context.drawImage(source, 0, 0);
+    });
+  }
+  function reset() {
+    groups.forEach(group => {
+      if (group.anchored) { document.body.append(group.layer); group.layer.style.cssText = ''; group.anchored = false; }
+      group.layer.getAnimations().forEach(animation => animation.cancel());
+      group.layer.hidden = true; group.visible = false; group.pose = null; group.current = null;
+    });
+  }
+  return {update, draw, reset};
 }

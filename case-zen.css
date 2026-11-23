@@ -1,0 +1,146 @@
+.zen-case { --zen-type-12: 12px; --zen-type-14: 14px; --zen-type-18: 18px; --zen-type-20: 20px; --zen-type-32: 32px; --zen-type-40: 40px; }
+.zen-case { --app: #faf9f7; --app-line: #e5e0d9; --espresso: #2f1d13; --coffee: #4b3021; }
+.zen-case .mini-tag,.zen-case .persona-id,.zen-case .persona-lead>small{font-family:ui-monospace,'SFMono-Regular',Consolas,'Liberation Mono',monospace;letter-spacing:-.018em}
+.zen-case .hero-visual{position:relative;overflow:hidden;min-height:720px}
+.zen-case .phone{border:8px solid #261a13;border-radius:38px;background:white;box-shadow:0 22px 55px #2c201731;overflow:hidden;aspect-ratio:946/2048}
+.zen-case .phone img{display:block;width:100%;height:100%;object-fit:cover}
+.zen-case .hero-phone{position:absolute;top:104px;width:230px;box-shadow:0 35px 70px #2e241d38}
+.zen-case .hero-phone-back{left:60px;top:145px;transform:rotate(-8deg);z-index:2}
+.zen-case .hero-phone-front{left:270px;transform:rotate(8deg);z-index:3}
+.zen-case .muted-research{color:#aba198;font-size:var(--zen-type-12);font-family:ui-monospace,monospace}
+.zen-case .persona-card{background:#fff;border:1px solid var(--app-line);border-radius:23px;display:grid;grid-template-columns:40% 60%;overflow:hidden;box-shadow:0 8px 26px #4f3b2710}
+.zen-case .persona-lead{background:#f0ece7;padding:34px 32px 25px;display:flex;align-items:flex-start;flex-direction:column}
+.zen-case .persona-id{font-size:var(--zen-type-12);font-weight:700;color:#958170;margin-bottom:9px}
+.zen-case .persona-lead h3{font-size:var(--zen-type-40);line-height:1;margin-bottom:17px;color:var(--espresso)}
+.zen-case .persona-lead>p{font-size:var(--zen-type-14);line-height:1.55;color:#76695f;margin-bottom:20px;max-width:330px}
+.zen-case .pills{display:flex;flex-wrap:wrap;gap:8px}
+.zen-case .pills>span{border:1px solid #d3c9c0;background:#fbf8f4;border-radius:20px;padding:8px 12px;font-weight:650;font-size:var(--zen-type-12);color:#5d4b3e}
+.zen-case .persona-quote{font-size:var(--zen-type-18);line-height:1.44;font-weight:725;margin-top:auto;padding-top:28px;color:#453124;max-width:330px}
+.zen-case .persona-lead>small{color:#9b8f87;font-size:var(--zen-type-12);line-height:1.4;margin-top:12px}
+.zen-case .persona-body{display:grid;grid-template-columns:repeat(2,1fr);grid-auto-rows:minmax(200px,1fr);gap:0;padding:18px}
+.zen-case .persona-block{padding:25px 24px;border-bottom:1px solid #ebe5df}
+.zen-case .persona-block:nth-child(odd){border-right:1px solid #ebe5df}
+.zen-case .persona-block:nth-child(n+3){border-bottom:0}
+.zen-case .mini-tag{font-size:var(--zen-type-12);color:#998b80;font-weight:650;letter-spacing:.06em}
+.zen-case .persona-block h4{font-size:var(--zen-type-20);font-weight:760;letter-spacing:-.045em;color:#38251a;margin:15px 0 9px}
+.zen-case .persona-block p{font-size:var(--zen-type-14);line-height:1.55;color:#8d8179;margin:0}
+.zen-case .jtbd{grid-column:1/-1;background:#fffafa;padding:29px 34px;border-top:1px solid var(--app-line);display:flex;align-items:start;gap:40px}
+.zen-case .jtbd>.mini-tag{min-width:130px;margin-top:5px}
+.zen-case .jtbd p{margin:0;color:#513d32;font-size:var(--zen-type-20);line-height:1.5}
+.zen-case .jtbd strong{color:#28170d}
+.zen-case .mood-card{margin:0 34px 27px;background:#f7f5f2;border-radius:13px;padding:17px 22px 15px}
+.zen-case .mood-head{display:flex;justify-content:space-between;gap:10px}
+.zen-case .mood-card svg{height:100px;width:100%;margin-top:7px;display:block}
+.zen-case .mood-labels{display:flex;justify-content:space-between;color:#ac9c90;font-size:var(--zen-type-12)}
+.zen-case .color-system{background:#f9f7f4;border:1px solid #e4dfd8;border-radius:13px;padding:26px 30px}
+.zen-case .swatches{display:flex;gap:14px;margin-top:24px;justify-content:space-between}
+.zen-case .swatches>div{flex:1;min-width:0}
+.zen-case .swatches i{display:block;height:52px;border-radius:6px;border:1px solid #e3ded8}
+.zen-case .swatches span{font:10px ui-monospace,monospace;color:#95877a;display:block;margin-top:9px}
+
+/* Page structure reuses the existing case template and its responsive tokens. */
+.zen-case .case-summary { max-width: 80ch; }
+.zen-case .zen-facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px 32px; margin: 32px 0 0; }
+.zen-case .zen-facts dt { font-size: var(--case-caption-size); color: #666; margin-bottom: 8px; }
+.zen-case .zen-facts dd { margin: 0; }
+.zen-case .zen-product-artifact { font-family: Inter, 'Helvetica Neue', Arial, sans-serif; margin: 32px 0 48px; min-width: 0; }
+.zen-case .zen-product-artifact h3, .zen-case .zen-product-artifact h4 { font-family: inherit; text-transform: none; }
+.zen-case .phone { aspect-ratio: auto; }
+.zen-case .phone img { height: auto; object-fit: contain; }
+.zen-case .hero-visual { width: min(640px, 100%); min-height: 0; height: 660px; margin: 32px auto 0; }
+.zen-case .hero-phone-front { top: 64px; }
+.zen-case .hero-phone-back { top: 108px; }
+.zen-case .zen-persona-photo { width: 140px; height: auto; border-radius: 12px; margin-bottom: 24px; }
+.zen-case .persona-id { margin-bottom: 12px; }
+.zen-case .persona-block h4 { line-height: var(--type-leading-title); }
+.zen-case .mood-card { margin: 0; padding: 24px; }
+.zen-case .mood-head { align-items: start; flex-wrap: wrap; }
+.zen-case .mood-card svg { height: 132px; margin-top: 16px; }
+.zen-case .mood-card svg path, .zen-case .mood-card svg line { vector-effect: non-scaling-stroke; }
+.zen-case .mood-labels { gap: 12px; font-size: var(--zen-type-12); }
+.zen-case .mood-labels > span { flex: 1; }
+.zen-case .mood-labels > :nth-child(2) { text-align: center; }
+.zen-case .mood-labels > :last-child { text-align: right; }
+.zen-case .zen-journey { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); list-style: none; margin: 0; padding: 0; gap: 32px 64px; }
+.zen-case .zen-journey li { display: grid; grid-template-columns: auto minmax(0, 1fr); gap: 20px; align-items: baseline; }
+.zen-case .zen-journey h4 { font: var(--case-weight-emphasis) var(--case-subheading-size)/var(--type-leading-title) var(--type-font); margin: 0 0 12px; }
+.zen-case .zen-index { font-size: var(--portfolio-meta); color: #5a5b53; }
+.zen-case .zen-insight { margin-top: 40px; padding-left: 24px; border-left: 1px solid #777; }
+.zen-case .zen-hypotheses { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 18px; }
+.zen-case .zen-hypothesis { --window-behind: 1; display: flex; flex-direction: column; gap: 16px; }
+.zen-case .zen-hypothesis h3 { margin: 0; }
+.zen-case .zen-solution { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; align-items: center; }
+.zen-case .zen-solution + .zen-solution { margin-top: 48px; }
+.zen-case .zen-solution .zen-product-artifact { margin: 0; padding-block: 24px; display: flex; justify-content: center; }
+.zen-case .decision-phone { width: 235px; max-width: 100%; border-width: 7px; border-radius: 35px; box-shadow: 0 25px 56px #3c2a1c2e; }
+.zen-case .color-system { max-width: 100%; }
+.zen-case .swatches { gap: 20px; }
+.zen-case .swatches i { height: 72px; }
+.zen-case .zen-comparison { margin-top: 40px; }
+.zen-case .zen-gallery-hint { font-size: var(--case-caption-size); color: #666; margin-bottom: 20px; }
+.zen-case .zen-gallery { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 28px 18px; }
+.zen-case .zen-screen { min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 0; border: 0; background: transparent; font: inherit; color: inherit; text-align: center; }
+.zen-case .zen-screen img { width: min(100%, 200px); height: auto; border-radius: 12px; }
+.zen-case .zen-gallery-after img { max-width: 173px; }
+.zen-case .zen-screen > span { font-size: var(--case-caption-size); color: #666; }
+.zen-case .zen-results { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; margin-top: 40px; align-items: center; }
+.zen-case .zen-results > figure { min-width: 0; margin: 0; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+.zen-case .zen-results figcaption { font-family: var(--type-font); font-size: var(--case-caption-size); text-align: center; }
+.zen-case .zen-placeholder > div { width: min(235px, 100%); aspect-ratio: 946 / 2048; border: 1px dashed #999; border-radius: 5px; display: grid; place-items: center; padding: 24px; text-align: center; font-size: var(--case-caption-size); color: #666; }
+.zen-case .zen-lightbox { width: min(620px, calc(100vw - 32px)); max-height: calc(100svh - 32px); padding: 52px 20px 20px; border: 1px solid #777; border-radius: 5px; color: #282828; background: var(--site-background); }
+.zen-case .zen-lightbox::backdrop { background: #191a17b8; }
+.zen-case .zen-lightbox figure { margin: 0; }
+.zen-case .zen-lightbox img { display: block; max-width: 100%; max-height: calc(100svh - 160px); width: auto; height: auto; margin: auto; object-fit: contain; }
+.zen-case .zen-lightbox figcaption { text-align: center; margin-top: 16px; font-size: var(--case-caption-size); }
+.zen-case .zen-lightbox-close { position: absolute; top: 4px; right: 4px; min-width: 44px; min-height: 44px; border: 0; background: transparent; font-size: var(--case-subheading-size); }
+@media (max-width: 1100px) {
+ .zen-case .zen-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+ .zen-case .zen-hypotheses { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+ .zen-case .persona-card { grid-template-columns: 1fr; }
+ .zen-case .persona-lead { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 12px 24px; align-items: start; }
+ .zen-case .zen-persona-photo { grid-column: 1; grid-row: 1 / span 5; width: 100%; margin: 0; }
+ .zen-case .persona-lead > :not(img) { grid-column: 2; margin: 0; }
+ .zen-case .persona-quote { padding-top: 12px; }
+ .zen-case .jtbd { gap: 24px; }
+ .zen-case .zen-solution { gap: 32px; }
+ .zen-case .zen-results { gap: 24px; }
+}
+@media (max-width: 600px) {
+ .zen-case .zen-facts { gap: 20px 16px; margin-top: 28px; }
+ .zen-case .zen-facts > :last-child { grid-column: 1 / -1; }
+ .zen-case .hero-visual { height: 430px; margin-top: 24px; }
+ .zen-case .hero-phone { width: calc(50% - 30px); border-width: 5px; border-radius: 26px; }
+ .zen-case .hero-phone-back { left: 20px; top: 72px; }
+ .zen-case .hero-phone-front { left: calc(50% - 8px); top: 32px; }
+ .zen-case .zen-product-artifact { margin: 24px 0 32px; }
+ .zen-case .persona-lead { display: flex; padding: 24px; }
+ .zen-case .zen-persona-photo { width: 120px; margin-bottom: 16px; }
+ .zen-case .persona-lead h3 { font-size: var(--zen-type-32); }
+ .zen-case .persona-body { grid-template-columns: 1fr; grid-auto-rows: auto; padding: 0 24px; }
+ .zen-case .persona-block { padding: 24px 0; }
+ .zen-case .persona-block:nth-child(n) { border-right: 0; border-bottom: 1px solid #ebe5df; }
+ .zen-case .persona-block:last-child { border-bottom: 0; }
+ .zen-case .jtbd { display: block; padding: 24px; }
+ .zen-case .jtbd p { margin-top: 12px; font-size: var(--zen-type-18); }
+ .zen-case .mood-card { padding: 20px 16px; }
+ .zen-case .mood-head { display: grid; }
+ .zen-case .zen-journey { grid-template-columns: 1fr; gap: 24px; }
+ .zen-case .zen-journey li { gap: 16px; }
+ .zen-case .zen-insight { margin-top: 32px; padding-left: 16px; }
+ .zen-case .zen-hypotheses { grid-template-columns: 1fr; }
+ .zen-case .zen-solution { grid-template-columns: 1fr; gap: 24px; }
+ .zen-case .zen-solution .zen-product-artifact { padding-block: 0; }
+ .zen-case .color-system { padding: 24px 20px; }
+ .zen-case .swatches { flex-wrap: wrap; gap: 20px 12px; margin-top: 20px; }
+ .zen-case .swatches > div { flex: 0 0 calc((100% - 24px) / 3); }
+ .zen-case .swatches i { height: 52px; }
+ .zen-case .zen-gallery { display: flex; overflow-x: auto; gap: 16px; padding-bottom: 16px; scroll-snap-type: x proximity; overscroll-behavior-x: contain; scrollbar-color: #8f735f #e5e0d9; scrollbar-width: thin; }
+ .zen-case .zen-screen { flex: 0 0 148px; scroll-snap-align: start; }
+ .zen-case .zen-results { grid-template-columns: 1fr; gap: 32px; }
+ .zen-case .zen-placeholder > div { height: 200px; aspect-ratio: auto; }
+}
+
+.zen-case #zen-cjm, .zen-case #zen-persona { scroll-margin-top: 88px; }
+
+.zen-case .mood-card ellipse { vector-effect: non-scaling-stroke; stroke-width: 2px; }
+.zen-case #zen-hero-visual { scroll-margin-top: 88px; }

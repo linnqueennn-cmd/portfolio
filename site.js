@@ -38,7 +38,7 @@ const caseUrl = id => './?case=' + id + (en ? '&lang=en' : '');
 const arrow = '<span class="arrow" aria-hidden="true">↗</span>';
 const person = t('Лина Ханнанова','Lina Khannanova');
 document.title = 'linqueenn — ' + person;
-document.querySelector('meta[name=description]').content = t('Независимый UX/UI, веб- и графический дизайнер.','Independent UX/UI, web and graphic designer.');
+document.querySelector('meta[name=description]').content = t('Лина Хананова — UX/UI, веб- и графический дизайнер.','Lina Khannanova — UX/UI, web and graphic designer.');
 
 function renderHome() {
   document.body.classList.add('home-page');
@@ -75,6 +75,13 @@ if (caseId === 'roma') {
   document.title = 'Мама Рома — UX/UI-кейс | linqueenn';
   document.querySelector('meta[name=description]').content = mamaRomaCase.summary;
   app.innerHTML = caseStudyPage(mamaRomaCase);
+} else if (caseId === 'zen') {
+  document.body.classList.add('case-page');
+  document.documentElement.lang = 'ru';
+  document.title = 'ZenSocial — UX/UI-кейс | linqueenn';
+  document.querySelector('meta[name=description]').content = zenSocialCase.summary;
+  app.innerHTML = zenSocialCasePage();
+  setupZenSocialCase();
 } else if (project) {
   const back = './?' + (en ? 'lang=en&' : '') + (projects.indexOf(project) > 2 ? 'work=graphic' : '') + '#work';
   document.title = project[1] + ' — linqueenn';

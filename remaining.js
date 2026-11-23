@@ -15,7 +15,7 @@ function remainingSections(t) {
           `<img src="assets/${image}.jpg" alt="" loading="lazy"${i === 0 ? ' class="is-active"' : ''}>`).join('')}</figure>
         <div class="service-options">${copy.services.map(([name, ru, english], i) => `
           <article class="service-option${i === 0 ? ' is-active' : ''}">
-            <h3><button type="button" aria-pressed="${i === 0}">${name.toLowerCase()}</button></h3>
+            <h3><button type="button" aria-pressed="${i === 0}">${name.toLowerCase().replace(/& /g, '& ')}</button></h3>
             <img src="assets/${serviceImages[i]}.jpg" alt="" loading="lazy" class="service-inline">
             <p>${tr([ru, english])}</p>
           </article>`).join('')}</div>
@@ -137,10 +137,28 @@ function setupProcessStack() {
   const section = document.querySelector('#process');
   const rail = document.querySelector('.process-rail');
   const cards = [...rail.children];
+  const track = document.createElement('div');
+  track.className = 'process-track';
+  track.append(...cards);
+  rail.append(track);
+  rail.tabIndex = 0;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  let frame;
-  let horizontalGesture;
-  let scrollRange;
+  let frame, drag;
+  let lastProgress, lastTravel = 0, step = 0;
+
+  function paintCards() {
+    const cursor = rail.scrollLeft / Math.max(1, step);
+    cards.forEach((card, i) => {
+      const offset = i - cursor;
+      // Native scrolling moves the leading cards. Only the passed cards receive
+      // a compensating offset to retain the agreed overlapping stack.
+      const x = i * step + (offset < 0 ? -offset * (step - 22) : 0);
+      card.style.transform = 'translateX(' + x + 'px)';
+      card.style.opacity = '1';
+      card.style.setProperty('--process-content-opacity', offset < 0 ? String(Math.max(.35, 1 + offset * 1.5)) : '1');
+    });
+  }
+
   function update() {
     frame = 0;
     if (reduced.matches) {
@@ -150,66 +168,66 @@ function setupProcessStack() {
         card.style.removeProperty('--process-content-opacity');
       });
       rail.style.height = '';
+      track.style.width = '';
+      lastProgress = undefined;
+      lastTravel = 0;
       return;
     }
+    const width = innerWidth <= 540 ? rail.clientWidth * .78 : (rail.clientWidth - 18) / 2;
+    rail.style.setProperty('--process-card-width', width + 'px');
+    step = width - 12;
+    const travel = Math.max(0, (cards.length - 1) * step + width - rail.clientWidth);
+    const before = rail.scrollLeft;
+    track.style.width = rail.clientWidth + travel + 'px';
     const pin = section.querySelector('.process-pin');
     section.style.setProperty('--process-pin-height', pin.offsetHeight + 'px');
     const pinTop = Math.max(80, (innerHeight - pin.offsetHeight) / 2);
     pin.style.top = pinTop + 'px';
-    const step = rail.firstElementChild.offsetWidth - 12;
-    const travel = Math.max(0, (cards.length - 1) * step + cards.at(-1).offsetWidth - rail.clientWidth);
     const scrollDistance = innerWidth <= 540
       ? Math.max(480, Math.min(640, travel * .5))
       : Math.max(240, Math.min(480, travel * .22));
     section.style.setProperty('--process-scroll-distance', scrollDistance + 'px');
     const distance = section.offsetHeight - pin.offsetHeight - 48;
-    scrollRange = {start: scrollY + section.getBoundingClientRect().top - pinTop, distance, travel};
     const progress = Math.max(0, Math.min(1, (pinTop - section.getBoundingClientRect().top) / Math.max(1, distance)));
-    cards.forEach((card, i) => {
-      const offset = i - progress * travel / step;
-      const x = offset < 0 ? offset * 22 : offset * step;
-      card.style.transform = `translateX(${x}px)`;
-      // Keep the paper opaque so stacked cards cannot show each other's text.
-      card.style.opacity = '1';
-      card.style.setProperty('--process-content-opacity', offset < 0 ? String(Math.max(.35, 1 + offset * 1.5)) : '1');
-    });
+    // Add the vertical delta to the current native scroll position. A manual
+    // swipe remains in place when vertical scrolling resumes; window.scrollY
+    // is never written by this component.
+    let target = lastProgress === undefined ? progress * travel : before + (progress - lastProgress) * travel;
+    if (lastTravel && Math.abs(lastTravel - travel) > 1) target = before / lastTravel * travel;
+    rail.scrollLeft = Math.max(0, Math.min(travel, target));
+    lastProgress = progress;
+    lastTravel = travel;
+    paintCards();
   }
   function schedule() {
     if (!frame) frame = requestAnimationFrame(update);
   }
+  rail.addEventListener('scroll', paintCards, {passive: true});
   addEventListener('scroll', schedule, {passive: true});
   addEventListener('resize', schedule);
-  // Horizontal swipes use the existing vertical-scroll timeline, preserving the
-  // approved stack and its position when the user resumes vertical scrolling.
+  reduced.addEventListener('change', schedule);
+  // Optional mouse dragging on narrow previews. Phones use native touch scroll,
+  // including momentum and direction selection, without pointer interception.
   rail.addEventListener('pointerdown', event => {
-    if ((event.pointerType !== 'touch' && !(event.pointerType === 'mouse' && innerWidth <= 900 && event.button === 0)) || reduced.matches || !scrollRange) return;
-    horizontalGesture = {id: event.pointerId, x: event.clientX, y: event.clientY, startY: scrollY};
-    if (event.pointerType === 'mouse') {
-      event.preventDefault();
-      rail.setPointerCapture(event.pointerId);
-    }
+    if (event.pointerType !== 'mouse' || event.button !== 0 || innerWidth > 900 || reduced.matches) return;
+    event.preventDefault();
+    drag = {id: event.pointerId, x: event.clientX, left: rail.scrollLeft};
+    rail.setPointerCapture(event.pointerId);
   });
   rail.addEventListener('pointermove', event => {
-    const gesture = horizontalGesture;
-    if (!gesture || event.pointerId !== gesture.id) return;
-    const dx = event.clientX - gesture.x;
-    const dy = event.clientY - gesture.y;
-    if (!gesture.horizontal && Math.abs(dx) <= Math.max(8, Math.abs(dy) * 1.2)) return;
-    gesture.horizontal = true;
-    if (!rail.hasPointerCapture(event.pointerId)) rail.setPointerCapture(event.pointerId);
-    const target = gesture.startY - dx / Math.max(1, scrollRange.travel) * scrollRange.distance;
-    window.scrollTo({top: Math.max(scrollRange.start, Math.min(scrollRange.start + scrollRange.distance, target)), behavior: 'instant'});
+    if (drag && drag.id === event.pointerId) rail.scrollLeft = drag.left + drag.x - event.clientX;
   });
-  const endGesture = () => { horizontalGesture = null; };
-  rail.addEventListener('pointerup', endGesture);
-  rail.addEventListener('pointercancel', endGesture);
-  rail.addEventListener('lostpointercapture', endGesture);
-  reduced.addEventListener('change', schedule);
+  const stopDrag = () => { drag = null; };
+  rail.addEventListener('pointerup', stopDrag);
+  rail.addEventListener('pointercancel', stopDrag);
+  rail.addEventListener('lostpointercapture', stopDrag);
+  rail.addEventListener('keydown', event => {
+    if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
+    event.preventDefault();
+    rail.scrollBy({left: step * (event.key === 'ArrowRight' ? 1 : -1), behavior: reduced.matches ? 'instant' : 'smooth'});
+  });
   const observer = new ResizeObserver(() => {
-    if (!reduced.matches) {
-      rail.style.height = '';
-      rail.style.height = Math.max(...cards.map(card => card.offsetHeight)) + 32 + 'px';
-    }
+    if (!reduced.matches) rail.style.height = Math.max(...cards.map(card => card.offsetHeight)) + 32 + 'px';
     schedule();
   });
   cards.forEach(card => observer.observe(card));

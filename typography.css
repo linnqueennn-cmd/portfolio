@@ -21,8 +21,10 @@
   --type-rate: 28px;
   --type-contact-tablet: 28px;
   --type-contact-mobile: 22px;
-  --type-pricing-action: 40px;
+  --type-pricing-action: 30px;
+  --type-pricing-bracket: 40px;
   --type-mobile-action: 24px;
+  --type-mobile-bracket: 32px;
   --type-hero-action: 60px;
   --portfolio-body: 22px;
   --portfolio-caption: 14px;
@@ -324,3 +326,15 @@ body.home-page, .home-screen, .work-screen, .about-screen,
 }
 
 @media (max-width: 600px) { .home-screen .home-philosophy span { width: 106px; } }
+
+/* Pricing button from button.pdf, using the supplied SVG glow. */
+html[lang] #pricing .pricing-cta { height: 54px; min-height: 54px; }
+#pricing .pricing-cta .home-cta-bracket { font-size: var(--type-pricing-bracket); }
+#pricing .pricing-cta::before { inset: 0 3px; height: auto; background: url("assets/home/button-glow.svg") center / 100% 100% no-repeat; filter: none; }
+@media (max-width: 600px) {
+ #pricing { --type-pricing-bracket: var(--type-mobile-bracket); }
+ html[lang] #pricing .pricing-cta { height: 48px; min-height: 48px; font-size: var(--type-mobile-action); }
+ .home-screen .home-cta::before { inset: 0 3px; height: auto; background: url("assets/home/button-glow.svg") center / 100% 100% no-repeat; filter: none; }
+}
+
+@media (max-width: 600px) { .home-screen .home-cta .home-cta-bracket { font-size: var(--type-mobile-bracket); } }
