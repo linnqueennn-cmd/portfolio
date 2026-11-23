@@ -543,3 +543,8 @@
 .page-top-row { padding: 24px 36px; display: flex; justify-content: end; }
 .back-to-top { width: 48px; height: 48px; display: grid; place-items: center; padding: 8px; border: 0; background: transparent; color: #282828; }
 @media (max-width: 600px) { .page-top-row { padding-inline: 16px; } }
+
+.home-portrait[role="button"] { pointer-events: auto; cursor: pointer; }
+.home-portrait-arrival { pointer-events: none; }
+.home-portrait[role="button"]:focus-visible { outline: 2px solid #507400; outline-offset: 4px; }
+body.home-page .page-top-row { justify-content: start; }

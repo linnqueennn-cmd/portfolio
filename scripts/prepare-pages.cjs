@@ -14,7 +14,7 @@ const files = [
   'case-study.js', 'case-roma.js', 'case-study.css',
   ...['01_cover', '02_before', '03_after', '04_wireframe_a', '04_wireframe_b',
     '05_palette', '06_hero', '07_vacancies', '08_team', '09_final', '11_month',
-    '12_year', '13_old_form'].map(name => `assets/cases/roma/${name}.png`),
+    '12_year', '13_old_form'].map(name => `assets/cases/roma/${name}.webp`),
   'assets/cases/roma/10_mobile.mp4',
   'assets/cases/roma/10_mobile.jpg',
   ...['brand', 'retail', 'roma', 'vinyl', 'social'].map(name => `assets/${name}.jpg`),

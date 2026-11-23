@@ -57,15 +57,19 @@
   white-space: nowrap;
 }
 .work-tab:disabled { cursor: default; opacity: 1; }
-.work-tab-active { position: relative; isolation: isolate; }
-.work-tab-active::before {
+.work-tab { position: relative; isolation: isolate; }
+.work-tab::before {
   content: "";
   position: absolute;
   inset: 21% clamp(22px, 3.75vw, 54px) 21% 3%;
   z-index: -1;
   background: #aed90d;
   filter: blur(clamp(15px, 2.16vw, 31px));
+  opacity: 0;
+  transition: opacity .18s ease;
 }
+.work-tab-active::before { opacity: 1; }
+.work-tab:not(.work-tab-active)::before { animation: none; }
 .work-gem { width: .52em; height: 1.03em; position: relative; overflow: clip; flex: none; }
 .work-gem img { position: absolute; width: 319.43%; height: 187.1%; max-width: none; left: -109.72%; top: -45.16%; }
 .work-list { display: grid; gap: clamp(24px, 3.19vw, 46px); }
@@ -148,3 +152,7 @@
   .work-label h3 { padding-right: 40px; }
   .work-case-arrow { display: block; position: absolute; right: 0; bottom: 0; width: 28px; height: 28px; color: #282828; }
 }
+
+.work-tab { gap: 0; }
+.work-tab .work-gem { margin-left: 8px; }
+@media (max-width: 600px) { .work-tab .work-gem { margin-left: 4px; } }

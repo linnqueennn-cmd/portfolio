@@ -9,11 +9,11 @@ const remainingContent = {
   processNote: ['На каждом этапе остаюсь на связи.', 'I stay in touch at every step.'],
   pricingIntro: ['Чтобы понимать, на какой бюджет ориентироваться.', 'A starting point for planning your budget.'],
   pricingNote: ['Стоимость зависит от задачи и объёма работы. Подберём подходящее решение для вас.', 'Pricing depends on the task and scope of work. We’ll find the right solution for you.'],
-  contactTitle: ['Есть что обсудить?', 'Something in mind?'],
+  contactTitle: ['ПИШИТЕ, СОЗДАДИМ ЧТО-ТО КРУТОЕ', 'LET’S CREATE SOMETHING GREAT'],
   contactBody: ['Новый проект, идея или предложение о работе — пиши. Буду рада познакомиться.', 'A new project, an idea or a job opportunity — get in touch. I’d love to hear from you.'],
   discuss: ['Обсудить проект', 'Discuss a project'],
   telegram: ['Написать в Telegram', 'Message on Telegram'],
-  likeNote: ['Пока не готовы сотрудничать? Ставьте лайк, если тоже любите The Sims.', 'Not ready to work together yet? Leave a like if you love The Sims too.'],
+  likeNote: ['Пока не готовы сотрудничать? Тогда ставьте лайк, если тоже любите The Sims.', 'Not ready to work together yet? Leave a like if you love The Sims too.'],
   "services": [
     [
       "Web Design & Development",
@@ -78,12 +78,12 @@ const remainingContent = {
     [
       "Лендинг под ключ",
       "Landing page",
-      "60 000"
+      "40 000"
     ],
     [
       "Многостраничный сайт",
       "Multi-page website",
-      "90 000"
+      "60 000"
     ],
     [
       "UX/UI-дизайн",
@@ -93,12 +93,12 @@ const remainingContent = {
     [
       "Айдентика",
       "Brand identity",
-      "35 000"
+      "20 000"
     ],
     [
       "Графический дизайн",
       "Graphic design",
-      "5 000"
+      "2 000"
     ],
     [
       "Комплексный digital-проект",

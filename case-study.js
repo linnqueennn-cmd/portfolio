@@ -3,7 +3,7 @@ function caseStudyPage(data) {
   const scramble = text => `<span class="home-scramble" data-scramble>${text}</span>`;
   const nbsp = text => text.replace(/(^|\s)([авикосу]|до|из|на|от|по|за|об|не|со|для|без)(?= ) /gi, '$1$2 ');
   const paragraphs = texts => texts.map(text => `<p>${text.startsWith('Моя роль:') ? `<strong>${nbsp(text)}</strong>` : nbsp(text)}</p>`).join('');
-  const picture = (name, alt, label = '', className = '') => `<figure class="case-picture ${className}" data-media="${name}">${label ? `<figcaption>${label}</figcaption>` : ''}<img src="assets/cases/${data.id}/${name}.png" alt="${alt}" width="${data.imageSizes[name][0]}" height="${data.imageSizes[name][1]}" loading="${className === 'case-cover' ? 'eager' : 'lazy'}" decoding="async"></figure>`;
+  const picture = (name, alt, label = '', className = '') => `<figure class="case-picture ${className}" data-media="${name}">${label ? `<figcaption>${label}</figcaption>` : ''}<img src="assets/cases/${data.id}/${name}.${data.imageFormat || 'png'}" alt="${alt}" width="${data.imageSizes[name][0]}" height="${data.imageSizes[name][1]}" loading="${className === 'case-cover' ? 'eager' : 'lazy'}" fetchpriority="${className === 'case-cover' ? 'high' : 'low'}" decoding="async"></figure>`;
   const compare = items => `<div class="case-comparison${items.some(item => item[0] === '13_old_form') ? ' case-comparison-form' : ''}">${items.map(item => picture(...item)).join('')}</div>`;
   return `<article class="case-study" aria-labelledby="case-title">
     <div class="case-content">

@@ -1,4 +1,5 @@
 const mamaRomaCase = {
+  imageFormat: 'webp',
   imageSizes: {
     '01_cover': [2100, 1113], '02_before': [1753, 1922], '03_after': [1753, 2311],
     '04_wireframe_a': [1754, 2314], '04_wireframe_b': [1754, 3093],

@@ -18,6 +18,12 @@ async function setupCrystal(host) {
   renderer.toneMappingExposure = 1;
 
   const scene = new THREE.Scene();
+  // Tint the existing HDR reflections; preserve their soft spatial distribution.
+  const pixels = environment.image.data;
+  for (let i = 0; i < pixels.length; i += 4) {
+    const blue = environment.type === THREE.HalfFloatType ? THREE.DataUtils.fromHalfFloat(pixels[i + 2]) : pixels[i + 2];
+    pixels[i + 2] = environment.type === THREE.HalfFloatType ? THREE.DataUtils.toHalfFloat(blue * .65) : blue * .65;
+  }
   environment.mapping = THREE.EquirectangularReflectionMapping;
   const pmrem = new THREE.PMREMGenerator(renderer);
   const reflections = pmrem.fromEquirectangular(environment);
@@ -53,9 +59,12 @@ async function setupCrystal(host) {
   // Equal, soft reflections around the vertical axis avoid isolated white flashes.
   for (let index = 0; index < 4; index++) {
     const angle = index * Math.PI / 2;
-    const light = new THREE.DirectionalLight(0xf1ffe6, .35);
+    const light = new THREE.DirectionalLight(0xe1ef89, .35);
     light.position.set(Math.cos(angle) * 4, 3, Math.sin(angle) * 4);
     scene.add(light);
+    const lower = new THREE.DirectionalLight(0xaed90d, .18);
+    lower.position.set(Math.cos(angle) * 4, -3, Math.sin(angle) * 4);
+    scene.add(lower);
   }
   const camera = new THREE.OrthographicCamera(-.6, .6, 1.1, -1.1, .1, 20);
   camera.position.set(0, 0, 5);

@@ -320,3 +320,6 @@ body.home-page { background: #efefef; font-family: "Ubuntu Sans Mono", monospace
   #services .service-story { gap: 16px; }
   #services .service-pin > .remaining-heading { margin-bottom: 20px; }
 }
+
+.process-rail { touch-action: pan-y pinch-zoom; }
+#process { scroll-margin-top: max(80px, calc((100svh - var(--process-pin-height, 400px)) / 2)); }

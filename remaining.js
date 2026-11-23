@@ -40,7 +40,7 @@ function remainingSections(t) {
       <dl class="rate-list">${copy.prices.map(([ru, english, amount]) => `
         <div class="rate-slot scroll-window-slot"><div class="rate-row scroll-window"><dt>[${tr([ru, english])}]</dt><dd>${amount ? t('от ','from ') + amount.replace(' ', ' ') + ' ₽' : t('по запросу','on request')}</dd></div></div>`).join('')}</dl>
       <div class="pricing-bottom">
-      ${action(tr(copy.discuss), '#contacts', true)}
+      ${action(tr(copy.discuss), 'https://t.me/linqueenn', true)}
       </div>
     </section>
     <section id="contacts" class="remaining-section" aria-labelledby="contacts-title">
@@ -139,6 +139,8 @@ function setupProcessStack() {
   const cards = [...rail.children];
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let frame;
+  let horizontalGesture;
+  let scrollRange;
   function update() {
     frame = 0;
     if (reduced.matches) {
@@ -161,6 +163,7 @@ function setupProcessStack() {
       : Math.max(240, Math.min(480, travel * .22));
     section.style.setProperty('--process-scroll-distance', scrollDistance + 'px');
     const distance = section.offsetHeight - pin.offsetHeight - 48;
+    scrollRange = {start: scrollY + section.getBoundingClientRect().top - pinTop, distance, travel};
     const progress = Math.max(0, Math.min(1, (pinTop - section.getBoundingClientRect().top) / Math.max(1, distance)));
     cards.forEach((card, i) => {
       const offset = i - progress * travel / step;
@@ -176,6 +179,31 @@ function setupProcessStack() {
   }
   addEventListener('scroll', schedule, {passive: true});
   addEventListener('resize', schedule);
+  // Horizontal swipes use the existing vertical-scroll timeline, preserving the
+  // approved stack and its position when the user resumes vertical scrolling.
+  rail.addEventListener('pointerdown', event => {
+    if ((event.pointerType !== 'touch' && !(event.pointerType === 'mouse' && innerWidth <= 900 && event.button === 0)) || reduced.matches || !scrollRange) return;
+    horizontalGesture = {id: event.pointerId, x: event.clientX, y: event.clientY, startY: scrollY};
+    if (event.pointerType === 'mouse') {
+      event.preventDefault();
+      rail.setPointerCapture(event.pointerId);
+    }
+  });
+  rail.addEventListener('pointermove', event => {
+    const gesture = horizontalGesture;
+    if (!gesture || event.pointerId !== gesture.id) return;
+    const dx = event.clientX - gesture.x;
+    const dy = event.clientY - gesture.y;
+    if (!gesture.horizontal && Math.abs(dx) <= Math.max(8, Math.abs(dy) * 1.2)) return;
+    gesture.horizontal = true;
+    if (!rail.hasPointerCapture(event.pointerId)) rail.setPointerCapture(event.pointerId);
+    const target = gesture.startY - dx / Math.max(1, scrollRange.travel) * scrollRange.distance;
+    window.scrollTo({top: Math.max(scrollRange.start, Math.min(scrollRange.start + scrollRange.distance, target)), behavior: 'instant'});
+  });
+  const endGesture = () => { horizontalGesture = null; };
+  rail.addEventListener('pointerup', endGesture);
+  rail.addEventListener('pointercancel', endGesture);
+  rail.addEventListener('lostpointercapture', endGesture);
   reduced.addEventListener('change', schedule);
   const observer = new ResizeObserver(() => {
     if (!reduced.matches) {

@@ -113,3 +113,21 @@ body.case-page { background: var(--site-background); color: #282828; font-family
 @media (max-width: 380px) {
   :root { --case-metric-size: 24px; }
 }
+
+/* Shared header arrangement: menu left, case brand centred, résumé right. */
+.case-header:not(.home-nav-floating) {
+  grid-template-columns: minmax(0, 1fr) auto minmax(0, 1fr);
+  gap: 0; padding: 8px 36px; min-height: 60px;
+}
+.case-header:not(.home-nav-floating) .case-header-brand { grid-column: 2; grid-row: 1; justify-self: center; font-size: var(--type-nav); }
+.case-header:not(.home-nav-floating) .home-menu-toggle { display: grid; grid-column: 1; grid-row: 1; justify-self: start; place-items: center; width: 48px; height: 44px; }
+.case-header:not(.home-nav-floating) .home-menu { display: none; position: absolute; top: 100%; left: 36px; right: auto; width: min(280px, calc(100vw - 72px)); padding: 12px 16px; border: 1px solid #b6b7ac; background: #efefef; z-index: 100; }
+.case-header:not(.home-nav-floating) .home-menu-toggle[aria-expanded="true"] + .home-menu { display: grid; gap: 0; }
+.case-header:not(.home-nav-floating) .home-menu nav { display: grid; grid-column: auto; grid-row: auto; justify-self: stretch; gap: 0; }
+.case-header:not(.home-nav-floating) #case-language { grid-column: auto; grid-row: auto; }
+.case-header:not(.home-nav-floating) .case-header-cv { display: flex; grid-column: 3; grid-row: 1; justify-self: end; font-size: var(--type-cv); }
+@media (max-width: 600px) {
+  .case-header:not(.home-nav-floating) { padding-inline: 16px; }
+  .case-header:not(.home-nav-floating) .home-menu { left: 16px; width: min(240px, calc(100vw - 32px)); }
+  .case-header-cv img { content: url('assets/home/mobile-download.svg'); width: 24px; height: 28px; }
+}

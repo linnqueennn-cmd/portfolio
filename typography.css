@@ -22,6 +22,7 @@
   --type-contact-tablet: 28px;
   --type-contact-mobile: 22px;
   --type-pricing-action: 40px;
+  --type-mobile-action: 24px;
   --type-hero-action: 60px;
   --portfolio-body: 22px;
   --portfolio-caption: 14px;
@@ -171,7 +172,7 @@ body.home-page { text-transform: lowercase; }
     mask-repeat: no-repeat;
     animation: cta-label-hide 1s cubic-bezier(.4, 0, .2, 1);
   }
-  .home-screen .home-cta-closing::before, #pricing .home-cta-closing::before {
+  .home-screen .home-cta-closing::before, #pricing .home-cta-closing::before, .work-tab-active.home-cta-closing::before {
     transform-origin: center;
     animation: cta-glow-close 1s cubic-bezier(.4, 0, .2, 1);
   }
@@ -293,4 +294,33 @@ body.home-page, .home-screen, .work-screen, .about-screen,
   .home-screen .home-resume-note img { zoom: 1; width: calc(43 * var(--u)); height: 100%; }
 }
 @media (max-width: 900px) { html[lang] #pricing .pricing-cta { font-size: 30px; } }
-@media (max-width: 540px) { html[lang] #pricing .pricing-cta { font-size: 24px; } }
+@media (max-width: 540px) { html[lang] #pricing .pricing-cta { font-size: var(--type-mobile-action); } }
+
+/* Mobile hero: keep Figma's text axes independent of the fitted portrait scale. */
+@media (max-width: 600px) {
+  .home-screen .home-stage { width: 100%; --frame-width: min(100cqw, 393px, max(260px, calc(100svh * 393 / 822))); }
+  .home-screen .home-nav { left: 16px; }
+  .home-screen .home-cv { left: auto; right: 16px; }
+  .home-screen .home-profile { left: 16px; }
+  .home-screen .home-line-digital { left: 19px; top: calc(92 * var(--u)); }
+  .home-screen .home-line-web { left: 19px; top: calc(151.72 * var(--u)); }
+  .home-screen .home-line-visual { left: 16px; top: calc(210.72 * var(--u)); }
+  .home-screen .home-portrait { left: calc((100% - var(--frame-width)) / 2 + 66 * var(--u)); }
+  .home-screen .home-intro { left: 16px; width: min(188px, calc(55% - 16px)); }
+  .home-screen .home-intro h2 { text-align: left; }
+  .home-screen .home-intro p { margin-top: 12px; }
+  html[lang] .home-screen .home-cta {
+    left: 16px; width: calc(100% - 32px); height: 48px; min-height: 48px;
+    display: flex; justify-content: space-between; align-items: center;
+    font-size: var(--type-mobile-action); padding: 0; letter-spacing: 0;
+  }
+  .home-screen .home-cta > .home-scramble { flex: 1; text-align: center; }
+  .home-screen .home-cta::before { inset: 11px; height: 30px; filter: blur(30.05px); }
+}
+
+@media (max-width: 600px) and (max-height: 740px) {
+ .home-screen { --type-home-body: 14px; }
+ .home-screen .home-intro { width: min(156px, calc(50% - 16px)); }
+}
+
+@media (max-width: 600px) { .home-screen .home-philosophy span { width: 106px; } }

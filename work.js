@@ -23,10 +23,10 @@ function projectsScreen(t, caseUrl) {
   return `<section id="work" class="work-screen" aria-label="${t('Кейсы','Selected work')}">
     <div class="work-tabs">
       <button type="button" class="work-tab work-tab-active" aria-pressed="true" data-work-tab="web">
-        <span class="home-scramble" data-scramble>[WEB &amp; UX/UI]</span>
+        <span class="home-cta-bracket home-cta-bracket-left" aria-hidden="true">[</span><span class="home-scramble" data-scramble>WEB &amp; UX/UI</span><span class="home-cta-bracket home-cta-bracket-right" aria-hidden="true">]</span>
         <span class="work-gem" aria-hidden="true"><img src="assets/home/gem.png" alt=""></span>
       </button>
-      <button class="work-tab" type="button" aria-pressed="false" data-work-tab="graphic"><span class="home-scramble" data-scramble>[GRAPHI]</span></button>
+      <button class="work-tab" type="button" aria-pressed="false" data-work-tab="graphic"><span class="home-cta-bracket home-cta-bracket-left" aria-hidden="true">[</span><span class="home-scramble" data-scramble>GRAPHI</span><span class="home-cta-bracket home-cta-bracket-right" aria-hidden="true">]</span></button>
     </div>
     <div class="work-list">${webProjects(t).map(([id, name, meta, description]) => `
       <div class="work-slot scroll-window-slot"><a class="work-case scroll-window" href="${caseUrl(id)}">
@@ -47,6 +47,7 @@ function setupProjectsScreen() {
   const gem = tabs.querySelector('.work-gem');
   function select(button) {
     buttons.forEach(tab => {
+      tab.classList.remove('home-cta-closing');
       tab.classList.toggle('work-tab-active', tab === button);
       tab.setAttribute('aria-pressed', tab === button);
     });

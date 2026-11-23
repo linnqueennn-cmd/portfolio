@@ -36,7 +36,7 @@ function homeScreen(t, person, cv) {
       </div>
       <a class="home-cv" href="${cv}" download>${scramble('CV')}<img src="${art}download.svg" alt=""></a>
       <div class="home-resume-note"><span>${t('моё резюме тут', 'my résumé is here')}</span><img src="${art}resume.svg" alt=""></div>
-      <a class="home-cta" href="#contacts" aria-label="${t('Обсудить проект', 'Discuss a project')}"><span class="home-cta-bracket home-cta-bracket-left" aria-hidden="true">[</span>${scramble(t('Обсудить проект', 'Discuss a project'))}<span class="home-cta-bracket home-cta-bracket-right" aria-hidden="true">]</span></a>
+      <a class="home-cta" href="https://t.me/linqueenn" aria-label="${t('Обсудить проект', 'Discuss a project')}"><span class="home-cta-bracket home-cta-bracket-left" aria-hidden="true">[</span>${scramble(t('Обсудить проект', 'Discuss a project'))}<span class="home-cta-bracket home-cta-bracket-right" aria-hidden="true">]</span></a>
       <div class="home-intro">
         <h2>${scramble(t('привет, я Лина', 'hi, I’m Lina'))}</h2>
         <p>${t('создаю сайты, цифровые интерфейсы и&nbsp;визуальные решения для&nbsp;брендов.', 'I design websites, digital interfaces and visual systems for brands.')}</p>
@@ -55,13 +55,25 @@ function setupPortraitArrival(startText) {
   const useNewArrival = !mode || mode === '6221' || mode === 'frames';
   if (useNewArrival) portrait.classList.add('home-portrait-6221');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  portrait.setAttribute('role', 'button');
+  portrait.setAttribute('tabindex', '0');
+  portrait.setAttribute('aria-label', document.documentElement.lang === 'en' ? 'Replay character arrival' : 'Повторить появление персонажа');
+  const replay = () => {
+    if (reduced.matches || portrait.classList.contains('home-portrait-pending')) return;
+    stopVideo();
+    portrait.classList.add('home-portrait-pending', 'home-portrait-6221');
+    stopVideo = playPortraitArrival(portrait, image, showPortrait, () => {});
+  };
+  portrait.addEventListener('click', replay);
+  portrait.addEventListener('keydown', event => {
+    if (event.key === 'Enter' || event.key === ' ') { event.preventDefault(); replay(); }
+  });
   let stopVideo = () => {};
   const showPortrait = () => {
     startText();
     stopVideo();
     portrait.classList.remove('home-portrait-pending', 'home-portrait-materializing',
       'home-portrait-playing', 'home-portrait-blending');
-    reduced.removeEventListener('change', onMotionChange);
   };
   const onMotionChange = () => { if (reduced.matches) showPortrait(); };
   if (reduced.matches) return showPortrait();
@@ -83,6 +95,7 @@ function setupPortraitArrival(startText) {
   }, showPortrait);
 }
 
+let portraitVideoSourcePromise;
 function playPortraitArrival(portrait, image, finish, startText) {
   const video = document.createElement('video');
   video.className = 'home-portrait-arrival';
@@ -258,9 +271,17 @@ function playPortraitArrival(portrait, image, finish, startText) {
     || (navigator.platform === 'MacIntel' && navigator.maxTouchPoints > 1);
   if (needsAtlas) startAtlas();
   else {
-    video.src = 'assets/home/portrait-6221.webm';
     portrait.append(video);
-    video.play().catch(() => { if (!stopped) startAtlas(); });
+    // Fully buffer once: the short walk must not stall waiting for the network.
+    portraitVideoSourcePromise ??= fetch('assets/home/portrait-6221.webm', {cache: 'force-cache', priority: 'high'})
+      .then(response => { if (!response.ok) throw new Error('Portrait video unavailable'); return response.blob(); })
+      .then(blob => URL.createObjectURL(blob))
+      .catch(error => { portraitVideoSourcePromise = null; throw error; });
+    portraitVideoSourcePromise.then(url => {
+      if (stopped || atlasStarted) return;
+      video.src = url;
+      return video.play();
+    }).catch(() => { if (!stopped) startAtlas(); });
   }
 
   return () => {
@@ -408,7 +429,7 @@ function createScrambleJobs(root) {
     if (element.closest('.home-menu-handle')) return () => {};
     if (scrambleJobCache.has(element)) return scrambleJobCache.get(element);
     const glyphs = [...element.textContent];
-    const menuItem = element.closest('.home-nav a, .home-nav button');
+    const menuItem = element.closest('.home-nav a, .home-nav button, .about-resume');
     const letters = glyphs.filter(glyph => /[\p{L}\p{N}]/u.test(glyph)).length;
     let duration = menuItem || letters <= 4 ? Math.min(550, 200 + letters * 38) : 760;
     if (element.closest('.home-title')) duration = 1800 - 3 * homeScrambleStagger;
@@ -450,7 +471,7 @@ function createScrambleJobs(root) {
       animation = requestAnimationFrame(frame);
     }
 
-    const heroButton = element.closest('.home-screen .home-cta, #pricing .pricing-cta');
+    const heroButton = element.closest('.home-screen .home-cta, #pricing .pricing-cta, .work-tab');
     if (heroButton) {
       const left = heroButton.querySelector('.home-cta-bracket-left');
       const right = heroButton.querySelector('.home-cta-bracket-right');
