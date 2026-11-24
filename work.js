@@ -24,7 +24,7 @@ function projectsScreen(t, caseUrl) {
     <div class="work-tabs">
       <button type="button" class="work-tab work-tab-active" aria-pressed="true" data-work-tab="web">
         <span class="home-cta-bracket home-cta-bracket-left" aria-hidden="true">[</span><span class="home-scramble" data-scramble>WEB &amp; UX/UI</span><span class="home-cta-bracket home-cta-bracket-right" aria-hidden="true">]</span>
-        <span class="work-gem" aria-hidden="true"><img src="assets/home/gem.png" alt=""></span>
+        <span class="work-gem" aria-hidden="true"></span>
       </button>
       <button class="work-tab" type="button" aria-pressed="false" data-work-tab="graphic"><span class="home-cta-bracket home-cta-bracket-left" aria-hidden="true">[</span><span class="home-scramble" data-scramble>GRAPHI</span><span class="home-cta-bracket home-cta-bracket-right" aria-hidden="true">]</span></button>
     </div>

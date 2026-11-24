@@ -4,7 +4,7 @@ import {HDRLoader} from './assets/vendor/three/HDRLoader.js';
 
 // One small renderer for the hero crystal.
 const host = document.querySelector('.home-gem-slot');
-if (host) setupCrystal(host).catch(error => console.warn('Crystal PNG fallback', error));
+if (host) setupCrystal(host).catch(error => console.warn('Crystal could not load', error));
 
 async function setupCrystal(host) {
   const [gltf, environment] = await Promise.all([
@@ -149,7 +149,7 @@ async function setupCrystal(host) {
 // Keep the original slot in the layout and move just its canvas.
 // One renderer, original lighting/material, no scroll interception or new library.
 function setupCrystalJourney(host, canvas) {
-  const desktop = matchMedia('(min-width: 1101px) and (hover: hover) and (pointer: fine)');
+  const desktop = matchMedia('(min-width: 1101px), (min-width: 601px) and (orientation: landscape)');
   const compact = matchMedia('(max-width: 600px), (max-width: 1100px) and (orientation: portrait)');
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const layer = document.createElement('span');
@@ -157,19 +157,26 @@ function setupCrystalJourney(host, canvas) {
   layer.setAttribute('aria-hidden', 'true');
   document.body.append(layer);
   const tabs = document.querySelector('.work-tabs');
-  const work = [...document.querySelectorAll('.work-slot')];
   const about = [...document.querySelectorAll('.about-slot')];
   const services = [...document.querySelectorAll('.service-option')];
+  const serviceSection = document.querySelector('#services');
+  const serviceStop = document.querySelector('#services-title .crystal-stop');
   const process = document.querySelector('#process');
   const pricing = document.querySelector('#pricing');
   const contacts = document.querySelector('#contacts');
   const processStop = document.querySelector('#process-title .crystal-stop');
   const pricingStop = document.querySelector('#pricing-title .crystal-stop');
   const footer = document.querySelector('#contacts-title .home-scramble');
+  const footerRange = document.createRange();
+  footerRange.setStart(footer.firstChild, 0);
+  footerRange.setEnd(footer.firstChild, footer.firstChild.length);
   const tabGem = document.querySelector('.work-gem');
   const local = setupLocalCrystals(canvas, about, services, contacts);
   let compactMode = false;
   let active = false, current, position, from, started = 0, lastScroll = scrollY;
+  let settled = false;
+  let attachedTo = null;
+  let aboutIndex = 0, appearing = false;
   let dirtyUntil = 0, previousMotion = {active: false, speed: 1};
   const invalidate = () => { dirtyUntil = performance.now() + 900; };
   addEventListener('scroll', invalidate, {passive: true});
@@ -185,7 +192,7 @@ function setupCrystalJourney(host, canvas) {
     return {x: side === 'inside' ? r.left + r.width / 2 : side === 'right' ? r.right + height * .32 + 8 : r.left - height * .32 - 8,
       y: r.top + r.height / 2, height};
   };
-  const passed = element => box(element).top <= innerHeight * .58;
+  const passed = element => box(element).top <= innerHeight * (current === element ? .66 : .58);
   function update(now, elapsed) {
     const mobile = compact.matches;
     const enabled = (desktop.matches || mobile) && !reduced.matches && !!contacts;
@@ -195,15 +202,18 @@ function setupCrystalJourney(host, canvas) {
       document.body.classList.toggle('crystal-journey-enabled', active);
       document.body.classList.toggle('crystal-local-enabled', active && mobile);
       (active ? layer : host).append(canvas);
+      if (attachedTo) { document.body.append(layer); layer.style.cssText = ''; attachedTo = null; }
       layer.hidden = !active;
       local.reset();
       current = null;
       position = null;
+      settled = false;
+      aboutIndex = 0;
       invalidate();
     }
     if (!active) return {active: false, speed: 1};
     // Layout is read only while scrolling, resizing or settling a transition.
-    if (now > dirtyUntil && position) return {...previousMotion, moving: false, speed: previousMotion.spinning ? 1 : 0};
+    if (now > dirtyUntil && position && settled) return {...previousMotion, moving: false, speed: previousMotion.spinning ? 1 : 0};
     const scrollDelta = scrollY - lastScroll;
     lastScroll = scrollY;
     const hero = box(host);
@@ -219,20 +229,19 @@ function setupCrystalJourney(host, canvas) {
       target.height += (tabRect.height - target.height) * t;
       continuous = true;
     } else if (scrollY >= tabEnd) {
-      target = point(tabGem, tabRect.height, 'inside'); key = tabs;
+      target = point(tabGem, tabRect.height, 'inside'); key = mobile ? tabs : tabGem.parentElement;
       if (!mobile) {
-      work.forEach(slot => {
-        if (!passed(slot)) return;
-        target = point(slot.querySelector('h3'), 27); key = slot; spinning = false;
-      });
-      about.forEach(slot => {
-        if (!passed(slot)) return;
-        const gem = slot.querySelector('.about-gem');
-        target = point(gem, Math.min(32, box(gem).height), 'inside'); key = slot; spinning = false;
-      });
-      if (services.length && passed(services[0])) {
-        const row = services.find(item => item.classList.contains('is-active')) || services[0];
-        target = point(row.querySelector('h3'), 36); key = row; spinning = false;
+      if (passed(about[0])) {
+        // Scroll selects a stop. Different forward/back thresholds prevent
+        // retriggering a hop on every small change of scroll direction.
+        const centre = index => { const r = box(about[index].querySelector('.about-panel')); return r.top + r.height / 2; };
+        while (aboutIndex < about.length - 1 && centre(aboutIndex + 1) < innerHeight * .60) aboutIndex++;
+        while (aboutIndex > 0 && centre(aboutIndex) > innerHeight * .68) aboutIndex--;
+        const gem = about[aboutIndex].querySelector('.about-gem');
+        target = point(gem, Math.min(32, box(gem).height), 'inside'); key = about[aboutIndex]; spinning = false;
+      }
+      if (passed(serviceSection)) {
+        target = point(serviceStop, 36, 'inside'); key = serviceSection; spinning = true;
       }
       if (passed(process)) {
         target = point(processStop, 36, 'inside');
@@ -242,37 +251,44 @@ function setupCrystalJourney(host, canvas) {
         target = point(pricingStop, 36, 'inside');
         key = pricing; spinning = true;
       }
-      // Cross the pricing section diagonally, reaching the footer at its entrance.
-      const footerBox = box(footer);
-      if (key === pricing) {
-        const t = ease(clamp((innerHeight * 1.12 - footerBox.top) / (innerHeight * .54)));
-        if (t > 0) {
-          const end = point(footer, 48, 'right');
-          target.x += (end.x - target.x) * t;
-          target.y += (end.y - target.y) * t;
-          target.height += (end.height - target.height) * t;
-          continuous = true;
-        }
-      }
       if (passed(contacts)) {
-        target = point(footer, 48, 'right');
+        const text = footerRange.getBoundingClientRect();
+        target = {x: text.right + 34, y: text.top + text.height / 2, height: 56};
         key = contacts; spinning = true;
       }
       }
     }
     target.x = Math.max(18, Math.min(innerWidth - 24, target.x));
+    if (continuous && attachedTo) {
+      document.body.append(layer);
+      layer.style.cssText = '';
+      attachedTo = null;
+    }
     if (key !== current) {
-      from = position ? {...position} : null;
+      const wasVisible = position && !layer.hidden;
+      const old = wasVisible ? box(layer) : null;
+      from = old ? {x: old.left + old.width / 2, y: old.top + old.height / 2 + scrollDelta, height: old.height} : position ? {...position} : null;
+      if (attachedTo) {
+        document.body.append(layer);
+        layer.style.cssText = '';
+        attachedTo = null;
+      }
+      const enteringAbout = about.includes(key) && !about.includes(current) && current !== serviceSection;
+      const separateEntry = enteringAbout || key === process || key === pricing || key === contacts;
+      appearing = !mobile && separateEntry && !wasVisible;
+      if (appearing) from = {x: target.x, y: target.y - 72 + scrollDelta, height: target.height};
       started = now;
       current = key;
+      settled = false;
     }
-    const t = clamp((now - started) / 620);
-    if (!position || continuous || !from || t === 1) position = {...target};
+    const t = clamp((now - started) / (mobile ? 620 : 400));
+    settled = t === 1 || continuous;
+    if (continuous || !from || t === 1) position = {...target};
     else {
       from.y -= scrollDelta;
       const blend = ease(t);
       position = {x: from.x + (target.x - from.x) * blend,
-        y: from.y + (target.y - from.y) * blend - Math.sin(Math.PI * t) * (mobile ? innerWidth <= 600 ? 0 : 8 : 24),
+        y: from.y + (target.y - from.y) * blend - Math.sin(Math.PI * t) * (mobile ? innerWidth <= 600 ? 0 : 8 : 6),
         height: from.height + (target.height - from.height) * blend};
     }
     // Scale the same canvas instead of reallocating the WebGL drawing buffer.
@@ -280,9 +296,29 @@ function setupCrystalJourney(host, canvas) {
     layer.style.width = hero.width + 'px';
     layer.style.height = hero.height + 'px';
     layer.style.transform = `translate3d(${position.x - hero.width * scale / 2}px,${position.y - position.height / 2}px,0) scale(${scale})`;
-    layer.dataset.stop = key.id || (key === host ? 'home' : key === tabs ? 'work-tabs' : key.className.split(' ')[0]);
+    layer.style.opacity = appearing && !continuous ? String(ease(t)) : '1';
+    if (!mobile && settled && !continuous) {
+      const anchor = key === host ? host : key === tabGem.parentElement ? tabGem :
+        about.includes(key) ? key.querySelector('.about-gem') : key === serviceSection ? serviceStop :
+        key === process ? processStop : key === pricing ? pricingStop : footer;
+      anchor.classList.add('crystal-anchor');
+      if (attachedTo !== anchor) { anchor.append(layer); attachedTo = anchor; }
+      const insideSlot = anchor !== footer;
+      const height = insideSlot ? anchor.clientHeight : target.height;
+      const width = height * hero.width / hero.height;
+      layer.style.position = 'absolute';
+      layer.style.width = width + 'px';
+      layer.style.height = height + 'px';
+      const text = insideSlot ? null : footerRange.getBoundingClientRect();
+      const anchorBox = insideSlot ? null : box(anchor);
+      layer.style.left = (insideSlot ? (anchor.clientWidth - width) / 2 : text.right - anchorBox.left + 20) + 'px';
+      layer.style.top = (insideSlot ? (anchor.clientHeight - height) / 2 : text.top + text.height / 2 - anchorBox.top - height / 2) + 'px';
+      layer.style.transform = 'none';
+    }
+    layer.dataset.stop = key.id || (key === host ? 'home' : key === tabs || key === tabGem.parentElement ? 'work-tabs' : key.className.split(' ')[0]);
     const moving = continuous || t < 1;
     previousMotion = {active, spinning, moving, speed: moving ? 1.35 + Math.min(1, Math.abs(scrollDelta) / Math.max(1, elapsed * 1600)) : spinning ? 1 : 0};
+    if (!mobile) previousMotion.speed = moving ? 1.15 : spinning ? 1 : 0;
     if (mobile && innerWidth <= 600) previousMotion.speed = 1;
     if (mobile) {
       const mainVisible = position.y + position.height / 2 > 0 && position.y - position.height / 2 < innerHeight;
@@ -290,7 +326,10 @@ function setupCrystalJourney(host, canvas) {
       const localsVisible = local.update(now, scrollDelta, hero);
       previousMotion.visible = mainVisible || localsVisible;
       previousMotion.afterRender = local.draw;
-    } else layer.hidden = false;
+    } else {
+      previousMotion.visible = position.y + position.height / 2 > 0 && position.y - position.height / 2 < innerHeight;
+      layer.hidden = !previousMotion.visible;
+    }
     return previousMotion;
   }
   return {update};
@@ -354,7 +393,7 @@ function setupLocalCrystals(source, about, services, contacts) {
         end.x = word.right + 14;
         end.y = word.top + word.height / 2;
       }
-      if (phone && index < 2) {
+      if (index < 2) {
         // Attach to the actual card/title: ordinary scrolling must never become
         // a second animation of a fixed overlay following its animated parent.
         const changed = target !== group.current;
@@ -377,10 +416,11 @@ function setupLocalCrystals(source, about, services, contacts) {
         group.layer.hidden = !group.visible;
         if (changed && old && group.visible) {
           const next = rect(group.layer);
-          group.layer.animate([
-            {transform: `translate(${old.left - next.left}px,${old.top - next.top}px)`},
-            {transform: 'translate(0,0)'}
-          ], {duration: 220, easing: 'ease-out'});
+          const dx = old.left - next.left, dy = old.top - next.top;
+          const frames = [{transform: `translate(${dx}px,${dy}px)`}];
+          if (!phone) frames.push({transform: `translate(${dx / 2}px,${dy / 2 - 12}px)`});
+          frames.push({transform: 'translate(0,0)'});
+          group.layer.animate(frames, {duration: phone ? 220 : 620, easing: 'ease-out'});
         }
         group.pose = end;
         return;

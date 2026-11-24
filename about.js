@@ -18,7 +18,7 @@ function aboutScreen(t, person) {
     <div class="about-scene"><a class="about-resume" href="assets/cv.pdf" download><span class="about-resume-label"><span class="home-scramble" data-scramble>CV</span><img src="assets/home/download.svg" alt=""></span><span class="about-resume-note"><span class="about-resume-desktop-note">${t('подробнее тут', 'more details here')}</span><span class="about-resume-mobile-note">${t('скачать резюме', 'download résumé')}</span></span></a>${cards.map(([heading, body], i) => `
       <div class="about-slot scroll-window-slot">
         <article class="about-panel scroll-window">
-          <h2><span class="home-scramble" data-scramble>0${i + 1} / ${heading}</span><span class="about-gem" aria-hidden="true">${i === 0 ? '<img src="assets/home/gem.png" alt="">' : ''}</span></h2>
+          <h2><span class="home-scramble" data-scramble>0${i + 1} / ${heading}</span><span class="about-gem" aria-hidden="true"></span></h2>
           <p>${body}</p>
           ${i === 0 ? `<img class="about-photo" src="assets/about/portrait.png" alt="${person}" loading="lazy">` : ''}
         </article>

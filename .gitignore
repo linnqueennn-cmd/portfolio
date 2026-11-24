@@ -3,6 +3,9 @@
 # Local processing, source footage and generated publishing output.
 /.portrait-processing/
 /dist/
+/assets/services/*.png
+/assets/services/manifest.json
+/assets/services/1f04d.webp
 /node_modules/
 *.mov
 *.MOV

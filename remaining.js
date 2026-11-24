@@ -5,18 +5,15 @@ function remainingSections(t) {
   const scramble = value => `<span class="home-scramble" data-scramble>${value}</span>`;
   const heading = (id, index) => `<h2 class="remaining-heading" id="${id}-title" data-reveal>${scramble(tr(copy.titles[index]))}<span class="crystal-stop" aria-hidden="true"></span></h2>`;
   const action = (label, url, fullWidth = false) => `<a class="remaining-action home-cta${fullWidth ? ' pricing-cta' : ''}" href="${url}">${fullWidth ? `<span class="home-cta-bracket home-cta-bracket-left" aria-hidden="true">[</span>${scramble(label)}<span class="home-cta-bracket home-cta-bracket-right" aria-hidden="true">]</span>` : scramble('[' + label + ']')}</a>`;
-  const serviceImages = ['roma', 'vinyl', 'brand', 'retail'];
   return `
     <section id="services" class="remaining-section" aria-labelledby="services-title">
       <div class="service-pin">
       ${heading('services', 0)}
       <div class="service-story">
-        <figure class="service-media" aria-hidden="true">${serviceImages.map((image, i) =>
-          `<img src="assets/${image}.jpg" alt="" loading="lazy"${i === 0 ? ' class="is-active"' : ''}>`).join('')}</figure>
+        <figure class="service-media" aria-hidden="true">${copy.services.map((_, i) => serviceCollageMarkup(i)).join('')}</figure>
         <div class="service-options">${copy.services.map(([name, ru, english], i) => `
           <article class="service-option${i === 0 ? ' is-active' : ''}">
             <h3><button type="button" aria-pressed="${i === 0}">${name.toLowerCase().replace(/& /g, '& ')}</button></h3>
-            <img src="assets/${serviceImages[i]}.jpg" alt="" loading="lazy" class="service-inline">
             <p>${tr([ru, english])}</p>
           </article>`).join('')}</div>
       </div>
@@ -55,22 +52,29 @@ function remainingSections(t) {
 
 function setupRemainingSections() {
   const rows = [...document.querySelectorAll('.service-option')];
-  const images = [...document.querySelectorAll('.service-media img')];
+  const images = [...document.querySelectorAll('.service-collage')];
+  const collage = setupServiceCollages(document.querySelector('.service-media'));
+  let measuring = false;
   const wide = matchMedia('(min-width: 900px)');
   const mobile = matchMedia('(max-width: 540px), (max-width: 1100px) and (orientation: portrait)');
   const serviceSection = document.querySelector('#services');
   const story = serviceSection.querySelector('.service-story');
+  const options = serviceSection.querySelector('.service-options');
   const servicePin = serviceSection.querySelector('.service-pin');
   let servicePinHeight = 0;
   function measureServices() {
     story.style.removeProperty('min-height');
-    if (!mobile.matches) return;
+    options.style.removeProperty('min-height');
+    if (!mobile.matches) { serviceSection.style.removeProperty('--service-sticky-top'); return; }
     const original = selected;
     let height = 0;
-    rows.forEach((_, index) => { activate(index); height = Math.max(height, story.offsetHeight); });
+    measuring = true;
+    rows.forEach((_, index) => { activate(index); height = Math.max(height, options.offsetHeight); });
     activate(original);
-    story.style.minHeight = height + 'px';
+    measuring = false;
+    options.style.minHeight = height + 'px';
     servicePinHeight = servicePin.offsetHeight;
+    serviceSection.style.setProperty('--service-sticky-top', Math.min(88, innerHeight - servicePinHeight - 16) + 'px');
   }
   let selected = 0;
   let frame = 0;
@@ -84,6 +88,7 @@ function setupRemainingSections() {
     rows[index].classList.add('is-active');
     images[index].classList.add('is-active');
     rows[index].querySelector('button').setAttribute('aria-pressed', 'true');
+    if (!measuring) collage.select(index);
   }
 
   function update() {
@@ -94,7 +99,7 @@ function setupRemainingSections() {
       const start = serviceSection.getBoundingClientRect().top + paddingTop;
       const distance = serviceSection.offsetHeight - paddingTop -
         Number.parseFloat(sectionStyle.paddingBottom) - servicePinHeight;
-      const stickyTop = Number.parseFloat(getComputedStyle(servicePin).top);
+      const stickyTop = Math.min(88, innerHeight - servicePinHeight - 16);
       const progress = Math.max(0, Math.min(1, (stickyTop - start) / Math.max(1, distance)));
       activate(Math.min(rows.length - 1, Math.floor(progress * rows.length)));
       return;
@@ -120,6 +125,9 @@ function setupRemainingSections() {
   addEventListener('resize', () => { measureServices(); schedule(); });
   document.fonts.ready.then(() => { measureServices(); schedule(); });
   measureServices();
+  new ResizeObserver(() => {
+    if (mobile.matches) serviceSection.style.setProperty('--service-sticky-top', Math.min(88, innerHeight - servicePin.offsetHeight - 16) + 'px');
+  }).observe(servicePin);
   schedule();
 
   setupScrollWindows(document.querySelector('.rate-list'));

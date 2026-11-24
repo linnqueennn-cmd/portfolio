@@ -11,6 +11,11 @@ const files = [
   'style.css', 'home.css', 'work.css', 'about.css', 'remaining.css', 'typography.css',
   'home.js', 'work.js', 'about.js', 'remaining-content.js', 'remaining.js', 'site.js',
   'crystal.js', 'grid-preview.js',
+  'service-collages.js',
+  ...['d18d9','48a79','a199c','1c27b','f4b28','35773','c955d','bd3f5',
+    '47ff9','51723','fe849','9f964','c0ea7','36c2c','00f34','bd4ed','350b2','bdebd']
+    .map(name => `assets/services/${name}.webp`),
+  'assets/services/8e6c1.svg',
   'case-study.js', 'case-roma.js', 'case-study.css',
   'case-zen.js', 'case-zen.css',
   ...['cover_before_after.webp', 'source_filters.webp', 'source_appearance.webp',

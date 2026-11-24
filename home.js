@@ -21,7 +21,7 @@ function homeScreen(t, person, cv) {
       <h1 class="home-title" id="home-title">
         <span class="home-line home-line-digital">${scramble('Digital design,')}</span>
         <span class="home-line home-line-web">${scramble('Web &amp;')}
-          <span class="home-gem-slot" data-crystal-anchor="home" aria-hidden="true"><img src="${art}gem.png" alt=""></span>
+          <span class="home-gem-slot" data-crystal-anchor="home" aria-hidden="true"></span>
         </span>
         <span class="home-line home-line-visual">${scramble('Visual')} ${scramble('systems')}</span>
       </h1>

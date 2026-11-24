@@ -31,19 +31,23 @@ body.home-page { background: #efefef; font-family: "Ubuntu Sans Mono", monospace
   top: max(24px, calc(50svh - min(14vw, 210px)));
   aspect-ratio: 4 / 3;
   overflow: hidden;
-  background: #deded6;
+  background: transparent;
 }
-.service-media img {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0;
-  transform: translateY(7%);
-  transition: opacity .32s ease, transform .42s ease;
+.service-collage { position: absolute; inset: 0; opacity: 0; visibility: hidden; pointer-events: none; transition: opacity .12s ease; }
+.service-collage.is-active { opacity: 1; visibility: visible; }
+.service-collage-layout { position: absolute; width: 680px; height: 511px; transform: scale(var(--collage-scale, 0)); transform-origin: 0 0; overflow: clip; }
+.service-piece { display: block; position: absolute; opacity: 0; transform: translate(var(--assemble-x),var(--assemble-y)) rotate(var(--assemble-turn)) scale(.94); transition: transform .42s cubic-bezier(.2,.7,.2,1), opacity .22s ease; }
+.service-part { display: block; position: absolute; }
+.service-collage.is-assembled .service-piece { opacity: 1; transform: none; transition-delay: var(--part-delay); }
+.service-art { position: absolute; left: 50%; top: 50%; }
+.service-raster { position: absolute; inset: 0; width: 100%; height: 100%; max-width: none; object-fit: cover; }
+.service-vector { display: block; max-width: none; }
+.service-art-cropped { overflow: hidden; }
+.service-art-cropped .service-raster { left: -25.04%; width: 145.69%; }
+@media (prefers-reduced-motion: reduce) {
+  .service-collage, .service-piece { transition: none; }
+  .service-collage.is-active .service-piece { opacity: 1; transform: none; }
 }
-.service-media img.is-active { opacity: 1; transform: none; }
 .service-option {
   display: grid;
   align-content: center;
@@ -55,6 +59,7 @@ body.home-page { background: #efefef; font-family: "Ubuntu Sans Mono", monospace
 .service-option p { max-width: none; }
 .service-option .remaining-meta { font: inherit; color: #aaa; letter-spacing: inherit; }
 .service-option.is-active { color: #191a17; }
+.service-option:not(.is-active) { opacity: .82; }
 .service-option button {
   display: flex;
   align-items: baseline;
@@ -194,6 +199,8 @@ body.home-page { background: #efefef; font-family: "Ubuntu Sans Mono", monospace
 .home-gem-slot canvas:active { cursor: grabbing; }
 .crystal-travel-enabled :is(.home-gem-slot,.work-gem,.about-gem) img { visibility: hidden; }
 .crystal-journey { position: fixed; left: 0; top: 0; z-index: 18; pointer-events: none; transform-origin: 0 0; }
+.crystal-anchor:not(.home-gem-slot) { position: relative; }
+.about-gem.crystal-anchor, .work-gem.crystal-anchor { overflow: visible; }
 .crystal-journey canvas { display: block; width: 100%; height: 100%; pointer-events: auto; touch-action: none; cursor: grab; }
 .crystal-journey canvas:active { cursor: grabbing; }
 .crystal-journey-enabled :is(.home-gem-slot,.work-gem,.about-gem) img { visibility: hidden; }
@@ -226,7 +233,7 @@ body.home-page { background: #efefef; font-family: "Ubuntu Sans Mono", monospace
 }
 @media (max-width: 540px), (max-width: 1100px) and (orientation: portrait) {
   #services { position: relative; min-height: 260svh; }
-  .service-pin { position: sticky; top: 88px; }
+  .service-pin { position: sticky; top: var(--service-sticky-top, 88px); }
   .service-story { position: static; display: flex; flex-direction: column; gap: 24px; }
   .service-options { order: 1; width: 100%; }
   .service-media { display: block; order: 2; position: relative; top: auto; width: 100%; aspect-ratio: 16 / 10; max-height: min(24svh, max(80px, calc(100svh - 580px))); }
@@ -245,6 +252,9 @@ body.home-page { background: #efefef; font-family: "Ubuntu Sans Mono", monospace
   .service-option .service-inline { display: none; }
   .service-option button { min-height: 44px; }
   .service-inline { aspect-ratio: 16 / 10; }
+}
+@media (max-width: 600px) {
+  #services .service-media { aspect-ratio: var(--collage-aspect, 1.25); height: auto; max-height: 60svh; }
 }
 @media (max-width: 540px) {
   .process-top { grid-template-columns: 1fr; }
