@@ -16,7 +16,10 @@ const files = [
     '47ff9','51723','fe849','9f964','c0ea7','36c2c','00f34','bd4ed','350b2','bdebd']
     .map(name => `assets/services/${name}.webp`),
   'assets/services/8e6c1.svg',
-  'case-study.js', 'case-roma.js', 'case-study.css',
+  'case-study.js', 'case-roma.js', 'case-choreo.js', 'case-dixon.js', 'case-study.css',
+  'case-vinyl.js', 'case-vinyl.css',
+  ...Array.from({length: 8}, (_, i) => `assets/cases/vinyl/${String(i + 1).padStart(2, '0')}.webp`),
+  ...Array.from({length: 14}, (_, i) => `assets/cases/dixon/page-${String(i + 1).padStart(2, '0')}.webp`),
   'case-zen.js', 'case-zen.css',
   ...['cover_before_after.webp', 'source_filters.webp', 'source_appearance.webp',
     'source_summary.webp', 'persona_anna.png', 'auth_login.webp',

@@ -49,7 +49,7 @@ function renderHome() {
   ${remainingSections(t)}
   `;
 
-  setupProjectsScreen();
+  setupProjectsScreen(t, caseUrl);
   setupRemainingSections();
   document.querySelector('#home-language').onclick = language.onclick;
   setupPortraitArrival(setupHomeScramble());
@@ -82,12 +82,30 @@ if (caseId === 'roma') {
   document.querySelector('meta[name=description]').content = zenSocialCase.summary;
   app.innerHTML = zenSocialCasePage();
   setupZenSocialCase();
+} else if (caseId === 'vinyl') {
+  document.body.classList.add('case-page');
+  document.documentElement.lang = 'ru';
+  document.title = 'Vinyl Store — UX/UI-кейс | linqueenn';
+  document.querySelector('meta[name=description]').content = vinylStoreCase.summary;
+  app.innerHTML = caseStudyPage(vinylStoreCase);
+} else if (caseId === 'choreo') {
+  document.body.classList.add('case-page');
+  document.documentElement.lang = 'ru';
+  document.title = 'XoreoKids — UX/UI-кейс | linqueenn';
+  document.querySelector('meta[name=description]').content = choreoKidsCase.summary;
+  app.innerHTML = caseStudyPage(choreoKidsCase);
+} else if (caseId === 'dixon') {
+  document.body.classList.add('case-page');
+  document.documentElement.lang = 'ru';
+  document.title = 'Dixon Dance — айдентика | linqueenn';
+  document.querySelector('meta[name=description]').content = dixonDanceCase.summary;
+  app.innerHTML = caseStudyPage(dixonDanceCase);
 } else if (project) {
   const back = './?' + (en ? 'lang=en&' : '') + (projects.indexOf(project) > 2 ? 'work=graphic' : '') + '#work';
   document.title = project[1] + ' — linqueenn';
   document.querySelector('meta[name=description]').content = project[3];
   app.innerHTML = `<section class="section case"><a class="note" href="${back}">← ${t('Все проекты','All projects')}</a><h1 class="heading">${project[1]}</h1><p class="meta">${project[2]}</p>${caseId === 'zen' ? '' : cover(project)}<p>${project[3]}</p>${project[4] ? `<a class="cta" href="${behance}gallery/${project[4]}">${t('Смотреть на Behance','View on Behance')} ↗</a>` : ''}</section>`;
 } else renderHome();
-if (project) setupCasePage();
+if (['roma', 'zen', 'vinyl', 'choreo', 'dixon'].includes(caseId)) setupCasePage();
 setupBackToTop();
 if (location.hash) requestAnimationFrame(() => document.getElementById(location.hash.slice(1))?.scrollIntoView({behavior:'instant'}));

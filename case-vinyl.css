@@ -1,0 +1,7 @@
+/* Vinyl uses the shared case template; only its image spacing is specific. */
+[data-case="vinyl"] .case-cover { margin-top: 32px; }
+[data-case="vinyl"] .case-picture > a { display: block; cursor: zoom-in; }
+[data-case="vinyl"] .case-block:has(> [data-media="05"]) { margin-top: 0; }
+@media (max-width: 600px) {
+  [data-case="vinyl"] .case-cover { margin-top: 24px; }
+}

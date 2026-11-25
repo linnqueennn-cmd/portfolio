@@ -297,8 +297,8 @@ function setupCrystalJourney(host, canvas) {
     layer.style.height = hero.height + 'px';
     layer.style.transform = `translate3d(${position.x - hero.width * scale / 2}px,${position.y - position.height / 2}px,0) scale(${scale})`;
     layer.style.opacity = appearing && !continuous ? String(ease(t)) : '1';
-    if (!mobile && settled && !continuous) {
-      const anchor = key === host ? host : key === tabGem.parentElement ? tabGem :
+    if (settled && !continuous) {
+      const anchor = key === host ? host : key === tabs || key === tabGem.parentElement ? tabGem :
         about.includes(key) ? key.querySelector('.about-gem') : key === serviceSection ? serviceStop :
         key === process ? processStop : key === pricing ? pricingStop : footer;
       anchor.classList.add('crystal-anchor');
@@ -393,26 +393,28 @@ function setupLocalCrystals(source, about, services, contacts) {
         end.x = word.right + 14;
         end.y = word.top + word.height / 2;
       }
-      if (index < 2) {
+      if (index < 3) {
         // Attach to the actual card/title: ordinary scrolling must never become
         // a second animation of a fixed overlay following its animated parent.
-        const changed = target !== group.current;
+        const anchor = index === 2 ? contacts.querySelector('h2') : target;
+        const changed = anchor !== group.current;
         const old = changed && group.current && !group.layer.hidden ? rect(group.layer) : null;
         if (changed) {
           group.layer.getAnimations().forEach(animation => animation.cancel());
-          target.append(group.layer);
-          group.current = target;
+          anchor.append(group.layer);
+          group.current = anchor;
         }
         const localHeight = index === 0 ? target.clientHeight : height;
         const width = localHeight * hero.width / hero.height;
+        const anchorRect = rect(anchor);
         group.anchored = true;
         group.layer.style.position = 'absolute';
         group.layer.style.width = width + 'px';
         group.layer.style.height = localHeight + 'px';
-        group.layer.style.left = (index === 0 ? (target.clientWidth - width) / 2 : -13 - width / 2) + 'px';
-        group.layer.style.top = (index === 0 ? 0 : end.y - r.top - height / 2) + 'px';
+        group.layer.style.left = (index === 0 ? (target.clientWidth - width) / 2 : index === 1 ? -13 - width / 2 : end.x - anchorRect.left - width / 2) + 'px';
+        group.layer.style.top = (index === 0 ? 0 : end.y - anchorRect.top - height / 2) + 'px';
         group.layer.style.transform = 'none';
-        group.visible = r.bottom > 0 && r.top < innerHeight && r.width > 0;
+        group.visible = anchorRect.bottom > 0 && anchorRect.top < innerHeight && anchorRect.width > 0;
         group.layer.hidden = !group.visible;
         if (changed && old && group.visible) {
           const next = rect(group.layer);

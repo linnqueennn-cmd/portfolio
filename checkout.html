@@ -1,0 +1,28 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8"><meta name="viewport" content="width=device-width,initial-scale=1">
+  <title>Оформление заказа — Vinyl Shop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="shop.css"><script src="shop.js" defer></script>
+</head>
+<body data-shop-page="checkout">
+  <header class="shop-header"><a class="shop-logo" href="catalog.html" aria-label="Vinyl Shop, каталог"><img src="assets/shop/logo.svg" alt=""></a><nav class="shop-nav" id="shop-nav" aria-label="Основная навигация"><a href="catalog.html">каталог</a><a href="catalog.html#blog">блог</a><a href="catalog.html#about">о нас</a><a href="catalog.html#contacts">контакты</a></nav><button class="menu-toggle" type="button" aria-expanded="false" aria-controls="shop-nav" aria-label="Открыть меню"><span aria-hidden="true"></span></button><a class="header-search" href="catalog.html#catalog-search" aria-label="Перейти к поиску"><img src="assets/shop/search.svg" alt=""></a><a class="cart-link" href="cart.html">корзина <span class="cart-count" hidden>0</span></a></header>
+  <nav class="checkout-steps page-steps" aria-label="Этапы оформления"><span class="is-active">01 данные</span><span>02 оплата</span><span>03 готово</span></nav>
+  <main class="shop-main order-page">
+    <a class="back-link" href="cart.html">← вернуться в&nbsp;корзину</a>
+    <div class="page-intro compact"><p class="eyebrow">почти готово</p><h1>ОФОРМЛЕНИЕ</h1></div>
+    <div class="checkout-layout">
+      <form class="checkout-form" id="checkout-form">
+        <fieldset><legend>контактные данные</legend><div class="form-grid"><label><span>имя</span><input name="name" autocomplete="name" required></label><label><span>телефон</span><input name="phone" type="tel" autocomplete="tel" placeholder="+7 900 000 00 00" required></label><label class="wide"><span>e-mail</span><input name="email" type="email" autocomplete="email" required></label></div></fieldset>
+        <fieldset><legend>доставка</legend><div class="delivery-options"><label><input type="radio" name="delivery" value="Курьером" data-price="490" checked><span><b>курьером</b><small>2–4 дня · 490 ₽</small></span></label><label><input type="radio" name="delivery" value="Самовывоз" data-price="0"><span><b>самовывоз</b><small>сегодня · бесплатно</small></span></label></div><label><span>адрес</span><input name="address" autocomplete="street-address" required placeholder="город, улица, дом, квартира"></label></fieldset>
+        <fieldset><legend>оплата</legend><label class="payment-option"><input type="radio" name="payment" value="Банковская карта" checked><span><b>банковская карта</b><small>безопасная оплата после подтверждения</small></span></label></fieldset>
+        <button class="lime-button checkout-submit" type="submit">ОПЛАТИТЬ <span id="checkout-button-total"></span></button>
+        <p class="form-note">нажимая кнопку, вы соглашаетесь с&nbsp;условиями обработки данных</p>
+      </form>
+      <aside class="order-summary checkout-summary" id="checkout-summary"></aside>
+    </div>
+  </main>
+</body>
+</html>

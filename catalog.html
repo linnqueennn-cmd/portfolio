@@ -1,0 +1,49 @@
+<!doctype html>
+<html lang="ru">
+<head>
+  <meta charset="utf-8">
+  <meta name="viewport" content="width=device-width,initial-scale=1">
+  <meta name="description" content="Каталог виниловых пластинок.">
+  <title>Каталог — Vinyl Shop</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Montserrat:wght@400;500;600&display=swap">
+  <link rel="stylesheet" href="shop.css">
+  <script src="shop.js" defer></script>
+</head>
+<body data-shop-page="catalog">
+  <header class="shop-header">
+    <a class="shop-logo" href="catalog.html" aria-label="Vinyl Shop, каталог"><img src="assets/shop/logo.svg" alt=""></a>
+    <nav class="shop-nav" id="shop-nav" aria-label="Основная навигация">
+      <a aria-current="page" href="catalog.html">каталог</a>
+      <a href="catalog.html#blog">блог</a>
+      <a href="catalog.html#about">о нас</a>
+      <a href="catalog.html#contacts">контакты</a>
+    </nav>
+    <button class="menu-toggle" type="button" aria-expanded="false" aria-controls="shop-nav" aria-label="Открыть меню"><span aria-hidden="true"></span></button>
+    <a class="header-search" href="#catalog-search" aria-label="Перейти к поиску"><img src="assets/shop/search.svg" alt=""></a>
+    <a class="cart-link" href="cart.html">корзина <span class="cart-count" aria-label="Товаров в корзине" hidden>0</span></a>
+  </header>
+  <main class="shop-main catalog-page">
+    <div class="page-intro">
+      <p class="eyebrow">подборка винила</p>
+      <h1>КАТАЛОГ</h1>
+      <p>пластинки, к&nbsp;которым хочется возвращаться</p>
+    </div>
+    <section class="catalog-controls" aria-label="Фильтры каталога">
+      <label class="search-field"><span>поиск</span><input id="catalog-search" type="search" placeholder="исполнитель или альбом"></label>
+      <div class="filter-group" role="group" aria-label="Фильтр по подборке">
+        <button class="filter-chip is-active" type="button" data-filter="all">все</button>
+        <button class="filter-chip" type="button" data-filter="popular">популярное</button>
+        <button class="filter-chip" type="button" data-filter="new">новинки</button>
+        <button class="filter-chip" type="button" data-filter="rare">редкие</button>
+      </div>
+      <label class="sort-field"><span>сортировка</span><select id="catalog-sort"><option value="default">по умолчанию</option><option value="price-asc">сначала дешевле</option><option value="price-desc">сначала дороже</option><option value="name">по названию</option></select></label>
+    </section>
+    <p class="catalog-result" id="catalog-result" aria-live="polite"></p>
+    <div class="product-grid" id="product-grid"></div>
+  </main>
+  <footer class="shop-footer"><a href="catalog.html">каталог</a><a href="cart.html">корзина</a><span>винил, который хочется слушать</span></footer>
+  <div class="toast" id="shop-toast" role="status" aria-live="polite"></div>
+</body>
+</html>

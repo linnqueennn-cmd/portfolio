@@ -4,7 +4,7 @@ function remainingSections(t) {
   const tr = pair => phrase(t(...pair));
   const scramble = value => `<span class="home-scramble" data-scramble>${value}</span>`;
   const heading = (id, index) => `<h2 class="remaining-heading" id="${id}-title" data-reveal>${scramble(tr(copy.titles[index]))}<span class="crystal-stop" aria-hidden="true"></span></h2>`;
-  const action = (label, url, fullWidth = false) => `<a class="remaining-action home-cta${fullWidth ? ' pricing-cta' : ''}" href="${url}">${fullWidth ? `<span class="home-cta-bracket home-cta-bracket-left" aria-hidden="true">[</span>${scramble(label)}<span class="home-cta-bracket home-cta-bracket-right" aria-hidden="true">]</span>` : scramble('[' + label + ']')}</a>`;
+  const action = (label, url, fullWidth = false) => `<a class="remaining-action home-cta${fullWidth ? ' pricing-cta' : ''}" href="${url}"><span class="home-cta-bracket home-cta-bracket-left" aria-hidden="true">[</span>${scramble(label)}<span class="home-cta-bracket home-cta-bracket-right" aria-hidden="true">]</span></a>`;
   return `
     <section id="services" class="remaining-section" aria-labelledby="services-title">
       <div class="service-pin">
@@ -62,6 +62,8 @@ function setupRemainingSections() {
   const options = serviceSection.querySelector('.service-options');
   const servicePin = serviceSection.querySelector('.service-pin');
   let servicePinHeight = 0;
+  let serviceTarget = null;
+  let serviceTargetTimer = 0;
   function measureServices() {
     story.style.removeProperty('min-height');
     options.style.removeProperty('min-height');
@@ -79,6 +81,16 @@ function setupRemainingSections() {
   let selected = 0;
   let frame = 0;
 
+  function serviceScrollMetrics() {
+    const sectionStyle = getComputedStyle(serviceSection);
+    const paddingTop = Number.parseFloat(sectionStyle.paddingTop);
+    const paddingBottom = Number.parseFloat(sectionStyle.paddingBottom);
+    const stickyTop = Math.min(88, innerHeight - servicePinHeight - 16);
+    const top = scrollY + serviceSection.getBoundingClientRect().top + paddingTop - stickyTop;
+    const distance = serviceSection.offsetHeight - paddingTop - paddingBottom - servicePinHeight;
+    return {top, distance: Math.max(1, distance), stickyTop};
+  }
+
   function activate(index) {
     if (selected === index) return;
     rows[selected].classList.remove('is-active');
@@ -94,14 +106,10 @@ function setupRemainingSections() {
   function update() {
     frame = 0;
     if (mobile.matches) {
-      const sectionStyle = getComputedStyle(serviceSection);
-      const paddingTop = Number.parseFloat(sectionStyle.paddingTop);
-      const start = serviceSection.getBoundingClientRect().top + paddingTop;
-      const distance = serviceSection.offsetHeight - paddingTop -
-        Number.parseFloat(sectionStyle.paddingBottom) - servicePinHeight;
-      const stickyTop = Math.min(88, innerHeight - servicePinHeight - 16);
-      const progress = Math.max(0, Math.min(1, (stickyTop - start) / Math.max(1, distance)));
-      activate(Math.min(rows.length - 1, Math.floor(progress * rows.length)));
+      if (serviceTarget !== null) { activate(serviceTarget); return; }
+      const metrics = serviceScrollMetrics();
+      const progress = Math.max(0, Math.min(1, (scrollY - metrics.top) / metrics.distance));
+      activate(Math.round(progress * (rows.length - 1)));
       return;
     }
     if (!wide.matches) return;
@@ -113,6 +121,57 @@ function setupRemainingSections() {
   function schedule() {
     if (!frame) frame = requestAnimationFrame(update);
   }
+
+  function stepService(direction) {
+    const next = Math.max(0, Math.min(rows.length - 1, selected + direction));
+    if (next === selected) return false;
+    const metrics = serviceScrollMetrics();
+    serviceTarget = next;
+    activate(next);
+    scrollTo({top: metrics.top + metrics.distance * next / (rows.length - 1), behavior: 'smooth'});
+    clearTimeout(serviceTargetTimer);
+    serviceTargetTimer = setTimeout(() => { serviceTarget = null; schedule(); }, 560);
+    return true;
+  }
+
+  let wheelLocked = false;
+  serviceSection.addEventListener('wheel', event => {
+    if (!mobile.matches || Math.abs(event.deltaY) <= Math.abs(event.deltaX) || Math.abs(event.deltaY) < 8) return;
+    const direction = event.deltaY > 0 ? 1 : -1;
+    if ((direction < 0 && selected === 0) || (direction > 0 && selected === rows.length - 1)) return;
+    event.preventDefault();
+    if (wheelLocked) return;
+    wheelLocked = true;
+    stepService(direction);
+    setTimeout(() => { wheelLocked = false; }, 620);
+  }, {passive: false});
+
+  let serviceTouch = null;
+  serviceSection.addEventListener('touchstart', event => {
+    if (!mobile.matches || event.touches.length !== 1) { serviceTouch = null; return; }
+    const touch = event.touches[0];
+    serviceTouch = {x: touch.clientX, y: touch.clientY, direction: 0};
+  }, {passive: true});
+  serviceSection.addEventListener('touchmove', event => {
+    if (!serviceTouch || event.touches.length !== 1) return;
+    const touch = event.touches[0];
+    const dx = touch.clientX - serviceTouch.x;
+    const dy = touch.clientY - serviceTouch.y;
+    if (Math.abs(dy) <= Math.abs(dx) || Math.abs(dy) < 8) return;
+    const direction = dy < 0 ? 1 : -1;
+    const canStep = direction > 0 ? selected < rows.length - 1 : selected > 0;
+    serviceTouch.direction = canStep ? direction : 0;
+    if (canStep) event.preventDefault();
+  }, {passive: false});
+  serviceSection.addEventListener('touchend', event => {
+    if (!serviceTouch) return;
+    const touch = event.changedTouches[0];
+    const dy = touch ? touch.clientY - serviceTouch.y : 0;
+    const direction = Math.abs(dy) >= 28 ? serviceTouch.direction : 0;
+    serviceTouch = null;
+    if (direction) stepService(direction);
+  }, {passive: true});
+  serviceSection.addEventListener('touchcancel', () => { serviceTouch = null; }, {passive: true});
 
   rows.forEach((row, i) => row.querySelector('button').addEventListener('click', () => {
     activate(i);
@@ -151,7 +210,7 @@ function setupProcessStack() {
   rail.append(track);
   rail.tabIndex = 0;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  let frame, drag;
+  let frame, paintFrame, drag, manualScroll = false, manualScrollTimer;
   let lastProgress, lastTravel = 0, step = 0;
 
   function paintCards() {
@@ -161,7 +220,7 @@ function setupProcessStack() {
       // Native scrolling moves the leading cards. Only the passed cards receive
       // a compensating offset to retain the agreed overlapping stack.
       const x = i * step + (offset < 0 ? -offset * (step - 22) : 0);
-      card.style.transform = 'translateX(' + x + 'px)';
+      card.style.transform = 'translate3d(' + x + 'px,0,0)';
       card.style.opacity = '1';
       card.style.setProperty('--process-content-opacity', offset < 0 ? String(Math.max(.35, 1 + offset * 1.5)) : '1');
     });
@@ -202,7 +261,7 @@ function setupProcessStack() {
     // is never written by this component.
     let target = lastProgress === undefined ? progress * travel : before + (progress - lastProgress) * travel;
     if (lastTravel && Math.abs(lastTravel - travel) > 1) target = before / lastTravel * travel;
-    rail.scrollLeft = Math.max(0, Math.min(travel, target));
+    if (!manualScroll) rail.scrollLeft = Math.max(0, Math.min(travel, target));
     lastProgress = progress;
     lastTravel = travel;
     paintCards();
@@ -210,22 +269,50 @@ function setupProcessStack() {
   function schedule() {
     if (!frame) frame = requestAnimationFrame(update);
   }
-  rail.addEventListener('scroll', paintCards, {passive: true});
+  function schedulePaint() {
+    if (paintFrame) return;
+    paintFrame = requestAnimationFrame(() => {
+      paintFrame = 0;
+      paintCards();
+    });
+  }
+  rail.addEventListener('scroll', () => {
+    schedulePaint();
+    if (!manualScroll) return;
+    clearTimeout(manualScrollTimer);
+    manualScrollTimer = setTimeout(() => {
+      manualScroll = false;
+      rail.classList.remove('is-manual-scroll');
+    }, 180);
+  }, {passive: true});
   addEventListener('scroll', schedule, {passive: true});
   addEventListener('resize', schedule);
   reduced.addEventListener('change', schedule);
   // Optional mouse dragging on narrow previews. Phones use native touch scroll,
   // including momentum and direction selection, without pointer interception.
   rail.addEventListener('pointerdown', event => {
+    if (event.pointerType === 'touch' || event.pointerType === 'pen') {
+      manualScroll = true;
+      rail.classList.add('is-manual-scroll');
+    }
     if (event.pointerType !== 'mouse' || event.button !== 0 || innerWidth > 900 || reduced.matches) return;
     event.preventDefault();
+    manualScroll = true;
+    rail.classList.add('is-manual-scroll');
     drag = {id: event.pointerId, x: event.clientX, left: rail.scrollLeft};
     rail.setPointerCapture(event.pointerId);
   });
   rail.addEventListener('pointermove', event => {
     if (drag && drag.id === event.pointerId) rail.scrollLeft = drag.left + drag.x - event.clientX;
   });
-  const stopDrag = () => { drag = null; };
+  const stopDrag = () => {
+    drag = null;
+    clearTimeout(manualScrollTimer);
+    manualScrollTimer = setTimeout(() => {
+      manualScroll = false;
+      rail.classList.remove('is-manual-scroll');
+    }, 180);
+  };
   rail.addEventListener('pointerup', stopDrag);
   rail.addEventListener('pointercancel', stopDrag);
   rail.addEventListener('lostpointercapture', stopDrag);

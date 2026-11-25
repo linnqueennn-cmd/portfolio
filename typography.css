@@ -165,6 +165,19 @@ body.home-page { text-transform: lowercase; }
 .remaining-section .home-cta { text-transform: uppercase; }
 .home-screen .home-cta { display: inline-flex; align-items: center; justify-content: center; }
 .home-cta-bracket { display: inline-block; flex: none; }
+.home-screen .home-cta,
+.work-screen .work-tab,
+#pricing .pricing-cta {
+  -webkit-tap-highlight-color: transparent;
+  transition: transform 120ms ease;
+  transform-origin: center;
+}
+.home-screen .home-cta:active,
+.work-screen .work-tab:active,
+#pricing .pricing-cta:active { transform: translateY(1px) scale(.985); }
+.home-screen .home-cta:active::before,
+.work-screen .work-tab:active::before,
+#pricing .pricing-cta:active::before { opacity: .72; }
 @media (prefers-reduced-motion: no-preference) {
   .home-cta-closing .home-cta-bracket-left { animation: cta-bracket-left 1s cubic-bezier(.4, 0, .2, 1); }
   .home-cta-closing .home-cta-bracket-right { animation: cta-bracket-right 1s cubic-bezier(.4, 0, .2, 1); }
@@ -335,6 +348,10 @@ html[lang] #pricing .pricing-cta { height: 54px; min-height: 54px; }
  #pricing { --type-pricing-bracket: var(--type-mobile-bracket); }
  html[lang] #pricing .pricing-cta { height: 48px; min-height: 48px; font-size: var(--type-mobile-action); }
  .home-screen .home-cta::before { inset: 0 3px; height: auto; background: url("assets/home/button-glow.svg") center / 100% 100% no-repeat; filter: none; }
+ .work-screen .work-tab::before {
+   background: url("assets/home/button-glow.svg") center / 100% 100% no-repeat;
+   filter: none;
+ }
 }
 
 @media (max-width: 600px) { .home-screen .home-cta .home-cta-bracket { font-size: var(--type-mobile-bracket); } }

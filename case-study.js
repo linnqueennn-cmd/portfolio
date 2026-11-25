@@ -3,26 +3,33 @@ function caseStudyPage(data) {
   const scramble = text => `<span class="home-scramble" data-scramble>${text}</span>`;
   const nbsp = text => text.replace(/(^|\s)([авикосу]|до|из|на|от|по|за|об|не|со|для|без)(?= ) /gi, '$1$2 ');
   const paragraphs = texts => texts.map(text => `<p>${text.startsWith('Моя роль:') ? `<strong>${nbsp(text)}</strong>` : nbsp(text)}</p>`).join('');
-  const picture = (name, alt, label = '', className = '') => `<figure class="case-picture ${className}" data-media="${name}">${label ? `<figcaption>${label}</figcaption>` : ''}<img src="assets/cases/${data.id}/${name}.${data.imageFormat || 'png'}" alt="${alt}" width="${data.imageSizes[name][0]}" height="${data.imageSizes[name][1]}" loading="${className === 'case-cover' ? 'eager' : 'lazy'}" fetchpriority="${className === 'case-cover' ? 'high' : 'low'}" decoding="async"></figure>`;
+  const picture = (name, alt, label = '', className = '') => {
+    const src = `assets/cases/${data.id}/${name}.${data.imageFormat || 'png'}`;
+    const img = `<img src="${src}" alt="${alt}" width="${data.imageSizes[name][0]}" height="${data.imageSizes[name][1]}" loading="${className === 'case-cover' ? 'eager' : 'lazy'}" fetchpriority="${className === 'case-cover' ? 'high' : 'low'}" decoding="async">`;
+    return `<figure class="case-picture ${className}" data-media="${name}">${label ? `<figcaption>${label}</figcaption>` : ''}${data.zoom ? `<a href="${src}" target="_blank" rel="noopener" aria-label="Открыть изображение в полном размере: ${alt}">${img}</a>` : img}</figure>`;
+  };
   const compare = items => `<div class="case-comparison${items.some(item => item[0] === '13_old_form') ? ' case-comparison-form' : ''}">${items.map(item => picture(...item)).join('')}</div>`;
-  return `<article class="case-study" aria-labelledby="case-title">
+  return `<article class="case-study" data-case="${data.id}" aria-labelledby="case-title">
     <div class="case-content">
     <section class="case-introduction">
       <a class="case-back" href="./#work">← Все проекты</a>
+      ${data.eyebrow ? `<p class="case-eyebrow">${nbsp(data.eyebrow)}</p>` : ''}
       <h1 id="case-title">${scramble(data.title)}</h1>
-      <p class="case-subtitle">${scramble(nbsp(data.subtitle))}</p>
+      ${data.subtitle ? `<p class="case-subtitle">${scramble(nbsp(data.subtitle))}</p>` : ''}
       <p class="case-summary">${nbsp(data.summary)}</p>
-      <dl class="case-metrics">${data.metrics.map(([number, label]) => `<div><dt>${scramble(number)}</dt><dd>${nbsp(label)}</dd></div>`).join('')}</dl>
-      ${picture(data.cover, 'Карьерный сайт Mama Roma на экране ноутбука', '', 'case-cover')}
-      <a class="case-live" href="${data.url}" target="_blank" rel="noopener noreferrer">Смотреть сайт: rabota.mamaroma.ru ↗</a>
+      ${data.metrics?.length ? `<dl class="case-metrics">${data.metrics.map(([number, label]) => `<div><dt>${scramble(number)}</dt><dd>${nbsp(label)}</dd></div>`).join('')}</dl>` : ''}
+      ${data.cover ? picture(data.cover, data.coverAlt || 'Обложка проекта', '', 'case-cover') : ''}
+      ${data.url ? `<a class="case-live" href="${data.url}" target="_blank" rel="noopener noreferrer">${data.urlLabel || 'Смотреть сайт: rabota.mamaroma.ru ↗'}</a>` : ''}
     </section>
     ${data.sections.map((section, index) => `<section class="case-chapter" aria-labelledby="case-chapter-${index}">
       <h2 id="case-chapter-${index}">${String(index + 1).padStart(2, '0')} / ${section.title}</h2>
       ${section.blocks.map(block => `<div class="case-block${block.kind === 'showcase' ? ' case-showcase' : ''}">
         ${block.title ? `<h3>${nbsp(block.title)}</h3>` : ''}
         ${paragraphs(block.text || [])}
+        ${block.list ? `<ul class="case-list">${block.list.map(item => `<li>${nbsp(item)}</li>`).join('')}</ul>` : ''}
         ${block.compare ? compare(block.compare) : ''}
         ${block.image ? picture(block.image[0], block.image[1], '', block.wide ? 'case-wide' : '') : ''}
+        ${block.images ? `<div class="case-gallery">${block.images.map(item => picture(...item)).join('')}</div>` : ''}
         ${block.kind === 'showcase' ? `<div class="case-interface">${picture('09_final', 'Финальные экраны сайта Mama Roma на компьютере и телефонах')}<figure class="case-video"><video autoplay loop playsinline muted preload="metadata" width="3840" height="2034" poster="assets/cases/${data.id}/10_mobile.jpg" aria-label="Демонстрация мобильной версии сайта Mama Roma"><source src="assets/cases/${data.id}/10_mobile.mp4" type="video/mp4">Ваш браузер не поддерживает видео. <a href="assets/cases/${data.id}/10_mobile.mp4">Открыть видео</a></video></figure></div>` : ''}
       </div>`).join('')}
     </section>`).join('')}
@@ -67,6 +74,8 @@ function setupCasePage() {
 }
 
 function setupBackToTop() {
-  app.insertAdjacentHTML('beforeend', `<div class="page-top-row"><button class="back-to-top" type="button" aria-label="${t('Наверх', 'Back to top')}"><svg width="28" height="32" viewBox="0 0 28 32" fill="none" aria-hidden="true"><path d="M14 30V3M3 14 14 3l11 11" stroke="currentColor" stroke-width="2"/></svg></button></div>`);
+  const contactsFooter = app.querySelector('#contacts .remaining-footer');
+  const position = contactsFooter ? 'beforebegin' : 'beforeend';
+  (contactsFooter || app).insertAdjacentHTML(position, `<div class="page-top-row"><button class="back-to-top" type="button" aria-label="${t('Наверх', 'Back to top')}"><svg width="28" height="32" viewBox="0 0 28 32" fill="none" aria-hidden="true"><path d="M14 30V3M3 14 14 3l11 11" stroke="currentColor" stroke-width="2"/></svg></button></div>`);
   document.querySelector('.back-to-top').onclick = () => window.scrollTo({top: 0, behavior: matchMedia('(prefers-reduced-motion: reduce)').matches ? 'instant' : 'smooth'});
 }

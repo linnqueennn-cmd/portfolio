@@ -115,6 +115,7 @@ function playPortraitArrival(portrait, image, finish, startText) {
   let atlasFrame;
   let atlasTime = 0;
   let sheets = [];
+  const mobileStart = matchMedia('(max-width: 600px)').matches ? .72 : 0;
   const timeout = setTimeout(startAtlas, 12000);
 
   function measure() {
@@ -232,7 +233,7 @@ function playPortraitArrival(portrait, image, finish, startText) {
       let previousTime;
       function draw(now) {
         if (stopped) return;
-        if (startedAt === undefined) startedAt = now;
+        if (startedAt === undefined) startedAt = now - mobileStart * 1000;
         // Background tabs must not skip the walk and jump straight to the PNG.
         if (document.hidden) {
           startedAt += previousTime === undefined ? 0 : now - previousTime;
@@ -280,7 +281,15 @@ function playPortraitArrival(portrait, image, finish, startText) {
     portraitVideoSourcePromise.then(url => {
       if (stopped || atlasStarted) return;
       video.src = url;
-      return video.play();
+      const play = () => {
+        if (mobileStart) video.currentTime = mobileStart;
+        return video.play();
+      };
+      if (video.readyState >= 1) return play();
+      return new Promise((resolve, reject) => {
+        video.addEventListener('loadedmetadata', () => play().then(resolve, reject), {once: true});
+        video.addEventListener('error', reject, {once: true});
+      });
     }).catch(() => { if (!stopped) startAtlas(); });
   }
 
@@ -398,8 +407,12 @@ function setupHomeScramble() {
 function setupPortfolioMenu(header, anchor) {
   const menu = header.querySelector('.home-menu');
   const toggle = header.querySelector('.home-menu-toggle');
-  const closeMenu = () => toggle.setAttribute('aria-expanded', 'false');
-  toggle.onclick = () => toggle.setAttribute('aria-expanded', String(toggle.getAttribute('aria-expanded') === 'false'));
+  const setMenuOpen = open => {
+    toggle.setAttribute('aria-expanded', String(open));
+    document.body.classList.toggle('portfolio-menu-open', open);
+  };
+  const closeMenu = () => setMenuOpen(false);
+  toggle.onclick = () => setMenuOpen(toggle.getAttribute('aria-expanded') === 'false');
   menu.addEventListener('click', event => { if (event.target.closest('a')) closeMenu(); });
   toggle.closest('header').addEventListener('keydown', event => {
     if (event.key !== 'Escape' || toggle.getAttribute('aria-expanded') !== 'true') return;
@@ -471,7 +484,7 @@ function createScrambleJobs(root) {
       animation = requestAnimationFrame(frame);
     }
 
-    const heroButton = element.closest('.home-screen .home-cta, #pricing .pricing-cta, .work-tab');
+    const heroButton = element.closest('.home-screen .home-cta, #pricing .pricing-cta, #contacts .remaining-action, .work-tab');
     if (heroButton) {
       const left = heroButton.querySelector('.home-cta-bracket-left');
       const right = heroButton.querySelector('.home-cta-bracket-right');
@@ -488,6 +501,12 @@ function createScrambleJobs(root) {
       }
       heroButton.addEventListener('pointerenter', event => {
         if (event.pointerType === 'mouse') animateButton();
+      });
+      heroButton.addEventListener('pointerdown', event => {
+        if (event.pointerType !== 'mouse' || event.button === 0) animateButton();
+      });
+      heroButton.addEventListener('keydown', event => {
+        if (event.key === 'Enter' || event.key === ' ') animateButton();
       });
       heroButton.addEventListener('focus', () => {
         if (heroButton.matches(':focus-visible')) animateButton();

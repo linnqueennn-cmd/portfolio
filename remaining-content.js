@@ -13,7 +13,7 @@ const remainingContent = {
   contactBody: ['Новый проект, идея или предложение о работе — пиши. Буду рада познакомиться.', 'A new project, an idea or a job opportunity — get in touch. I’d love to hear from you.'],
   discuss: ['Обсудить проект', 'Discuss a project'],
   telegram: ['Написать в Telegram', 'Message on Telegram'],
-  likeNote: ['Пока не готовы сотрудничать? Тогда ставьте лайк, если тоже любите The Sims.', 'Not ready to work together yet? Leave a like if you love The Sims too.'],
+  likeNote: ['Пока не готовы сотрудничать? Тогда ставьте лайк, если тоже любите The Sims.', 'Not ready to work together yet? Leave a like if you love The Sims too.'],
   "services": [
     [
       "Web Design & Development",
