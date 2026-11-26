@@ -167,6 +167,8 @@ function setupCrystalJourney(host, canvas) {
   const processStop = document.querySelector('#process-title .crystal-stop');
   const pricingStop = document.querySelector('#pricing-title .crystal-stop');
   const footer = document.querySelector('#contacts-title .contact-title-copy');
+  const footerRange = document.createRange();
+  footerRange.selectNodeContents(footer);
   const tabGem = document.querySelector('.work-gem');
   const local = setupLocalCrystals(canvas, about, services, contacts);
   let compactMode = false;
@@ -256,8 +258,8 @@ function setupCrystalJourney(host, canvas) {
         key = pricing; spinning = true;
       }
       if (passed(contacts)) {
-        const text = box(footer);
-        target = {x: text.right + 54, y: text.top + text.height / 2, height: 72};
+        const text = footerRange.getBoundingClientRect();
+        target = {x: text.right + 34, y: text.top + text.height / 2, height: 56};
         key = contacts; spinning = true;
       }
       }
@@ -343,9 +345,9 @@ function setupCrystalJourney(host, canvas) {
       layer.style.position = 'absolute';
       layer.style.width = width + 'px';
       layer.style.height = height + 'px';
-      const text = insideSlot ? null : box(footer);
+      const text = insideSlot ? null : footerRange.getBoundingClientRect();
       const anchorBox = insideSlot ? null : box(anchor);
-      layer.style.left = (insideSlot ? (anchor.clientWidth - width) / 2 : text.right - anchorBox.left + 30) + 'px';
+      layer.style.left = (insideSlot ? (anchor.clientWidth - width) / 2 : text.right - anchorBox.left + 20) + 'px';
       layer.style.top = (insideSlot ? (anchor.clientHeight - height) / 2 : text.top + text.height / 2 - anchorBox.top - height / 2) + 'px';
       layer.style.transform = 'none';
     }

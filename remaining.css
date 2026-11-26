@@ -141,10 +141,10 @@ body.home-page { background: #efefef; font-family: "Ubuntu Sans Mono", monospace
 .process-note { margin: 0; }
 .contact-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 24px; align-items: start; }
 .contact-top .remaining-heading { margin-bottom: 0; }
-#contacts-title { align-items: center; gap: clamp(16px, 2.5vw, 36px); line-height: 1.08; }
-.contact-title-copy { display: flex; flex-direction: column; align-items: flex-start; gap: .16em; }
-.contact-title-line { display: block; white-space: nowrap; }
-.contact-title-line-secondary { font-size: 1.23em; line-height: 1; }
+.contact-title-copy { display: inline; }
+.contact-title-line { display: inline; white-space: normal; }
+.contact-title-line + .contact-title-line { margin-left: .3em; }
+.contact-title-line-secondary { font-size: inherit; line-height: inherit; }
 .pricing-mobile-line { display: inline; }
 #contacts .home-cta::before { display: none; }
 .contact-profile > a { text-decoration: underline; font-size: clamp(24px, 2.1vw, 30px); }
@@ -215,6 +215,11 @@ body.home-page { background: #efefef; font-family: "Ubuntu Sans Mono", monospace
 .compact-crystal-slot { display: none; position: relative; }
 .crystal-local canvas, .crystal-local-enabled .crystal-journey canvas { pointer-events: none; touch-action: auto; }
 @media (max-width: 600px) {
+  #contacts-title { align-items: center; gap: 16px; line-height: 1.08; }
+  .contact-title-copy { display: flex; flex-direction: column; align-items: flex-start; gap: .16em; }
+  .contact-title-line { display: block; white-space: nowrap; }
+  .contact-title-line + .contact-title-line { margin-left: 0; }
+  .contact-title-line-secondary { font-size: 1.23em; line-height: 1; }
   .crystal-local-enabled .about-gem { overflow: visible; }
   .crystal-local-enabled #services .service-option h3 { position: relative; }
   .crystal-local-enabled #contacts-title { position: relative; padding-right: 0; }
