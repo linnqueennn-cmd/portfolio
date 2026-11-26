@@ -316,10 +316,10 @@ body.home-page, .home-screen, .work-screen, .about-screen,
   .home-screen .home-stage { width: 100%; --frame-width: min(100cqw, 393px, max(260px, calc(100svh * 393 / 822))); }
   .home-screen .home-nav { left: 16px; }
   .home-screen .home-cv { left: auto; right: 16px; }
-  .home-screen .home-profile { left: 16px; top: calc(72 * var(--u)); }
-  .home-screen .home-line-digital { left: 19px; top: calc(98 * var(--u)); }
-  .home-screen .home-line-web { left: 19px; top: calc(149 * var(--u)); }
-  .home-screen .home-line-visual { left: 16px; top: calc(200 * var(--u)); }
+  .home-screen .home-profile { left: 16px; }
+  .home-screen .home-line-digital { left: 19px; top: calc(92 * var(--u)); }
+  .home-screen .home-line-web { left: 19px; top: calc(151.72 * var(--u)); }
+  .home-screen .home-line-visual { left: 16px; top: calc(210.72 * var(--u)); }
   .home-screen .home-portrait { left: calc((100% - var(--frame-width)) / 2 + 66 * var(--u)); }
   .home-screen .home-intro { left: 16px; width: min(188px, calc(55% - 16px)); }
   .home-screen .home-intro h2 { text-align: left; }

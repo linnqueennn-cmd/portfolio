@@ -412,7 +412,7 @@
   }
   .home-cv img { content: url("assets/home/mobile-download.svg"); zoom: var(--scale); }
   .home-profile {
-    left: calc(14.65 * var(--u)); top: calc(78 * var(--u));
+    left: calc(14.65 * var(--u)); top: calc(60 * var(--u));
     margin: 0; font-size: calc(14 * var(--u));
   }
   .home-profile img { content: url("assets/home/mobile-status.svg"); zoom: var(--scale); }
@@ -427,20 +427,20 @@
     width: calc(30 * var(--u)); height: calc(60 * var(--u));
   }
   .home-portrait {
-    left: calc(66 * var(--u)); top: calc(126 * var(--u)); right: auto; bottom: auto;
+    left: calc(66 * var(--u)); top: calc(110.93 * var(--u)); right: auto; bottom: auto;
     width: calc(475 * var(--u)); height: auto; transform: none;
   }
   .home-shadow-left, .home-shadow-right { scale: 1; zoom: var(--scale); }
   .home-shadow-left { content: url("assets/home/mobile-left-shadow.svg"); left: 31.4%; top: 95.7%; }
   .home-shadow-right { content: url("assets/home/mobile-right-shadow.svg"); left: 56.1%; top: 96.9%; }
-  .home-intro { --intro-gap: calc(10 * var(--u)); left: calc(17 * var(--u)); top: calc(425 * var(--u)); width: calc(188 * var(--u)); margin: 0; }
+  .home-intro { --intro-gap: calc(10 * var(--u)); left: calc(17 * var(--u)); top: calc(409 * var(--u)); width: calc(188 * var(--u)); margin: 0; }
   .home-intro h2 { text-align: right; font-size: calc(24 * var(--u)); }
   .home-intro p { font-size: calc(16 * var(--u)); line-height: 1.2; }
   .home-philosophy { width: auto; margin: calc(26 * var(--u)) 0 0 calc(38 * var(--u)); font-size: calc(12 * var(--u)); }
   .home-philosophy::before { width: calc(42 * var(--u)); height: calc(83 * var(--u)); }
   .home-philosophy span { margin: calc(65 * var(--u)) 0 0 calc(50 * var(--u)); width: calc(106 * var(--u)); }
   .home-cta, html[lang="en"] .home-cta {
-    left: calc(14 * var(--u)); top: calc(748 * var(--u));
+    left: calc(14 * var(--u)); top: calc(726.71 * var(--u));
     display: grid; place-items: center;
     width: calc(364 * var(--u)); min-height: 0; height: calc(45.898 * var(--u));
     font-size: calc(38.249 * var(--u)); line-height: 1.2;
