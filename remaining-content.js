@@ -17,7 +17,7 @@ const remainingContent = {
   "services": [
     [
       "Web Design & Development",
-      "Лендинги и многостраничные сайты. Аналитика, структура, дизайн, адаптация и запуск.",
+      "Готовые сайты — от идеи до публикации. Лендинги и многостраничные сайты: аналитика, структура, дизайн, адаптация и запуск.",
       "Landing pages and multi-page websites. Research, structure, design, responsive layouts and launch."
     ],
     [
@@ -64,13 +64,13 @@ const remainingContent = {
     [
       "Дизайн",
       "Design",
-      "Собираю финальный дизайн, компоненты и адаптивы.",
+      "создаю дизайн всех страниц, прорабатываю детали интерфейса и адаптирую под разные устройства.",
       "I create the final designs, components and responsive layouts."
     ],
     [
       "Запуск",
       "Launch",
-      "Реализую проект или передаю его в разработку. Проверяем, тестируем, запускаем.",
+      "создаю готовый к работе сайт или передаю дизайн в разработку. проверяем, тестируем, запускаем.",
       "I build the project or hand it off for development. We review, test and launch."
     ]
   ],

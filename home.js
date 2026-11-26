@@ -41,7 +41,7 @@ function homeScreen(t, person, cv) {
         <h2>${scramble(t('привет, я Лина', 'hi, I’m Lina'))}</h2>
         <p>${t('создаю сайты, цифровые интерфейсы и&nbsp;визуальные решения для&nbsp;брендов.', 'I design websites, digital interfaces and visual systems for brands.')}</p>
         <div class="home-philosophy">
-          <span>${t('обожаю дизайн и&nbsp;приносить людям деньги', 'I love design and helping people make money')}</span>
+          <span>${t('создаю дизайн, который приносит людям деньги', 'I love design and helping people make money')}</span>
         </div>
       </div>
     </div>

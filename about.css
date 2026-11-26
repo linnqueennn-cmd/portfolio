@@ -120,3 +120,4 @@
  .about-resume-label > img { grid-column: 2; grid-row: 1; align-self: center; }
  .about-resume-note { position: absolute; grid-column: 1; grid-row: 2; right: 80px; bottom: 0; width: max-content; padding: 0; margin: 0; white-space: nowrap; transform: translateY(50%); }
 }
+.about-proper-name { text-transform: none; }

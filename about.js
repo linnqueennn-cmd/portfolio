@@ -1,7 +1,7 @@
 function aboutScreen(t, person) {
   const cards = [
-    [t('Привет, я Лина', 'Hi, I’m Lina'), t(
-      'Уже больше 6 лет занимаюсь UX/UI, веб- и графическим дизайном. Создаю сайты, интерфейсы и визуальные решения для бизнеса. Часто беру проекты с нуля, разбираюсь в деталях и довожу идеи до полноценного результата.',
+    [t('Обо мне', 'Hi, I’m Lina'), t(
+      'меня зовут <span class="about-proper-name">Лина</span>, более семи лет занимаюсь дизайном. специализируюсь на ux/ui, создаю сайты, интерфейсы и визуальные решения для бизнеса. от первых идей до реализации — умею работать на каждом этапе проекта.',
       'I’ve worked in UX/UI, web and graphic design for over six years. I create websites, interfaces and visual systems for businesses. I often take on projects from scratch, work through the details and bring ideas to completion.'
     )],
     [t('Не просто красиво', 'More than looks'), t(
