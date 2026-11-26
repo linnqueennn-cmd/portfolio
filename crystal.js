@@ -377,7 +377,7 @@ function setupLocalCrystals(source, about, services, contacts) {
   const footerSlot = document.createElement('span');
   footerSlot.className = 'compact-crystal-slot';
   footerSlot.setAttribute('aria-hidden', 'true');
-  contacts?.querySelector('h2').append(footerSlot);
+  (contacts?.querySelector('.contact-title-copy') || contacts?.querySelector('h2'))?.append(footerSlot);
   // Measure the actual text, not a button's enlarged touch target or flex column.
   const serviceRanges = new Map(services.map(row => {
     const range = document.createRange();
