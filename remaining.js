@@ -42,7 +42,7 @@ function remainingSections(t) {
       <div class="pricing-top">${heading('pricing', 2)}
       <p class="remaining-note">${pricingNote}</p></div>
       <dl class="rate-list">${copy.prices.map(([ru, english, amount]) => `
-        <div class="rate-slot scroll-window-slot"><div class="rate-row scroll-window"><dt>[${tr([ru, english])}]</dt><dd>${amount ? t('от ','from ') + amount.replace(' ', ' ') + ' ₽' : t('по запросу','on request')}</dd></div></div>`).join('')}</dl>
+        <div class="rate-slot scroll-window-slot"><div class="rate-row scroll-window"><dt>[${tr([ru, english])}]</dt><dd>${amount ? `<span class="rate-prefix">${t('от ','from ')}</span><span class="rate-amount">${amount.replace(' ', ' ')} ₽</span>` : t('по запросу','on request')}</dd></div></div>`).join('')}</dl>
       <div class="pricing-bottom">
       ${action(tr(copy.discuss), 'https://t.me/linqueenn', true)}
       </div>
