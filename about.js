@@ -20,7 +20,7 @@ function aboutScreen(t, person) {
         <article class="about-panel scroll-window">
           <h2><span class="home-scramble" data-scramble>0${i + 1} / ${heading}</span><span class="about-gem" aria-hidden="true"></span></h2>
           <p>${body}</p>
-          ${i === 0 ? `<img class="about-photo" src="assets/about/portrait.png" alt="${person}" width="640" height="640" loading="lazy" decoding="async">` : ''}
+          ${i === 0 ? `<img class="about-photo" src="assets/about/portrait.png" alt="${person}" loading="lazy">` : ''}
         </article>
       </div>`).join('')}</div>
   </section>`;
