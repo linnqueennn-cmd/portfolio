@@ -1,41 +1,45 @@
 function webProjects(t) {
   return [
-    ['roma', 'Mama Roma', '01 / hr / design & development', t(
+    ['roma', 'Mama Roma', 'hr / design & development', t(
       'hr-сайт для сети ресторанов. исследование, проектирование, дизайн и разработка. результат — работающий сайт с высокой конверсией.',
       'Careers site for a restaurant group. Research, planning, design and development. A live site with a high conversion rate.'
     )],
-    ['zen', 'ZenSocial', '02 / mobile app / ux/ui design', t(
+    ['zen', 'ZenSocial', 'mobile app / ux/ui design', t(
       'ios-приложение против бездумного скроллинга. разработка логики приложения и ux/ui-дизайн, направленный на формирование осознанных цифровых привычек.',
       'An iOS app for mindful digital habits. Product logic and UX/UI design to help users break out of mindless scrolling.'
     )],
-    ['choreo', 'XoreoKids', '03 / dance studio / design & development', t(
+    ['choreo', 'XoreoKids', 'dance studio / design & development', t(
       'сайт детской танцевальной студии. от исследования и проектирования структуры до запоминающегося дизайна и разработки.',
       'A website for a children’s dance studio, from research and site architecture to distinctive design and development.'
     )],
-    ['vinyl', 'Vinyl Store', '04 / e-commerce / design', t(
+    ['vinyl', 'Vinyl Store', 'e-commerce / design', t(
       'интернет-магазин виниловых пластинок. акцент на визуальной подаче каталога, удобной навигации и поиске пластинок.',
       'An online record store concept focused on a visual catalogue, clear navigation and easy record discovery.'
     )]
   ];
 }
 
+function workPhrase(value) {
+  return value.replace(/(^|\s)(а|в|и|к|о|с|у|я|но|да|до|из|на|от|по|за|об|не|со|во|ко|для|при|без|под|над)\s+/gi, '$1$2 ');
+}
+
 function graphicProjects(t) {
   return [
-    {id: 'dixon', name: 'Dixon Dance', meta: '01 / branding / visual identity', href: null, preview: 'assets/cases/dixon/page-01.webp', description: t(
+    {id: 'dixon', name: 'Dixon Dance', meta: 'branding / visual identity', href: null, preview: 'assets/cases/dixon/page-01.webp', description: t(
       'айдентика современной онлайн-платформы о танце и движении. логотип, цветовая система, типографика и правила применения.',
       'A visual identity for a modern dance and movement platform: logo, colour system, typography and usage guidelines.'
     )},
-    {id: 'getbrand', name: 'Get Brand', meta: '02 / social media / graphic design', href: 'https://www.behance.net/gallery/216916181/dizajn-lenty-dlja-Getbrand', external: true, description: t(
+    {id: 'getbrand', name: 'Get Brand', meta: 'social media / graphic design', href: 'https://www.behance.net/gallery/216916181/dizajn-lenty-dlja-Getbrand', external: true, description: t(
       'концепция и дизайн ленты instagram: визуальная система, композиция публикаций и единый характер коммуникации.',
       'An Instagram feed concept and design: visual system, post composition and a consistent communication style.'
     )},
-    {id: 'metro', name: 'Metro Advertising', meta: '03 / advertising / graphic design', href: 'https://www.behance.net/gallery/177874527/maket-reklamy-v-metro', external: true, description: t(
+    {id: 'metro', name: 'Metro Advertising', meta: 'advertising / graphic design', href: 'https://www.behance.net/gallery/177874527/maket-reklamy-v-metro', external: true, description: t(
       'акционный баннер в метро для магазина косметики: заметная композиция и понятная подача предложения.',
       'A promotional metro banner for a cosmetics store, with a bold composition and a clear offer.'
     )},
-    {id: 'behance', name: 'More on Behance', meta: '04 / graphic design / behance', href: 'https://www.behance.net/linnqueenn', external: true, description: t(
-      'больше проектов по графическому дизайну, айдентике и digital-коммуникациям в моём профиле behance.',
-      'More graphic design, visual identity and digital communication projects in my Behance profile.'
+    {id: 'behance', name: 'BEHANCE', meta: '', href: 'https://www.behance.net/linnqueenn', external: true, special: true, description: t(
+      'больше проектов можно посмотреть на BEHANCE.',
+      'More projects are available on BEHANCE.'
     )}
   ];
 }
@@ -47,13 +51,12 @@ function workProjectsMarkup(projects, caseUrl) {
       : project;
     const href = item.href || caseUrl(item.id);
     const external = item.external ? ' target="_blank" rel="noopener noreferrer"' : '';
-    const marker = item.external ? '<span class="work-external-mark" aria-label="Откроется на Behance">Bē ↗</span>' : '';
     const preview = item.preview || (!item.external ? `assets/work/${item.id}.gif` : '');
-    return `<div class="work-slot scroll-window-slot"><a class="work-case scroll-window" href="${href}"${external}>
+    return `<div class="work-slot scroll-window-slot" data-project="${item.id}"><a class="work-case scroll-window${item.special ? ' work-case-more' : ''}" href="${href}"${external}>
       <img class="work-bracket work-bracket-left" src="assets/work/left.svg" alt="">
-      <div class="work-label"><p>${item.meta}</p><h3><span class="home-scramble" data-scramble>${item.name}</span>${marker}</h3><svg class="work-case-arrow" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M6 26 26 6M6 6h20v20" stroke="currentColor" stroke-width="2"/></svg></div>
+      <div class="work-label">${item.meta ? `<p>${workPhrase(item.meta)}</p>` : ''}<h3><span class="home-scramble" data-scramble>${item.name}</span></h3><svg class="work-case-arrow" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M6 26 26 6M6 6h20v20" stroke="currentColor" stroke-width="2"/></svg></div>
       <span class="work-preview"${preview ? ` data-gif="${preview}"` : ''} aria-hidden="true"></span>
-      <p class="work-description">${item.description}</p>
+      <p class="work-description">${workPhrase(item.description)}</p>
       <img class="work-bracket work-bracket-right" src="assets/work/right.svg" alt="">
     </a></div>`;
   }).join('');
@@ -66,7 +69,7 @@ function projectsScreen(t, caseUrl) {
         <span class="home-cta-bracket home-cta-bracket-left" aria-hidden="true">[</span><span class="home-scramble" data-scramble>WEB &amp; UX/UI</span><span class="home-cta-bracket home-cta-bracket-right" aria-hidden="true">]</span>
         <span class="work-gem" aria-hidden="true"></span>
       </button>
-      <button class="work-tab" type="button" aria-pressed="false" data-work-tab="graphic"><span class="home-cta-bracket home-cta-bracket-left" aria-hidden="true">[</span><span class="home-scramble" data-scramble>GRAPHIC DESIGN</span><span class="home-cta-bracket home-cta-bracket-right" aria-hidden="true">]</span></button>
+      <button class="work-tab" type="button" aria-pressed="false" data-work-tab="graphic"><span class="home-cta-bracket home-cta-bracket-left" aria-hidden="true">[</span><span class="home-scramble" data-scramble>GRAPHIC</span><span class="home-cta-bracket home-cta-bracket-right" aria-hidden="true">]</span></button>
     </div>
     <div class="work-list">${workProjectsMarkup(webProjects(t), caseUrl)}</div>
   </section>`;
@@ -122,6 +125,7 @@ function setupProjectsScreen(t, caseUrl) {
   const enter = new IntersectionObserver(([entry]) => {
     if (!entry.isIntersecting) return;
     jobs.forEach((play, i) => play(i * 70));
+    enter.unobserve(tabs);
   }, {threshold: .5});
   enter.observe(tabs);
 }

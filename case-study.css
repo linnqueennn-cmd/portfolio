@@ -74,6 +74,8 @@ body.case-page { background: var(--site-background); color: #282828; font-family
 .case-next { margin-top: 72px; display: grid; gap: 20px; justify-items: start; }
 .case-next h2 { margin: 0; }
 .case-next .case-next-link { font-size: var(--case-subtitle-size); }
+.case-next-link { gap: .55em; }
+.case-next-arrow { flex: none; }
 @media (max-width: 1100px) {
   :root { --case-body-size: 20px; --case-metric-size: 40px; }
   .case-comparison, .case-block, .case-metrics { column-gap: 32px; }

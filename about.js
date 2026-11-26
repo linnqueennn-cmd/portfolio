@@ -20,7 +20,7 @@ function aboutScreen(t, person) {
         <article class="about-panel scroll-window">
           <h2><span class="home-scramble" data-scramble>0${i + 1} / ${heading}</span><span class="about-gem" aria-hidden="true"></span></h2>
           <p>${body}</p>
-          ${i === 0 ? `<img class="about-photo" src="assets/about/portrait.png" alt="${person}" loading="lazy">` : ''}
+          ${i === 0 ? `<img class="about-photo" src="assets/about/portrait.png" alt="${person}" width="640" height="640" loading="lazy" decoding="async">` : ''}
         </article>
       </div>`).join('')}</div>
   </section>`;
@@ -31,13 +31,15 @@ function setupAboutScreen() {
   setupScrollWindows(document.querySelector('.about-scene'), {layered: true});
 }
 
+const playedScrollWindowKeys = new Set();
 function setupScrollWindows(scene, {layered = false} = {}) {
   const slots = [...scene.querySelectorAll('.scroll-window-slot')];
   const panels = slots.map(slot => slot.firstElementChild);
   const titles = panels.map(createScrambleJobs);
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   const progress = panels.map(() => 0);
-  const didScramble = panels.map(() => false);
+  const keys = slots.map(slot => slot.dataset.project ? `project:${slot.dataset.project}` : null);
+  const didScramble = keys.map(key => key ? playedScrollWindowKeys.has(key) : false);
   let pending;
   let previousTime;
 
@@ -63,9 +65,9 @@ function setupScrollWindows(scene, {layered = false} = {}) {
       panels[i].style.setProperty('--window-progress', progress[i]);
       if (visible && progress[i] >= .68 && !didScramble[i] && !reduced.matches) {
         didScramble[i] = true;
+        if (keys[i]) playedScrollWindowKeys.add(keys[i]);
         titles[i].forEach(play => play());
       }
-      if (!visible || progress[i] < .05) didScramble[i] = false;
     });
     if (layered) panels.forEach((panel, i) => panel.style.setProperty('--window-behind', progress[i + 1] ?? 0));
     if (moving) schedule();

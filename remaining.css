@@ -172,6 +172,7 @@ body.home-page { background: #efefef; font-family: "Ubuntu Sans Mono", monospace
 .remaining-footer a { display: inline-flex; align-items: center; min-height: 44px; }
 .remaining-footer a:hover { text-decoration: underline; }
 .remaining-footer p { max-width: 45ch; font-size: var(--portfolio-body); }
+.like-note-mobile { display: none; }
 .sims-like {
   width: 62px; height: 62px; border: 0; background: none; padding: 14px;
   color: #777; cursor: pointer;
@@ -339,7 +340,9 @@ body.home-page #contacts > .page-top-row + .remaining-footer { margin-top: 28px;
   #contacts .remaining-actions > :nth-child(4) { grid-column: 1 / -1; grid-row: 3; }
   #contacts .remaining-actions > :nth-child(5) { grid-column: 1; grid-row: 2; justify-self: start; }
   #contacts .remaining-footer { flex-wrap: nowrap; gap: 8px; margin-top: 44px; }
-  #contacts .remaining-footer p { flex: 1; min-width: 0; font-size: var(--portfolio-meta); }
+  #contacts .remaining-footer p { flex: 1; min-width: 0; font-size: var(--portfolio-meta); line-height: 1.35; }
+  #contacts .like-note-full { display: none; }
+  #contacts .like-note-mobile { display: inline; }
   #contacts .sims-like { width: 48px; height: 48px; padding: 10px; }
 }
 @media (max-width: 540px), (max-width: 1100px) and (orientation: portrait) {
@@ -353,7 +356,7 @@ body.home-page #contacts > .page-top-row + .remaining-footer { margin-top: 28px;
   #services .service-pin > .remaining-heading { margin-bottom: 20px; }
 }
 
-.process-rail { overflow-x: auto; overflow-y: hidden; touch-action: auto; overscroll-behavior-x: contain; scrollbar-width: none; -webkit-overflow-scrolling: touch; }
+.process-rail { overflow: hidden; touch-action: pan-y; overscroll-behavior-x: contain; scrollbar-width: none; user-select: none; }
 .process-rail::-webkit-scrollbar { display: none; }
 .process-track { position: relative; height: 100%; }
 .process-track > .process-step.step { width: var(--process-card-width); }

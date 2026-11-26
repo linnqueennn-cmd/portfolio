@@ -1,8 +1,10 @@
 /assets/cv.pdf
+!/assets/cv-public.pdf
 
 # Local processing, source footage and generated publishing output.
 /.portrait-processing/
 /dist/
+/tmp/
 /assets/services/*.png
 /assets/cases/vinyl/*.png
 /assets/services/manifest.json

@@ -1,7 +1,7 @@
 const choreoKidsCase = {
   id: 'choreo',
   title: 'XoreoKids',
-  eyebrow: '03 / dance studio / design & development',
+  eyebrow: 'dance studio / design & development',
   subtitle: 'UX/UI-дизайн и разработка лендинга танцевальной студии для детей и подростков',
   summary: 'Сайт современной хореографической студии в Санкт-Петербурге: эмоционально знакомит с пространством, понятно объясняет подход и ведёт к записи на пробное занятие.',
   next: {id: 'vinyl', title: 'Vinyl Store'},

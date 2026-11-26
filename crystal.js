@@ -174,6 +174,7 @@ function setupCrystalJourney(host, canvas) {
   const local = setupLocalCrystals(canvas, about, services, contacts);
   let compactMode = false;
   let active = false, current, position, from, started = 0, lastScroll = scrollY;
+  let restoreWork = location.hash === '#work';
   let settled = false;
   let attachedTo = null;
   let aboutIndex = 0, appearing = false;
@@ -209,6 +210,7 @@ function setupCrystalJourney(host, canvas) {
       position = null;
       settled = false;
       aboutIndex = 0;
+      if (restoreWork) layer.hidden = true;
       invalidate();
     }
     if (!active) return {active: false, speed: 1};
@@ -256,6 +258,22 @@ function setupCrystalJourney(host, canvas) {
         target = {x: text.right + 34, y: text.top + text.height / 2, height: 56};
         key = contacts; spinning = true;
       }
+      }
+    }
+    if (restoreWork) {
+      if (key === host) {
+        layer.hidden = true;
+        previousMotion = {active, spinning: false, moving: false, speed: 0, visible: false};
+        return previousMotion;
+      }
+      if (key === tabs || key === tabGem.parentElement) {
+        current = key;
+        position = {...target};
+        from = null;
+        started = now - (mobile ? 620 : 400);
+        settled = true;
+        appearing = false;
+        restoreWork = false;
       }
     }
     target.x = Math.max(18, Math.min(innerWidth - 24, target.x));

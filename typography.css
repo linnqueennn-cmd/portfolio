@@ -23,13 +23,13 @@
   --type-contact-mobile: 22px;
   --type-pricing-action: 30px;
   --type-pricing-bracket: 40px;
-  --type-mobile-action: 24px;
-  --type-mobile-bracket: 32px;
-  --type-hero-action: 60px;
+  --type-mobile-action: 30px;
+  --type-mobile-bracket: 36px;
+  --type-hero-action: 58px;
   --portfolio-body: 22px;
   --portfolio-caption: 14px;
-  --portfolio-action: 60px;
-  --portfolio-tab: 60px;
+  --portfolio-action: 58px;
+  --portfolio-tab: 58px;
   --portfolio-case-title: 60px;
   --portfolio-meta: 20px;
 }
@@ -187,7 +187,7 @@ body.home-page { text-transform: lowercase; }
     mask-repeat: no-repeat;
     animation: cta-label-hide 1s cubic-bezier(.4, 0, .2, 1);
   }
-  .home-screen .home-cta-closing::before, #pricing .home-cta-closing::before, .work-tab-active.home-cta-closing::before {
+  .home-screen .home-cta-closing::before, #pricing .home-cta-closing::before {
     transform-origin: center;
     animation: cta-glow-close 1s cubic-bezier(.4, 0, .2, 1);
   }
@@ -316,10 +316,10 @@ body.home-page, .home-screen, .work-screen, .about-screen,
   .home-screen .home-stage { width: 100%; --frame-width: min(100cqw, 393px, max(260px, calc(100svh * 393 / 822))); }
   .home-screen .home-nav { left: 16px; }
   .home-screen .home-cv { left: auto; right: 16px; }
-  .home-screen .home-profile { left: 16px; }
-  .home-screen .home-line-digital { left: 19px; top: calc(92 * var(--u)); }
-  .home-screen .home-line-web { left: 19px; top: calc(151.72 * var(--u)); }
-  .home-screen .home-line-visual { left: 16px; top: calc(210.72 * var(--u)); }
+  .home-screen .home-profile { left: 16px; top: calc(72 * var(--u)); }
+  .home-screen .home-line-digital { left: 19px; top: calc(98 * var(--u)); }
+  .home-screen .home-line-web { left: 19px; top: calc(149 * var(--u)); }
+  .home-screen .home-line-visual { left: 16px; top: calc(200 * var(--u)); }
   .home-screen .home-portrait { left: calc((100% - var(--frame-width)) / 2 + 66 * var(--u)); }
   .home-screen .home-intro { left: 16px; width: min(188px, calc(55% - 16px)); }
   .home-screen .home-intro h2 { text-align: left; }
@@ -355,3 +355,44 @@ html[lang] #pricing .pricing-cta { height: 54px; min-height: 54px; }
 }
 
 @media (max-width: 600px) { .home-screen .home-cta .home-cta-bracket { font-size: var(--type-mobile-bracket); } }
+
+/* Figma 2182:7995 — one button system for the hero, work tabs and pricing CTA. */
+.home-screen .home-cta::before,
+.work-screen .work-tab::before,
+#pricing .pricing-cta::before {
+  background: linear-gradient(90deg,
+    rgb(176 224 83 / 0) 0%,
+    rgb(176 224 83 / .7) 10.5%,
+    #b0e053 48.5%,
+    rgb(176 224 83 / .7) 89.8%,
+    rgb(176 224 83 / 0) 100%);
+  filter: blur(4px);
+}
+.home-screen .home-cta .home-cta-bracket,
+.work-screen .work-tab .home-cta-bracket,
+#pricing .pricing-cta .home-cta-bracket { font-size: 1em; }
+.home-screen .home-cta-bracket-left,
+.work-screen .home-cta-bracket-left,
+#pricing .home-cta-bracket-left { margin-right: .18em; }
+.home-screen .home-cta-bracket-right,
+.work-screen .home-cta-bracket-right,
+#pricing .home-cta-bracket-right { margin-left: .18em; }
+.work-screen .work-tab:has(.work-gem)::before { right: calc(.52em + 16px); }
+@media (min-width: 1300px) {
+  html[lang] .home-screen .home-cta,
+  .work-screen .work-tab { height: 70px; min-height: 70px; }
+  .home-screen .home-cta::before,
+  .work-screen .work-tab::before { inset: 11px 6px 8px 4px; }
+}
+@media (max-width: 600px) {
+  html[lang] .home-screen .home-cta,
+  html[lang] #pricing .pricing-cta { height: 48px; min-height: 48px; }
+  html[lang] .home-screen .home-cta { width: calc(100% - 32px); }
+  html[lang] #pricing .pricing-cta { width: 100%; }
+  .home-screen .home-cta::before,
+  #pricing .pricing-cta::before { inset: 5px 3px; height: auto; }
+  .work-screen .work-tab::before { inset: 6px 2px; height: auto; }
+  .work-screen .work-tab:has(.work-gem)::before { right: calc(.52em + 10px); }
+  .home-screen .home-cta .home-cta-bracket,
+  #pricing .pricing-cta .home-cta-bracket { font-size: var(--type-mobile-bracket); }
+}

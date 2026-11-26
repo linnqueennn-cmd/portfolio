@@ -225,7 +225,7 @@ function zenSocialCasePage() {
     return '<button type="button" class="zen-screen" data-zen-screen="' + name + '" data-caption="' + esc(title) + '" aria-label="Увеличить: ' + esc(title) + '">' + image(name, title) + '<span>' + number + ' / ' + String(count).padStart(2, '0') + '</span></button>';
   }).join('') + '</div>';
   const html = '<article class="case-study zen-case" aria-labelledby="case-title"><div class="case-content">' +
-    '<section class="case-introduction"><a class="case-back" href="./#work">← Все проекты</a><p class="case-eyebrow">02 / mobile app / ux/ui design</p><h1 id="case-title"><span class="home-scramble" data-scramble>ZenSocial</span></h1>' +
+    '<section class="case-introduction"><a class="case-back" href="./#work">← Все проекты</a><p class="case-eyebrow">mobile app / ux/ui design</p><h1 id="case-title"><span class="home-scramble" data-scramble>ZenSocial</span></h1>' +
     '<p class="case-summary">' + esc(d.summary) + '</p><dl class="zen-facts">' + d.facts.map(([label, value]) => '<div><dt>' + label + '</dt><dd>' + value + '</dd></div>').join('') + '</dl>' +
     '<div class="hero-visual" id="zen-hero-visual" aria-label="Интерфейс ZenSocial в двух телефонах">' + phone('source_filters.webp', 'Настройка фильтров ZenSocial', 'hero-phone hero-phone-back', true) + phone('cover_before_after.webp', 'Сравнение ленты Instagram до и после фильтрации', 'hero-phone hero-phone-front', true) + '</div></section>' +
     chapter('02', 'О проекте', d.about.map(([title, text]) => '<div class="case-block"><h3>' + title + '</h3>' + paragraphs(text) + '</div>').join('')) +

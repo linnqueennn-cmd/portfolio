@@ -1,5 +1,5 @@
 const vinylStoreCase = {
-  id: 'vinyl', title: 'Vinyl Store', eyebrow: '04 / e-commerce / design',
+  id: 'vinyl', title: 'Vinyl Store', eyebrow: 'e-commerce / design',
   summary: 'Интернет-магазин виниловых пластинок, разработанный для запуска нового музыкального магазина. Проект охватывает весь путь покупателя: от знакомства с ассортиментом и поиска нужной пластинки до оформления заказа.',
   cover: '01', coverAlt: 'Vinyl Store: интернет-магазин на ноутбуке и телефоне',
   imageFormat: 'webp', zoom: true,

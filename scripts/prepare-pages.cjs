@@ -39,9 +39,7 @@ const files = [
   ...['download', 'gem', 'left-shadow', 'right-shadow', 'mobile-download',
     'mobile-left-shadow', 'mobile-menu', 'mobile-right-shadow', 'mobile-status',
     'resume', 'status', 'portrait', 'ubuntu-sans-mono', 'LICENCE',
-    'portrait-6221', 'portrait-walk-detail', 'portrait-walk-6207-clean',
-    'portrait-walk-6209-soft', 'portrait-walk-6211', 'portrait-walk-6211-transparent',
-    'portrait-walk-6215', 'plumbob-reflective', 'plumbob-reflections'].map(name => {
+    'portrait-6221', 'plumbob-reflective', 'plumbob-reflections'].map(name => {
       const extension = name === 'gem' || name === 'portrait' ? 'png'
         : name === 'ubuntu-sans-mono' ? 'ttf' : name === 'LICENCE' ? 'txt'
         : name.startsWith('portrait-') ? 'webm'

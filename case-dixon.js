@@ -1,7 +1,7 @@
 const dixonDanceCase = {
   id: 'dixon',
   title: 'DIXON DANCE',
-  eyebrow: '01 / branding / visual identity',
+  eyebrow: 'branding / visual identity',
   subtitle: 'Айдентика современной онлайн-платформы о танце и движении',
   summary: 'Фирменный стиль для бренда, который помогает сделать движение естественной частью повседневной жизни и поддерживает свободу самовыражения.',
   cover: 'page-01',

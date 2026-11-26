@@ -33,7 +33,7 @@ function caseStudyPage(data) {
         ${block.kind === 'showcase' ? `<div class="case-interface">${picture('09_final', 'Финальные экраны сайта Mama Roma на компьютере и телефонах')}<figure class="case-video"><video autoplay loop playsinline muted preload="metadata" width="3840" height="2034" poster="assets/cases/${data.id}/10_mobile.jpg" aria-label="Демонстрация мобильной версии сайта Mama Roma"><source src="assets/cases/${data.id}/10_mobile.mp4" type="video/mp4">Ваш браузер не поддерживает видео. <a href="assets/cases/${data.id}/10_mobile.mp4">Открыть видео</a></video></figure></div>` : ''}
       </div>`).join('')}
     </section>`).join('')}
-    <nav class="case-next" aria-label="Другие кейсы"><h2>Следующий кейс</h2><a href="./?case=${data.next.id}" class="case-next-link">${data.next.title} →</a><a href="./#work">← Все проекты</a></nav>
+    <nav class="case-next" aria-label="Другие кейсы"><h2>Следующий кейс</h2><a href="./?case=${data.next.id}" class="case-next-link"><span class="case-next-arrow" aria-hidden="true">→</span><span>${data.next.title}</span></a><a href="./#work">← Все проекты</a></nav>
     </div>
   </article>`;
 }

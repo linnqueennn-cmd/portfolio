@@ -19,7 +19,7 @@ jobs:
       - uses: actions/setup-node@v4
         with:
           node-version: '22'
-      - run: node scripts/prepare-pages.cjs
+      - run: node scripts/prepare-pages.cjs --require-resume
       - uses: actions/upload-pages-artifact@v4
         with:
           path: dist

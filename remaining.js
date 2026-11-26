@@ -46,7 +46,7 @@ function remainingSections(t) {
         <h2 class="remaining-heading" id="contacts-title" data-reveal>${scramble(tr(copy.contactTitle))}</h2>
       </div>
       <div class="remaining-actions">${action('Telegram', 'https://t.me/linqueenn')}${action('WhatsApp', 'https://wa.me/79997204828')}${action('Behance', 'https://www.behance.net/linnqueenn')}${action('linnqueenn@gmail.com', 'mailto:linnqueenn@gmail.com')}${action('Instagram', 'https://instagram.com/lin.queenn')}</div>
-      <footer class="remaining-footer"><p>${tr(copy.likeNote)}</p><button class="sims-like" type="button" aria-pressed="false" aria-label="${t('Люблю The Sims','I love The Sims')}"><svg viewBox="0 0 9 8" aria-hidden="true" shape-rendering="crispEdges"><path fill="currentColor" d="M1 0h2v1h1v1h1V1h1V0h2v1h1v3H8v1H7v1H6v1H5v1H4V7H3V6H2V5H1V4H0V1h1z"/></svg></button></footer>
+      <footer class="remaining-footer"><p><span class="like-note-full">${tr(copy.likeNote)}</span><span class="like-note-mobile">${t('Пока не готовы сотрудничать?<br>Тогда ставьте лайк.','Not ready to work together?<br>Then leave a like.')}</span></p><button class="sims-like" type="button" aria-pressed="false" aria-label="${t('Люблю The Sims','I love The Sims')}"><svg viewBox="0 0 9 8" aria-hidden="true" shape-rendering="crispEdges"><path fill="currentColor" d="M1 0h2v1h1v1h1V1h1V0h2v1h1v3H8v1H7v1H6v1H5v1H4V7H3V6H2V5H1V4H0V1h1z"/></svg></button></footer>
     </section>`;
 }
 
@@ -62,9 +62,13 @@ function setupRemainingSections() {
   const options = serviceSection.querySelector('.service-options');
   const servicePin = serviceSection.querySelector('.service-pin');
   let servicePinHeight = 0;
+  let measuredViewportWidth = 0;
+  let measuredMobile = mobile.matches;
   let serviceTarget = null;
   let serviceTargetTimer = 0;
   function measureServices() {
+    measuredViewportWidth = innerWidth;
+    measuredMobile = mobile.matches;
     story.style.removeProperty('min-height');
     options.style.removeProperty('min-height');
     if (!mobile.matches) { serviceSection.style.removeProperty('--service-sticky-top'); return; }
@@ -175,13 +179,26 @@ function setupRemainingSections() {
 
   rows.forEach((row, i) => row.querySelector('button').addEventListener('click', () => {
     activate(i);
+    if (mobile.matches) {
+      const metrics = serviceScrollMetrics();
+      serviceTarget = i;
+      scrollTo({top: metrics.top + metrics.distance * i / (rows.length - 1), behavior: 'instant'});
+      clearTimeout(serviceTargetTimer);
+      serviceTargetTimer = setTimeout(() => { serviceTarget = null; schedule(); }, 120);
+      return;
+    }
     if (wide.matches && !mobile.matches) row.scrollIntoView({block: 'center'});
   }));
   rows.forEach((row, i) => row.querySelector('button').addEventListener('focus', () => {
     if (!wide.matches || mobile.matches) activate(i);
   }));
   addEventListener('scroll', schedule, {passive: true});
-  addEventListener('resize', () => { measureServices(); schedule(); });
+  addEventListener('resize', () => {
+    const layoutChanged = innerWidth !== measuredViewportWidth || mobile.matches !== measuredMobile;
+    if (layoutChanged) measureServices();
+    else if (mobile.matches) serviceSection.style.setProperty('--service-sticky-top', Math.min(88, innerHeight - servicePin.offsetHeight - 16) + 'px');
+    schedule();
+  });
   document.fonts.ready.then(() => { measureServices(); schedule(); });
   measureServices();
   new ResizeObserver(() => {
@@ -210,16 +227,16 @@ function setupProcessStack() {
   rail.append(track);
   rail.tabIndex = 0;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
-  let frame, paintFrame, drag, manualScroll = false, manualScrollTimer;
-  let lastProgress, lastTravel = 0, step = 0;
+  let frame, drag, manualScroll = false;
+  let lastProgress, currentProgress = 0, lastTravel = 0, step = 0, travel = 0, visualScroll = 0;
 
   function paintCards() {
-    const cursor = rail.scrollLeft / Math.max(1, step);
+    const cursor = visualScroll / Math.max(1, step);
     cards.forEach((card, i) => {
       const offset = i - cursor;
       // Native scrolling moves the leading cards. Only the passed cards receive
       // a compensating offset to retain the agreed overlapping stack.
-      const x = i * step + (offset < 0 ? -offset * (step - 22) : 0);
+      const x = i * step - visualScroll + (offset < 0 ? -offset * (step - 22) : 0);
       card.style.transform = 'translate3d(' + x + 'px,0,0)';
       card.style.opacity = '1';
       card.style.setProperty('--process-content-opacity', offset < 0 ? String(Math.max(.35, 1 + offset * 1.5)) : '1');
@@ -243,8 +260,7 @@ function setupProcessStack() {
     const width = innerWidth <= 540 ? rail.clientWidth * .78 : (rail.clientWidth - 18) / 2;
     rail.style.setProperty('--process-card-width', width + 'px');
     step = width - 12;
-    const travel = Math.max(0, (cards.length - 1) * step + width - rail.clientWidth);
-    const before = rail.scrollLeft;
+    travel = Math.max(0, (cards.length - 1) * step + width - rail.clientWidth);
     track.style.width = rail.clientWidth + travel + 'px';
     const pin = section.querySelector('.process-pin');
     section.style.setProperty('--process-pin-height', pin.offsetHeight + 'px');
@@ -256,12 +272,13 @@ function setupProcessStack() {
     section.style.setProperty('--process-scroll-distance', scrollDistance + 'px');
     const distance = section.offsetHeight - pin.offsetHeight - 48;
     const progress = Math.max(0, Math.min(1, (pinTop - section.getBoundingClientRect().top) / Math.max(1, distance)));
+    currentProgress = progress;
     // Add the vertical delta to the current native scroll position. A manual
     // swipe remains in place when vertical scrolling resumes; window.scrollY
     // is never written by this component.
-    let target = lastProgress === undefined ? progress * travel : before + (progress - lastProgress) * travel;
-    if (lastTravel && Math.abs(lastTravel - travel) > 1) target = before / lastTravel * travel;
-    if (!manualScroll) rail.scrollLeft = Math.max(0, Math.min(travel, target));
+    let target = lastProgress === undefined ? progress * travel : visualScroll + (progress - lastProgress) * travel;
+    if (lastTravel && Math.abs(lastTravel - travel) > 1) target = visualScroll / lastTravel * travel;
+    if (!manualScroll) visualScroll = Math.max(0, Math.min(travel, target));
     lastProgress = progress;
     lastTravel = travel;
     paintCards();
@@ -269,49 +286,33 @@ function setupProcessStack() {
   function schedule() {
     if (!frame) frame = requestAnimationFrame(update);
   }
-  function schedulePaint() {
-    if (paintFrame) return;
-    paintFrame = requestAnimationFrame(() => {
-      paintFrame = 0;
-      paintCards();
-    });
-  }
-  rail.addEventListener('scroll', () => {
-    schedulePaint();
-    if (!manualScroll) return;
-    clearTimeout(manualScrollTimer);
-    manualScrollTimer = setTimeout(() => {
-      manualScroll = false;
-      rail.classList.remove('is-manual-scroll');
-    }, 180);
-  }, {passive: true});
   addEventListener('scroll', schedule, {passive: true});
   addEventListener('resize', schedule);
   reduced.addEventListener('change', schedule);
-  // Optional mouse dragging on narrow previews. Phones use native touch scroll,
-  // including momentum and direction selection, without pointer interception.
   rail.addEventListener('pointerdown', event => {
-    if (event.pointerType === 'touch' || event.pointerType === 'pen') {
-      manualScroll = true;
-      rail.classList.add('is-manual-scroll');
-    }
-    if (event.pointerType !== 'mouse' || event.button !== 0 || innerWidth > 900 || reduced.matches) return;
-    event.preventDefault();
-    manualScroll = true;
-    rail.classList.add('is-manual-scroll');
-    drag = {id: event.pointerId, x: event.clientX, left: rail.scrollLeft};
+    if (reduced.matches || (event.pointerType === 'mouse' && event.button !== 0)) return;
+    drag = {id: event.pointerId, x: event.clientX, y: event.clientY, left: visualScroll, active: false};
     rail.setPointerCapture(event.pointerId);
   });
   rail.addEventListener('pointermove', event => {
-    if (drag && drag.id === event.pointerId) rail.scrollLeft = drag.left + drag.x - event.clientX;
+    if (!drag || drag.id !== event.pointerId) return;
+    const dx = drag.x - event.clientX;
+    const dy = drag.y - event.clientY;
+    if (!drag.active && Math.abs(dx) < 7) return;
+    if (!drag.active && Math.abs(dx) <= Math.abs(dy)) return;
+    drag.active = true;
+    manualScroll = true;
+    rail.classList.add('is-manual-scroll');
+    event.preventDefault();
+    visualScroll = Math.max(0, Math.min(travel, drag.left + dx));
+    paintCards();
   });
   const stopDrag = () => {
     drag = null;
-    clearTimeout(manualScrollTimer);
-    manualScrollTimer = setTimeout(() => {
-      manualScroll = false;
-      rail.classList.remove('is-manual-scroll');
-    }, 180);
+    manualScroll = false;
+    rail.classList.remove('is-manual-scroll');
+    lastProgress = currentProgress;
+    schedule();
   };
   rail.addEventListener('pointerup', stopDrag);
   rail.addEventListener('pointercancel', stopDrag);
@@ -319,7 +320,8 @@ function setupProcessStack() {
   rail.addEventListener('keydown', event => {
     if (event.key !== 'ArrowLeft' && event.key !== 'ArrowRight') return;
     event.preventDefault();
-    rail.scrollBy({left: step * (event.key === 'ArrowRight' ? 1 : -1), behavior: reduced.matches ? 'instant' : 'smooth'});
+    visualScroll = Math.max(0, Math.min(travel, visualScroll + step * (event.key === 'ArrowRight' ? 1 : -1)));
+    paintCards();
   });
   const observer = new ResizeObserver(() => {
     if (!reduced.matches) rail.style.height = Math.max(...cards.map(card => card.offsetHeight)) + 32 + 'px';

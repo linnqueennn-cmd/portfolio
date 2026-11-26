@@ -59,7 +59,7 @@ function serviceCollageMarkup(index) {
     const vector = asset === '8e6c1';
     const dimensions = vector || !asset ? '' : `width="${serviceCollageSizes[asset][0]}" height="${serviceCollageSizes[asset][1]}"`;
     const dx = ((x+w/2-340)*.12).toFixed(2), dy = ((y+h/2-255.5)*.12).toFixed(2);
-    const content = part.parts ? part.parts.map((child,j)=>render(child,j,x,y,false)).join('') : `<span class="service-art${crop ? ' service-art-cropped' : ''}" style="width:${aw}px;height:${ah}px;transform:translate(-50%,-50%) rotate(${angle}deg) scaleY(${flip});filter:blur(${blur}px)"><img class="${vector ? 'service-vector' : 'service-raster'}" ${crop === 'phone' ? 'style="left:0;width:119.96%"' : ''} data-src="assets/services/${asset}.${vector ? 'svg' : 'webp'}" ${dimensions} alt="" decoding="async" draggable="false"></span>`;
+    const content = part.parts ? part.parts.map((child,j)=>render(child,j,x,y,false)).join('') : `<span class="service-art${crop ? ' service-art-cropped' : ''}" data-blur="${blur}" style="width:${aw}px;height:${ah}px;--render-blur:${blur}px;transform:translate(-50%,-50%) rotate(${angle}deg) scaleY(${flip});filter:blur(var(--render-blur))"><img class="${vector ? 'service-vector' : 'service-raster'}" ${crop === 'phone' ? 'style="left:0;width:119.96%"' : ''} data-src="assets/services/${asset}.${vector ? 'svg' : 'webp'}" ${dimensions} alt="" decoding="async" draggable="false"></span>`;
     return `<span class="${animated ? 'service-piece' : 'service-part'}" style="left:${x-originX}px;top:${y-originY}px;width:${w}px;height:${h}px;--assemble-x:${dx}px;--assemble-y:${dy}px;--assemble-turn:${i%2 ? -5 : 5}deg;--part-delay:${i*30}ms">${content}</span>`;
   }
   return `<div class="service-collage${index === 0 ? ' is-active' : ''}" data-collage="${index + 1}"><div class="service-collage-layout">${serviceCollageParts[index].map((part,i)=>render(part,i)).join('')}</div></div>`;
@@ -70,6 +70,7 @@ function setupServiceCollages(media) {
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
   let selected = 0, visible = false, sequence = 0;
   const loads = new Map();
+  const played = new Set();
   function setAspect(index) {
     const [, , w, h] = serviceCollageBounds[index];
     media.style.setProperty('--collage-aspect', String(w / h / (index === 3 ? .78 : 1)));
@@ -86,14 +87,15 @@ function setupServiceCollages(media) {
     selected = index;
     setAspect(index);
     const token = ++sequence;
-    groups.forEach(group => group.classList.remove('is-assembled'));
+    groups.forEach((group, groupIndex) => group.classList.toggle('is-assembled', groupIndex === index && played.has(group)));
     if (!visible) return;
     const group = groups[index];
     await load(group);
     if (token !== sequence || !visible) return;
+    if (played.has(group)) { group.classList.add('is-assembled'); return; }
     // Two frames establish the starting pose without forcing synchronous layout.
     requestAnimationFrame(() => requestAnimationFrame(() => {
-      if (token === sequence && visible) group.classList.add('is-assembled');
+      if (token === sequence && visible) { group.classList.add('is-assembled'); played.add(group); }
     }));
   }
   const resize = new ResizeObserver(() => {
@@ -101,6 +103,8 @@ function setupServiceCollages(media) {
       const [x,y,w,h] = matchMedia('(max-width: 600px)').matches ? serviceCollageBounds[i] : [0,0,680,511];
       const scale = Math.min(media.clientWidth / w, media.clientHeight / h);
       group.style.setProperty('--collage-scale', String(scale));
+      const blurAdjust = matchMedia('(max-width: 600px)').matches ? Math.min(1, .8 / Math.max(.01, scale)) : 1;
+      group.querySelectorAll('[data-blur]').forEach(art => art.style.setProperty('--render-blur', Number(art.dataset.blur) * blurAdjust + 'px'));
       const layout = group.firstElementChild;
       layout.style.left = (media.clientWidth - w * scale) / 2 - x * scale + 'px';
       layout.style.top = (media.clientHeight - h * scale) / 2 - y * scale + 'px';
@@ -112,7 +116,7 @@ function setupServiceCollages(media) {
     if (next === visible) return;
     visible = next;
     if (visible) select(selected);
-    else { sequence++; groups.forEach(group => group.classList.remove('is-assembled')); }
+    else sequence++;
   }, {rootMargin: '80px 0px'}).observe(media);
   reduced.addEventListener('change', () => { if (visible) select(selected); });
   return {select};

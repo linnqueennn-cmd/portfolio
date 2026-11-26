@@ -442,7 +442,7 @@ function createScrambleJobs(root) {
     if (element.closest('.home-menu-handle')) return () => {};
     if (scrambleJobCache.has(element)) return scrambleJobCache.get(element);
     const glyphs = [...element.textContent];
-    const menuItem = element.closest('.home-nav a, .home-nav button, .about-resume');
+    const menuItem = element.closest('.home-nav a, .home-nav button, .about-resume, .work-tab, #contacts .remaining-action');
     const letters = glyphs.filter(glyph => /[\p{L}\p{N}]/u.test(glyph)).length;
     let duration = menuItem || letters <= 4 ? Math.min(550, 200 + letters * 38) : 760;
     if (element.closest('.home-title')) duration = 1800 - 3 * homeScrambleStagger;
@@ -484,7 +484,7 @@ function createScrambleJobs(root) {
       animation = requestAnimationFrame(frame);
     }
 
-    const heroButton = element.closest('.home-screen .home-cta, #pricing .pricing-cta, #contacts .remaining-action, .work-tab');
+    const heroButton = element.closest('.home-screen .home-cta, #pricing .pricing-cta');
     if (heroButton) {
       const left = heroButton.querySelector('.home-cta-bracket-left');
       const right = heroButton.querySelector('.home-cta-bracket-right');

@@ -55,6 +55,9 @@ function renderHome() {
   setupPortraitArrival(setupHomeScramble());
   setupAboutScreen();
   setupMotion();
+  const loadCrystal = () => import('./crystal.js?v=20261126-performance').catch(error => console.warn('3D crystal unavailable', error));
+  if ('requestIdleCallback' in window) requestIdleCallback(loadCrystal, {timeout: 1400});
+  else setTimeout(loadCrystal, 500);
 }
 
 function setupMotion() {
@@ -63,6 +66,7 @@ function setupMotion() {
     if (!isIntersecting) return;
     target.classList.add('enter');
     if (target.matches('.remaining-heading, .remaining-actions, .pricing-bottom')) createScrambleJobs(target).forEach(play => play());
+    observer.unobserve(target);
   }), {threshold:.18, rootMargin:'0px 0px -12% 0px'});
   document.querySelectorAll('[data-reveal], #contacts .remaining-actions, #pricing .pricing-bottom').forEach(el => observer.observe(el));
 }
