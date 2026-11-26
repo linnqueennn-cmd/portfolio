@@ -141,6 +141,11 @@ body.home-page { background: #efefef; font-family: "Ubuntu Sans Mono", monospace
 .process-note { margin: 0; }
 .contact-top { display: flex; flex-wrap: wrap; justify-content: space-between; gap: 24px; align-items: start; }
 .contact-top .remaining-heading { margin-bottom: 0; }
+#contacts-title { align-items: center; gap: clamp(16px, 2.5vw, 36px); line-height: 1.08; }
+.contact-title-copy { display: flex; flex-direction: column; align-items: flex-start; gap: .16em; }
+.contact-title-line { display: block; white-space: nowrap; }
+.contact-title-line-secondary { font-size: 1.23em; line-height: 1; }
+.pricing-mobile-line { display: inline; }
 #contacts .home-cta::before { display: none; }
 .contact-profile > a { text-decoration: underline; font-size: clamp(24px, 2.1vw, 30px); }
 .contact-profile p { display: flex; align-items: center; gap: 11px; font-size: 16px; margin-top: 10px; }
@@ -207,19 +212,18 @@ body.home-page { background: #efefef; font-family: "Ubuntu Sans Mono", monospace
 .crystal-journey canvas { display: block; width: 100%; height: 100%; pointer-events: auto; touch-action: none; cursor: grab; }
 .crystal-journey canvas:active { cursor: grabbing; }
 .crystal-journey-enabled :is(.home-gem-slot,.work-gem,.about-gem) img { visibility: hidden; }
-.compact-crystal-slot { display: none; }
+.compact-crystal-slot { display: none; position: relative; }
 .crystal-local canvas, .crystal-local-enabled .crystal-journey canvas { pointer-events: none; touch-action: auto; }
 @media (max-width: 600px) {
   .crystal-local-enabled .about-gem { overflow: visible; }
   .crystal-local-enabled #services .service-option h3 { position: relative; }
-  .crystal-local-enabled #contacts-title { position: relative; padding-right: 28px; }
-  .crystal-local-enabled #contacts .compact-crystal-slot { display: none; }
+  .crystal-local-enabled #contacts-title { position: relative; padding-right: 0; }
 }
 @media (max-width: 600px), (max-width: 1100px) and (orientation: portrait) {
   #services .service-option h3 { min-width: 0; width: calc(100% - 24px); }
   #services .service-option button { max-width: 100%; }
   .crystal-local-enabled #services .service-option.is-active h3 { transform: translateX(24px); }
-  .crystal-local-enabled .compact-crystal-slot { display: inline-block; width: 17px; height: 32px; flex: none; align-self: flex-end; margin-bottom: 3px; }
+  .crystal-local-enabled .compact-crystal-slot { display: inline-block; width: 28px; height: 48px; flex: none; align-self: center; margin: 0; }
 }
 @media (max-width: 899px) {
   .remaining-section { --section-gutter: clamp(16px, 3.5vw, 36px); }
@@ -265,6 +269,7 @@ body.home-page { background: #efefef; font-family: "Ubuntu Sans Mono", monospace
   .process-top { gap: 12px; margin-bottom: 28px; }
   .process-top .remaining-heading { margin-bottom: 0; }
   .pricing-top { grid-template-columns: 1fr; gap: 12px; margin-bottom: 36px; }
+  .pricing-mobile-line { display: block; }
   .process-rail { height: 280px; }
   .process-step.step { width: 78%; min-height: 270px; }
   .process-step h3 { font-size: 23px; overflow-wrap: anywhere; }
@@ -333,7 +338,7 @@ body.home-page #contacts > .page-top-row + .remaining-footer { margin-top: 28px;
 }
 @media (max-width: 540px) {
   #contacts .remaining-actions { grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 28px 12px; margin-top: 32px; }
-  html[lang] #contacts .remaining-action.home-cta { font-size: var(--type-contact-mobile); white-space: nowrap; }
+  html[lang] #contacts .remaining-action.home-cta { font-size: var(--portfolio-tab); white-space: nowrap; }
   #contacts .remaining-actions > :nth-child(1) { grid-column: 1; grid-row: 1; }
   #contacts .remaining-actions > :nth-child(2) { grid-column: 2; grid-row: 1; justify-self: end; }
   #contacts .remaining-actions > :nth-child(3) { grid-column: 2; grid-row: 2; justify-self: end; }

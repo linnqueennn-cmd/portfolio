@@ -442,7 +442,7 @@ function createScrambleJobs(root) {
     if (element.closest('.home-menu-handle')) return () => {};
     if (scrambleJobCache.has(element)) return scrambleJobCache.get(element);
     const glyphs = [...element.textContent];
-    const menuItem = element.closest('.home-nav a, .home-nav button, .about-resume, .work-tab, #contacts .remaining-action');
+    const menuItem = element.closest('.home-nav a, .home-nav button, .home-cv, .about-resume, .work-tab, #contacts .remaining-action');
     const letters = glyphs.filter(glyph => /[\p{L}\p{N}]/u.test(glyph)).length;
     let duration = menuItem || letters <= 4 ? Math.min(550, 200 + letters * 38) : 760;
     if (element.closest('.home-title')) duration = 1800 - 3 * homeScrambleStagger;
@@ -503,7 +503,7 @@ function createScrambleJobs(root) {
         if (event.pointerType === 'mouse') animateButton();
       });
       heroButton.addEventListener('pointerdown', event => {
-        if (event.pointerType !== 'mouse' || event.button === 0) animateButton();
+        if (event.pointerType === 'mouse' && event.button === 0) animateButton();
       });
       heroButton.addEventListener('keydown', event => {
         if (event.key === 'Enter' || event.key === ' ') animateButton();

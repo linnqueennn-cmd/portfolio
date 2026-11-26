@@ -166,15 +166,13 @@ function setupCrystalJourney(host, canvas) {
   const contacts = document.querySelector('#contacts');
   const processStop = document.querySelector('#process-title .crystal-stop');
   const pricingStop = document.querySelector('#pricing-title .crystal-stop');
-  const footer = document.querySelector('#contacts-title .home-scramble');
-  const footerRange = document.createRange();
-  footerRange.setStart(footer.firstChild, 0);
-  footerRange.setEnd(footer.firstChild, footer.firstChild.length);
+  const footer = document.querySelector('#contacts-title .contact-title-copy');
   const tabGem = document.querySelector('.work-gem');
   const local = setupLocalCrystals(canvas, about, services, contacts);
   let compactMode = false;
   let active = false, current, position, from, started = 0, lastScroll = scrollY;
   let restoreWork = location.hash === '#work';
+  let workPinned = false;
   let settled = false;
   let attachedTo = null;
   let aboutIndex = 0, appearing = false;
@@ -182,7 +180,7 @@ function setupCrystalJourney(host, canvas) {
   const invalidate = () => { dirtyUntil = performance.now() + 900; };
   addEventListener('scroll', invalidate, {passive: true});
   addEventListener('resize', invalidate);
-  tabs?.addEventListener('click', invalidate);
+  tabs?.addEventListener('click', () => { workPinned = true; restoreWork = false; invalidate(); });
   const serviceObserver = new MutationObserver(invalidate);
   services.forEach(row => serviceObserver.observe(row, {attributes: true, attributeFilter: ['class']}));
   const clamp = value => Math.max(0, Math.min(1, value));
@@ -223,7 +221,11 @@ function setupCrystalJourney(host, canvas) {
     let key = host, spinning = true, continuous = false;
     const tabRect = box(tabGem);
     const tabEnd = Math.max(1, box(tabs).top + scrollY - innerHeight * .56);
-    if (scrollY > 0 && scrollY < tabEnd) {
+    if (scrollY <= 1) workPinned = false;
+    if (workPinned) {
+      target = point(tabGem, tabRect.height, 'inside');
+      key = mobile ? tabs : tabGem.parentElement;
+    } else if (scrollY > 0 && scrollY < tabEnd) {
       // A soft right-hand bend connects the hero to the selected work tab.
       const t = ease(clamp(scrollY / tabEnd));
       target.x += (tabRect.left + tabRect.width / 2 - target.x) * t + Math.sin(Math.PI * t) * (mobile ? innerWidth <= 600 ? 0 : 24 : 150);
@@ -254,8 +256,8 @@ function setupCrystalJourney(host, canvas) {
         key = pricing; spinning = true;
       }
       if (passed(contacts)) {
-        const text = footerRange.getBoundingClientRect();
-        target = {x: text.right + 34, y: text.top + text.height / 2, height: 56};
+        const text = box(footer);
+        target = {x: text.right + 54, y: text.top + text.height / 2, height: 72};
         key = contacts; spinning = true;
       }
       }
@@ -282,7 +284,21 @@ function setupCrystalJourney(host, canvas) {
       layer.style.cssText = '';
       attachedTo = null;
     }
-    if (key !== current) {
+    if (scrollY <= 1) {
+      current = host;
+      position = {...target};
+      from = null;
+      started = now - (mobile ? 620 : 400);
+      settled = true;
+      appearing = false;
+    } else if (workPinned) {
+      current = key;
+      position = {...target};
+      from = null;
+      started = now - (mobile ? 620 : 400);
+      settled = true;
+      appearing = false;
+    } else if (key !== current) {
       const wasVisible = position && !layer.hidden;
       const old = wasVisible ? box(layer) : null;
       from = old ? {x: old.left + old.width / 2, y: old.top + old.height / 2 + scrollDelta, height: old.height} : position ? {...position} : null;
@@ -327,9 +343,9 @@ function setupCrystalJourney(host, canvas) {
       layer.style.position = 'absolute';
       layer.style.width = width + 'px';
       layer.style.height = height + 'px';
-      const text = insideSlot ? null : footerRange.getBoundingClientRect();
+      const text = insideSlot ? null : box(footer);
       const anchorBox = insideSlot ? null : box(anchor);
-      layer.style.left = (insideSlot ? (anchor.clientWidth - width) / 2 : text.right - anchorBox.left + 20) + 'px';
+      layer.style.left = (insideSlot ? (anchor.clientWidth - width) / 2 : text.right - anchorBox.left + 30) + 'px';
       layer.style.top = (insideSlot ? (anchor.clientHeight - height) / 2 : text.top + text.height / 2 - anchorBox.top - height / 2) + 'px';
       layer.style.transform = 'none';
     }
@@ -366,13 +382,6 @@ function setupLocalCrystals(source, about, services, contacts) {
     range.selectNodeContents(row.querySelector('button'));
     return [row, range];
   }));
-  const footerText = contacts?.querySelector('h2 .home-scramble')?.firstChild;
-  const footerWord = document.createRange();
-  if (footerText?.nodeType === Node.TEXT_NODE) {
-    const match = /\S+\s*$/.exec(footerText.textContent);
-    footerWord.setStart(footerText, match?.index ?? 0);
-    footerWord.setEnd(footerText, footerText.length);
-  }
   const groups = ['about', 'services', 'contacts'].map(name => {
     const layer = document.createElement('span');
     layer.className = 'crystal-journey crystal-local';
@@ -399,22 +408,17 @@ function setupLocalCrystals(source, about, services, contacts) {
       const target = targets[index];
       if (!target) return;
       const r = rect(target);
-      const height = index === 0 ? Math.min(30, r.height) : index === 1 && innerWidth <= 600 ? 26 : 32;
+      const height = index === 0 ? Math.min(30, r.height) : index === 1 && innerWidth <= 600 ? 26 : index === 2 ? Math.min(48, r.height) : 32;
       const end = pose(target, height);
       if (index === 1) { end.x = r.left - 13; end.y = r.top + Math.min(r.height, 44) / 2; }
       if (phone && index === 1) {
         const text = serviceRanges.get(row).getClientRects()[0] || serviceRanges.get(row).getBoundingClientRect();
         end.y = text.top + text.height / 2;
       }
-      if (phone && index === 2) {
-        const word = footerWord.getBoundingClientRect();
-        end.x = word.right + 14;
-        end.y = word.top + word.height / 2;
-      }
       if (index < 3) {
         // Attach to the actual card/title: ordinary scrolling must never become
         // a second animation of a fixed overlay following its animated parent.
-        const anchor = index === 2 ? contacts.querySelector('h2') : target;
+        const anchor = index === 2 ? footerSlot : target;
         const changed = anchor !== group.current;
         const old = changed && group.current && !group.layer.hidden ? rect(group.layer) : null;
         if (changed) {
@@ -429,8 +433,8 @@ function setupLocalCrystals(source, about, services, contacts) {
         group.layer.style.position = 'absolute';
         group.layer.style.width = width + 'px';
         group.layer.style.height = localHeight + 'px';
-        group.layer.style.left = (index === 0 ? (target.clientWidth - width) / 2 : index === 1 ? -13 - width / 2 : end.x - anchorRect.left - width / 2) + 'px';
-        group.layer.style.top = (index === 0 ? 0 : end.y - anchorRect.top - height / 2) + 'px';
+        group.layer.style.left = (index === 0 || index === 2 ? (target.clientWidth - width) / 2 : -13 - width / 2) + 'px';
+        group.layer.style.top = (index === 0 || index === 2 ? (target.clientHeight - localHeight) / 2 : end.y - anchorRect.top - height / 2) + 'px';
         group.layer.style.transform = 'none';
         group.visible = anchorRect.bottom > 0 && anchorRect.top < innerHeight && anchorRect.width > 0;
         group.layer.hidden = !group.visible;

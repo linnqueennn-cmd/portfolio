@@ -5,6 +5,13 @@ function remainingSections(t) {
   const scramble = value => `<span class="home-scramble" data-scramble>${value}</span>`;
   const heading = (id, index) => `<h2 class="remaining-heading" id="${id}-title" data-reveal>${scramble(tr(copy.titles[index]))}<span class="crystal-stop" aria-hidden="true"></span></h2>`;
   const action = (label, url, fullWidth = false) => `<a class="remaining-action home-cta${fullWidth ? ' pricing-cta' : ''}" href="${url}"><span class="home-cta-bracket home-cta-bracket-left" aria-hidden="true">[</span>${scramble(label)}<span class="home-cta-bracket home-cta-bracket-right" aria-hidden="true">]</span></a>`;
+  const pricingNote = tr(copy.pricingNote)
+    .replace(/для[  ]вас\./, '<span class="pricing-mobile-line">для вас.</span>')
+    .replace(/for[  ]you\./, '<span class="pricing-mobile-line">for you.</span>');
+  const contactHeading = t(
+    `<span class="contact-title-copy"><span class="contact-title-line">${scramble('ПИШИТЕ, СОЗДАДИМ')}</span><span class="contact-title-line contact-title-line-secondary">${scramble('ЧТО-ТО КРУТОЕ')}</span></span>`,
+    `<span class="contact-title-copy"><span class="contact-title-line">${scramble('LET’S CREATE')}</span><span class="contact-title-line contact-title-line-secondary">${scramble('SOMETHING GREAT')}</span></span>`
+  );
   return `
     <section id="services" class="remaining-section" aria-labelledby="services-title">
       <div class="service-pin">
@@ -33,7 +40,7 @@ function remainingSections(t) {
     </section>
     <section id="pricing" class="remaining-section" aria-labelledby="pricing-title">
       <div class="pricing-top">${heading('pricing', 2)}
-      <p class="remaining-note">${tr(copy.pricingNote)}</p></div>
+      <p class="remaining-note">${pricingNote}</p></div>
       <dl class="rate-list">${copy.prices.map(([ru, english, amount]) => `
         <div class="rate-slot scroll-window-slot"><div class="rate-row scroll-window"><dt>[${tr([ru, english])}]</dt><dd>${amount ? t('от ','from ') + amount.replace(' ', ' ') + ' ₽' : t('по запросу','on request')}</dd></div></div>`).join('')}</dl>
       <div class="pricing-bottom">
@@ -43,7 +50,7 @@ function remainingSections(t) {
     <section id="contacts" class="remaining-section" aria-labelledby="contacts-title">
       <div class="contact-top">
         <div class="contact-profile"><p><img src="assets/home/status.svg" alt="">${t('открыта к проектам','open for projects')}</p></div>
-        <h2 class="remaining-heading" id="contacts-title" data-reveal>${scramble(tr(copy.contactTitle))}</h2>
+        <h2 class="remaining-heading" id="contacts-title" data-reveal>${contactHeading}</h2>
       </div>
       <div class="remaining-actions">${action('Telegram', 'https://t.me/linqueenn')}${action('WhatsApp', 'https://wa.me/79997204828')}${action('Behance', 'https://www.behance.net/linnqueenn')}${action('linnqueenn@gmail.com', 'mailto:linnqueenn@gmail.com')}${action('Instagram', 'https://instagram.com/lin.queenn')}</div>
       <footer class="remaining-footer"><p><span class="like-note-full">${tr(copy.likeNote)}</span><span class="like-note-mobile">${t('Пока не готовы сотрудничать?<br>Тогда ставьте лайк.','Not ready to work together?<br>Then leave a like.')}</span></p><button class="sims-like" type="button" aria-pressed="false" aria-label="${t('Люблю The Sims','I love The Sims')}"><svg viewBox="0 0 9 8" aria-hidden="true" shape-rendering="crispEdges"><path fill="currentColor" d="M1 0h2v1h1v1h1V1h1V0h2v1h1v3H8v1H7v1H6v1H5v1H4V7H3V6H2V5H1V4H0V1h1z"/></svg></button></footer>

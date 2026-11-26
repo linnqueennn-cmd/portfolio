@@ -55,7 +55,7 @@ function renderHome() {
   setupPortraitArrival(setupHomeScramble());
   setupAboutScreen();
   setupMotion();
-  const loadCrystal = () => import('./crystal.js?v=20261126-performance').catch(error => console.warn('3D crystal unavailable', error));
+  const loadCrystal = () => import('./crystal.js?v=20261126-small-fixes').catch(error => console.warn('3D crystal unavailable', error));
   if ('requestIdleCallback' in window) requestIdleCallback(loadCrystal, {timeout: 1400});
   else setTimeout(loadCrystal, 500);
 }

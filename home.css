@@ -440,7 +440,7 @@
   .home-philosophy::before { width: calc(42 * var(--u)); height: calc(83 * var(--u)); }
   .home-philosophy span { margin: calc(65 * var(--u)) 0 0 calc(50 * var(--u)); width: calc(106 * var(--u)); }
   .home-cta, html[lang="en"] .home-cta {
-    left: calc(14 * var(--u)); top: calc(726.71 * var(--u));
+    left: calc(14 * var(--u)); top: calc(748 * var(--u));
     display: grid; place-items: center;
     width: calc(364 * var(--u)); min-height: 0; height: calc(45.898 * var(--u));
     font-size: calc(38.249 * var(--u)); line-height: 1.2;

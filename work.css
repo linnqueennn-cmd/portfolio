@@ -164,7 +164,7 @@
   translate: 0 -50%; width: var(--portfolio-case-title); height: var(--portfolio-case-title); color: #282828;
 }
 [data-project="metro"] .work-label h3 {
-  font-size: clamp(30px, 3.2vw, 46px);
+  font-size: var(--portfolio-case-title);
   letter-spacing: -.055em;
   white-space: nowrap;
 }
