@@ -1,5 +1,4 @@
 /assets/cv.pdf
-!/assets/cv-public.pdf
 
 # Local processing, source footage and generated publishing output.
 /.portrait-processing/
@@ -15,6 +14,11 @@
 *.mp4
 *.MP4
 !/assets/cases/roma/10_mobile.mp4
+!/assets/cases/choreo/hero-desktop-refresh.mp4
+!/assets/cases/choreo/hero-phone-refresh.mp4
+!/assets/cases/choreo/training-motion.mp4
+!/assets/cases/choreo/values-desktop-refresh.mp4
+!/assets/cases/choreo/values-motion-mobile.mp4
 *.log
 *.tmp
 *.bak

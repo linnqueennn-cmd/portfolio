@@ -10,29 +10,29 @@ const serviceCollageSizes = {
 // Asset, bounding box, rotation, unrotated dimensions, vertical flip, blur, crop.
 const serviceCollageParts = [
   [
-    ['d18d9',141,-17,254.317,254.317,.27,253.105,253.105,1,.5],
+    ['d18d9',141,-17,254.317,254.317,.27,253.105,253.105,1,.35],
     ['48a79',167.48,110.43,344.092,344.092],
     ['a199c',48,168,238.902,193.514,24.45,208.987,117.555],
-    ['1c27b',326,160,295.02,295.02,17.09,236.074,236.074,1,2.891]
+    ['1c27b',326,160,295.02,295.02,17.09,236.074,236.074,1,2.25]
   ],
   [
     ['f4b28',105,358.99,139.065,139.065],
     ['35773',163.13,62.45,350.963,438.548],
     ['c955d',375.77,86.75,295.79,295.79,0,295.79,295.79,1,.5],
-    ['bd3f5',348.07,-43.36,221.672,221.672,-174.34,202.666,202.666,-1,1.75]
+    ['bd3f5',348.07,-43.36,221.672,221.672,-174.34,202.666,202.666,-1,1.25]
   ],
   [
     ['47ff9',-10,133,310.108,256.295,-11.37,274.853,206.139],
     ['51723',206,72,267,389,0,267,389,1,0,true],
-    ['fe849',393,335,133.472,150.977,10.86,110.487,132.54,1,0,'phone'],
-    ['9f964',363,69,268.442,196.946,16.19,240.237,135.345,1,2.5]
+    ['fe849',400,332,133.472,150.977,10.86,110.487,132.54,1,0,'phone'],
+    ['9f964',363,69,268.442,196.946,16.19,240.237,135.345,1,1.75]
   ],
   [
     ['c0ea7',394,390,121.245,121.245],
     {box:[172,7,361,504], parts:[
       ['8e6c1',429,429,18.5397,8.5],
       ['36c2c',172,7,361,504],
-      ['00f34',386,101,39.185,34.063,0,39.185,34.063,1,.25],
+      ['00f34',386,101,39.185,34.063,0,39.185,34.063,1,0],
       ['bd4ed',321.14,43.14,60.385,30.192]
     ]},
     ['350b2',136,128,169.045,138.039,-163.15,146.371,99.898,-1,1.5],
@@ -68,6 +68,7 @@ function serviceCollageMarkup(index) {
 function setupServiceCollages(media) {
   const groups = [...media.querySelectorAll('.service-collage')];
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const compact = matchMedia('(max-width: 600px), (max-width: 1100px) and (orientation: portrait)');
   let selected = 0, visible = false, sequence = 0;
   const loads = new Map();
   const played = new Set();
@@ -100,10 +101,10 @@ function setupServiceCollages(media) {
   }
   const resize = new ResizeObserver(() => {
     groups.forEach((group,i) => {
-      const [x,y,w,h] = matchMedia('(max-width: 600px)').matches ? serviceCollageBounds[i] : [0,0,680,511];
+      const [x,y,w,h] = compact.matches ? serviceCollageBounds[i] : [0,0,680,511];
       const scale = Math.min(media.clientWidth / w, media.clientHeight / h);
       group.style.setProperty('--collage-scale', String(scale));
-      const blurAdjust = matchMedia('(max-width: 600px)').matches ? Math.min(1, .8 / Math.max(.01, scale)) : 1;
+      const blurAdjust = compact.matches ? Math.min(1, .8 / Math.max(.01, scale)) : 1;
       group.querySelectorAll('[data-blur]').forEach(art => art.style.setProperty('--render-blur', Number(art.dataset.blur) * blurAdjust + 'px'));
       const layout = group.firstElementChild;
       layout.style.left = (media.clientWidth - w * scale) / 2 - x * scale + 'px';

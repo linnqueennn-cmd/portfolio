@@ -1,8 +1,8 @@
-function aboutScreen(t, person) {
+function aboutScreen(t, person, cv) {
   const cards = [
-    [t('Обо мне', 'Hi, I’m Lina'), t(
+    [t('Обо мне', 'About me'), t(
       'меня зовут <span class="about-proper-name">Лина</span>, более семи лет занимаюсь дизайном. специализируюсь на ux/ui, создаю сайты, интерфейсы и визуальные решения для бизнеса. от первых идей до реализации —<br class="about-desktop-break"> умею работать на каждом этапе проекта.',
-      'I’ve worked in UX/UI, web and graphic design for over six years. I create websites, interfaces and visual systems for businesses. I often take on projects from scratch, work through the details and bring ideas to completion.'
+      'I’m <span class="about-proper-name">Lina</span>, and I’ve been designing for over seven years. I specialise in UX/UI and create websites, interfaces and visual systems for businesses. I work across every stage, from the first idea to implementation.'
     )],
     [t('Не просто красиво', 'More than looks'), t(
       'Я люблю задавать вопросы. Для кого мы это делаем? Зачем? Какую задачу решаем? Поэтому погружаюсь в продукт, изучаю аудиторию, продумываю структуру и пользовательские сценарии. Мне важно, чтобы дизайн не только классно выглядел, но и приносил бизнесу реальную пользу.',
@@ -15,10 +15,10 @@ function aboutScreen(t, person) {
   ];
 
   return `<section id="about" class="about-screen" aria-label="${t('Обо мне', 'About me')}">
-    <div class="about-scene"><a class="about-resume" href="assets/cv.pdf" download><span class="about-resume-label"><span class="home-scramble" data-scramble>CV</span><img src="assets/home/download.svg" alt=""></span><span class="about-resume-note"><span class="about-resume-desktop-note">${t('подробнее тут', 'more details here')}</span><span class="about-resume-mobile-note">${t('скачать резюме', 'download résumé')}</span></span></a>${cards.map(([heading, body], i) => `
+    <div class="about-scene"><a class="about-resume" href="${cv}" download><span class="about-resume-label"><span class="home-scramble" data-scramble>CV</span><img src="assets/home/download.svg" alt=""></span><span class="about-resume-note"><span class="about-resume-desktop-note">${t('подробнее тут', 'more details here')}</span><span class="about-resume-mobile-note">${t('скачать резюме', 'download résumé')}</span></span></a>${cards.map(([heading, body], i) => `
       <div class="about-slot scroll-window-slot">
         <article class="about-panel scroll-window">
-          <h2><span class="home-scramble" data-scramble>0${i + 1} / ${heading}</span><span class="about-gem" aria-hidden="true"></span></h2>
+          <h2><span class="home-scramble" data-scramble>0${i + 1} / ${joinRussianShortWords(heading)}</span><span class="about-gem" aria-hidden="true"></span></h2>
           <p>${body}</p>
           ${i === 0 ? `<img class="about-photo" src="assets/about/portrait.png" alt="${person}" loading="lazy">` : ''}
         </article>

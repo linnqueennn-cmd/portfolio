@@ -1,16 +1,42 @@
+function remainingText(value, animated = true) {
+  return animated ? `<span class="home-scramble" data-scramble>${value}</span>` : value;
+}
+
+function remainingAction(label, url, {pricing = false, animated = true} = {}) {
+  return `<a class="remaining-action home-cta${pricing ? ' pricing-cta' : ''}" href="${url}"><span class="home-cta-bracket home-cta-bracket-left" aria-hidden="true">[</span>${remainingText(label, animated)}<span class="home-cta-bracket home-cta-bracket-right" aria-hidden="true">]</span></a>`;
+}
+
+function contactFooter(t, {homePage = false} = {}) {
+  const title = t(['ПИШИТЕ, СОЗДАДИМ', 'ЧТО-ТО КРУТОЕ'], ['LET’S CREATE', 'SOMETHING GREAT']);
+  const email = 'linnqueenn@icloud.com';
+  const actions = [
+    ['Telegram', 'https://t.me/linqueenn'],
+    ['WhatsApp', 'https://wa.me/79997204828'],
+    ['Behance', 'https://www.behance.net/linnqueenn'],
+    [email, `mailto:${email}`],
+    ['Instagram', 'https://instagram.com/lin.queenn']
+  ];
+  return `
+    <footer id="contacts" class="remaining-section" role="contentinfo" aria-labelledby="contacts-title">
+      <div class="contact-top">
+        <div class="contact-profile"><p><img src="assets/home/status.svg" alt="">${t('открыта к проектам','open for projects')}</p></div>
+        <h2 class="remaining-heading" id="contacts-title"${homePage ? ' data-reveal' : ''}><span class="contact-title-copy"><span class="contact-title-line">${remainingText(title[0], homePage)}</span><span class="contact-title-line contact-title-line-secondary">${remainingText(title[1], homePage)}</span></span></h2>
+      </div>
+      <div class="remaining-actions">${actions.map(([label, url]) => remainingAction(label, url, {animated: homePage})).join('')}</div>
+      ${homePage ? `<div class="remaining-footer"><p><span class="like-note-full">${joinRussianShortWords(t(...remainingContent.likeNote))}</span><span class="like-note-mobile">${t('Пока не готовы сотрудничать?<br>Тогда ставьте лайк, если тоже любите The Sims.','Not ready to work together?<br>Then leave a like if you love The Sims too.')}</span></p><button class="sims-like" type="button" aria-pressed="false" aria-label="${t('Люблю The Sims','I love The Sims')}"><svg viewBox="0 0 9 8" aria-hidden="true" shape-rendering="crispEdges"><path fill="currentColor" d="M1 0h2v1h1v1h1V1h1V0h2v1h1v3H8v1H7v1H6v1H5v1H4V7H3V6H2V5H1V4H0V1h1z"/></svg></button></div>` : ''}
+    </footer>`;
+}
+
 function remainingSections(t) {
   const copy = remainingContent;
-  const phrase = value => value.replace(/(^|\s)([авикосуя]|до|из|на|от|по|за|об|не|со)(?= ) /gi, '$1$2 ');
-  const tr = pair => phrase(t(...pair));
-  const scramble = value => `<span class="home-scramble" data-scramble>${value}</span>`;
-  const heading = (id, index) => `<h2 class="remaining-heading" id="${id}-title" data-reveal>${scramble(tr(copy.titles[index]))}<span class="crystal-stop" aria-hidden="true"></span></h2>`;
-  const action = (label, url, fullWidth = false) => `<a class="remaining-action home-cta${fullWidth ? ' pricing-cta' : ''}" href="${url}"><span class="home-cta-bracket home-cta-bracket-left" aria-hidden="true">[</span>${scramble(label)}<span class="home-cta-bracket home-cta-bracket-right" aria-hidden="true">]</span></a>`;
+  const tr = pair => joinRussianShortWords(t(...pair));
+  const heading = (id, index) => `<h2 class="remaining-heading" id="${id}-title" data-reveal>${remainingText(tr(copy.titles[index]))}<span class="crystal-stop" aria-hidden="true"></span></h2>`;
   const pricingNote = tr(copy.pricingNote)
     .replace(/для[  ]вас\./, '<span class="pricing-mobile-line">для вас.</span>')
     .replace(/for[  ]you\./, '<span class="pricing-mobile-line">for you.</span>');
-  const contactHeading = t(
-    `<span class="contact-title-copy"><span class="contact-title-line">${scramble('ПИШИТЕ, СОЗДАДИМ')}</span><span class="contact-title-line contact-title-line-secondary">${scramble('ЧТО-ТО КРУТОЕ')}</span></span>`,
-    `<span class="contact-title-copy"><span class="contact-title-line">${scramble('LET’S CREATE')}</span><span class="contact-title-line contact-title-line-secondary">${scramble('SOMETHING GREAT')}</span></span>`
+  const rateLabel = pair => `[${tr(pair)}]`.replace(
+    / (digital(?:-проект| project)\])$/i,
+    ' <span class="rate-mobile-line">$1</span>'
   );
   return `
     <section id="services" class="remaining-section" aria-labelledby="services-title">
@@ -42,19 +68,12 @@ function remainingSections(t) {
       <div class="pricing-top">${heading('pricing', 2)}
       <p class="remaining-note">${pricingNote}</p></div>
       <dl class="rate-list">${copy.prices.map(([ru, english, amount]) => `
-        <div class="rate-slot scroll-window-slot"><div class="rate-row scroll-window"><dt>[${tr([ru, english])}]</dt><dd>${amount ? `<span class="rate-prefix">${t('от ','from ')}</span><span class="rate-amount">${amount.replace(' ', ' ')} ₽</span>` : t('по запросу','on request')}</dd></div></div>`).join('')}</dl>
+        <div class="rate-slot scroll-window-slot"><div class="rate-row scroll-window"><dt>${rateLabel([ru, english])}</dt><dd>${amount ? `<span class="rate-prefix">${t('от ','from ')}</span><span class="rate-amount">${amount.replace(' ', ' ')} ₽</span>` : t('по запросу','on request')}</dd></div></div>`).join('')}</dl>
       <div class="pricing-bottom">
-      ${action(tr(copy.discuss), 'https://t.me/linqueenn', true)}
+      ${remainingAction(tr(copy.discuss), 'https://t.me/linqueenn', {pricing: true})}
       </div>
     </section>
-    <section id="contacts" class="remaining-section" aria-labelledby="contacts-title">
-      <div class="contact-top">
-        <div class="contact-profile"><p><img src="assets/home/status.svg" alt="">${t('открыта к проектам','open for projects')}</p></div>
-        <h2 class="remaining-heading" id="contacts-title" data-reveal>${contactHeading}</h2>
-      </div>
-      <div class="remaining-actions">${action('Telegram', 'https://t.me/linqueenn')}${action('WhatsApp', 'https://wa.me/79997204828')}${action('Behance', 'https://www.behance.net/linnqueenn')}${action('linnqueenn@gmail.com', 'mailto:linnqueenn@gmail.com')}${action('Instagram', 'https://instagram.com/lin.queenn')}</div>
-      <footer class="remaining-footer"><p><span class="like-note-full">${tr(copy.likeNote)}</span><span class="like-note-mobile">${t('Пока не готовы сотрудничать?<br>Тогда ставьте лайк.','Not ready to work together?<br>Then leave a like.')}</span></p><button class="sims-like" type="button" aria-pressed="false" aria-label="${t('Люблю The Sims','I love The Sims')}"><svg viewBox="0 0 9 8" aria-hidden="true" shape-rendering="crispEdges"><path fill="currentColor" d="M1 0h2v1h1v1h1V1h1V0h2v1h1v3H8v1H7v1H6v1H5v1H4V7H3V6H2V5H1V4H0V1h1z"/></svg></button></footer>
-    </section>`;
+    ${contactFooter(t, {homePage: true})}`;
 }
 
 function setupRemainingSections() {
@@ -62,7 +81,7 @@ function setupRemainingSections() {
   const images = [...document.querySelectorAll('.service-collage')];
   const collage = setupServiceCollages(document.querySelector('.service-media'));
   let measuring = false;
-  const wide = matchMedia('(min-width: 900px)');
+  const wide = matchMedia('(min-width: 900px), (min-width: 760px) and (orientation: landscape) and (pointer: coarse)');
   const mobile = matchMedia('(max-width: 540px), (max-width: 1100px) and (orientation: portrait)');
   const serviceSection = document.querySelector('#services');
   const story = serviceSection.querySelector('.service-story');
@@ -234,6 +253,7 @@ function setupProcessStack() {
   rail.append(track);
   rail.tabIndex = 0;
   const reduced = matchMedia('(prefers-reduced-motion: reduce)');
+  const portraitTablet = matchMedia('(min-width: 541px) and (max-width: 1100px) and (orientation: portrait)');
   let frame, drag, manualScroll = false;
   let lastProgress, currentProgress = 0, lastTravel = 0, step = 0, travel = 0, visualScroll = 0;
 
@@ -264,7 +284,9 @@ function setupProcessStack() {
       lastTravel = 0;
       return;
     }
-    const width = innerWidth <= 540 ? rail.clientWidth * .78 : (rail.clientWidth - 18) / 2;
+    const width = innerWidth <= 540 ? rail.clientWidth * .78
+      : portraitTablet.matches ? rail.clientWidth * .62
+      : (rail.clientWidth - 18) / 2;
     rail.style.setProperty('--process-card-width', width + 'px');
     step = width - 12;
     travel = Math.max(0, (cards.length - 1) * step + width - rail.clientWidth);

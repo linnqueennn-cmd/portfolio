@@ -3,12 +3,11 @@ const fs = require('node:fs');
 const path = require('node:path');
 const root = path.resolve(__dirname, '..');
 const output = path.join(root, 'dist');
-if (process.argv.includes('--require-resume') && !fs.existsSync(path.join(root, 'assets/cv-public.pdf'))) {
-  throw Error('Add a reviewed assets/cv-public.pdf before publishing; the private assets/cv.pdf must stay local.');
-}
 const files = [
   'index.html', '.nojekyll',
+  'assets/Lina_Khannanova_CV_RU.pdf', 'assets/Lina_Khannanova_CV_EN.pdf',
   'style.css', 'home.css', 'work.css', 'about.css', 'remaining.css', 'typography.css',
+  'typography.js', 'analytics.js',
   'home.js', 'work.js', 'about.js', 'remaining-content.js', 'remaining.js', 'site.js',
   'crystal.js', 'grid-preview.js',
   'service-collages.js',
@@ -17,18 +16,33 @@ const files = [
     .map(name => `assets/services/${name}.webp`),
   'assets/services/8e6c1.svg',
   'case-study.js', 'case-roma.js', 'case-choreo.js', 'case-dixon.js', 'case-study.css',
+  'case-choreo.css',
+  ...['hero-desktop', 'concept-one', 'concept-two', 'style-desktop', 'gallery-desktop',
+    'gallery-mobile', 'booking-desktop', 'booking-mobile', 'laptop-frame', 'phone-frame']
+    .map(name => `assets/cases/choreo/${name}.webp`),
+  ...['mentors', 'groups', 'prices', 'studios'].flatMap(name =>
+    ['desktop', 'mobile'].map(device => `assets/cases/choreo/${name}-${device}.webp`)),
+  ...['hero-desktop-refresh', 'hero-phone-refresh', 'training-motion', 'values-desktop-refresh',
+    'values-motion-mobile']
+    .flatMap(name => [`assets/cases/choreo/${name}.webp`, `assets/cases/choreo/${name}.mp4`]),
   'case-vinyl.js', 'case-vinyl.css',
-  ...Array.from({length: 8}, (_, i) => `assets/cases/vinyl/${String(i + 1).padStart(2, '0')}.webp`),
+  ...['cover', '03', '06', '07', '08', 'catalog-desktop', 'catalog-mobile', 'cart-desktop', 'cart-mobile',
+    'checkout-desktop', 'checkout-mobile', 'success-desktop', 'success-mobile',
+    'cover-preview', '07-preview', '08-preview', 'catalog-desktop-preview', 'catalog-mobile-preview']
+    .map(name => `assets/cases/vinyl/${name}.webp`),
   ...Array.from({length: 14}, (_, i) => `assets/cases/dixon/page-${String(i + 1).padStart(2, '0')}.webp`),
+  ...['page-01-preview', 'dancer-merch', 'social-media-mockup'].map(name => `assets/cases/dixon/${name}.webp`),
   'case-zen.js', 'case-zen.css',
-  ...['cover_before_after.webp', 'source_filters.webp', 'source_appearance.webp',
-    'source_summary.webp', 'persona_anna.png', 'auth_login.webp',
+  ...['persona_anna.png',
+    ...['no-reels', 'chats', 'suggestions', 'ads', 'stories'].map(name => `app-store-${name}.webp`),
+    'feed-facts.webp', 'feed-explore.webp', 'feed-filtered.webp', 'settings-filter.webp',
     ...Array.from({length: 15}, (_, i) => `before_${String(i + 1).padStart(2, '0')}.webp`),
-    ...Array.from({length: 5}, (_, i) => `after_${String(i + 1).padStart(2, '0')}.webp`)
+    ...Array.from({length: 5}, (_, i) => `iteration_${String(i + 1).padStart(2, '0')}`)
+      .flatMap(name => [`${name}.webp`, `${name}-preview.webp`])
   ].map(name => `assets/cases/zen/${name}`),
   ...['01_cover', '02_before', '03_after', '04_wireframe_a', '04_wireframe_b',
     '05_palette', '06_hero', '07_vacancies', '08_team', '09_final', '11_month',
-    '12_year', '13_old_form'].map(name => `assets/cases/roma/${name}.webp`),
+    '12_year', '13_old_form', '01_cover-preview', '09_final-preview'].map(name => `assets/cases/roma/${name}.webp`),
   'assets/cases/roma/10_mobile.mp4',
   'assets/cases/roma/10_mobile.jpg',
   ...['brand', 'retail', 'roma', 'vinyl', 'social'].map(name => `assets/${name}.jpg`),
@@ -46,15 +60,14 @@ const files = [
         : name === 'plumbob-reflective' ? 'glb' : name === 'plumbob-reflections' ? 'hdr' : 'svg';
       return `assets/home/${name}.${extension}`;
     }),
-  ...['roma', 'vinyl', 'zen', 'choreo', 'dixon', 'getbrand', 'metro'].map(name => `assets/work/${name}.gif`),
+  ...['vinyl', 'zen', 'choreo', 'dixon', 'metro'].map(name => `assets/work/${name}.gif`),
+  'assets/work/roma.webp', 'assets/work/getbrand.webp',
   'assets/work/behance.png',
   'assets/work/left.svg', 'assets/work/right.svg',
   ...['three.module.js', 'three.core.js', 'GLTFLoader.js', 'HDRLoader.js',
     'BufferGeometryUtils.js', 'LICENSE'].map(name => `assets/vendor/three/${name}`)
 ];
 
-// A separately reviewed public résumé may be added later. Never copy private cv.pdf.
-if (fs.existsSync(path.join(root, 'assets/cv-public.pdf'))) files.push('assets/cv-public.pdf');
 for (const file of files) {
   let current = root;
   for (const segment of file.split('/')) {
@@ -73,11 +86,5 @@ for (const file of files) {
   fs.mkdirSync(path.dirname(destination), {recursive: true});
   fs.copyFileSync(path.join(root, file), destination);
   total += fs.statSync(destination).size;
-}
-if (files.includes('assets/cv-public.pdf')) {
-  // Preserve the site's existing download URL without exposing the private file.
-  fs.copyFileSync(path.join(output, 'assets/cv-public.pdf'), path.join(output, 'assets/cv.pdf'));
-} else {
-  console.warn('PUBLIC RESUME MISSING: assets/cv.pdf is private and excluded. Add a reviewed assets/cv-public.pdf to enable public downloads.');
 }
 console.log(`Prepared ${files.length} files (${(total / 1024 / 1024).toFixed(1)} MiB) in dist/`);

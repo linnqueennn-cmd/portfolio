@@ -1,7 +1,49 @@
-/* Vinyl uses the shared case template; only its image spacing is specific. */
+/* Vinyl uses the shared case template and pairs desktop and phone screens. */
 [data-case="vinyl"] .case-cover { margin-top: 32px; }
 [data-case="vinyl"] .case-picture > a { display: block; cursor: zoom-in; }
-[data-case="vinyl"] .case-block:has(> [data-media="05"]) { margin-top: 0; }
+[data-case="vinyl"] .case-visual-steps { margin-top: 32px; scroll-margin-top: 90px; }
+[data-case="vinyl"] .case-visual-versions { display: none; }
+[data-case="vinyl"] .case-visual-step-list { display: grid; gap: 40px; margin: 0; padding: 0; list-style: none; }
+[data-case="vinyl"] .case-visual-step-list h4 {
+  margin: 0 0 12px;
+  font-size: var(--case-caption-size);
+  font-weight: var(--case-weight-emphasis);
+}
+[data-case="vinyl"] .case-visual-step-pair {
+  display: grid;
+  grid-template-columns: minmax(0, 3.75fr) minmax(0, 1fr);
+  gap: 32px;
+  max-width: 1172px;
+}
+[data-case="vinyl"] .case-visual-step-pair img { display: block; }
+[data-case="vinyl"] .case-visual-phone { contain: size; min-width: 0; }
+[data-case="vinyl"] .case-visual-phone > a { height: 100%; width: fit-content; max-width: 100%; margin-inline: auto; }
+[data-case="vinyl"] .case-visual-phone img { height: 100%; width: auto; max-width: 100%; object-fit: contain; object-position: top center; }
+[data-case="vinyl"] .vinyl-catalog-pair {
+  grid-template-columns: minmax(0, 3.5fr) minmax(0, 1fr);
+  max-width: 1008px;
+}
+[data-case="vinyl"] .vinyl-catalog-pair > .case-picture { grid-column: auto; }
+[data-case="vinyl"] .vinyl-catalog-pair .case-visual-phone { align-self: stretch; }
 @media (max-width: 600px) {
   [data-case="vinyl"] .case-cover { margin-top: 24px; }
+  [data-case="vinyl"] .case-visual-steps { margin-top: 24px; }
+  [data-case="vinyl"] .case-visual-versions {
+    display: flex;
+    flex-wrap: wrap;
+    gap: 0 20px;
+    margin-bottom: 20px;
+    border-bottom: 1px solid var(--line);
+    font-size: var(--case-caption-size);
+  }
+  [data-case="vinyl"] .case-visual-versions label { display: inline-flex; min-height: 44px; align-items: center; gap: 6px; cursor: pointer; }
+  [data-case="vinyl"] .case-visual-versions input { margin: 0; accent-color: var(--ink); }
+  [data-case="vinyl"] .case-visual-step-list { gap: 28px; }
+  [data-case="vinyl"] .case-visual-steps .case-visual-step-pair { display: block; }
+  [data-case="vinyl"] .case-visual-steps .case-visual-phone { contain: none; }
+  [data-case="vinyl"] .case-visual-steps .case-visual-phone > a { height: auto; }
+  [data-case="vinyl"] .case-visual-steps .case-visual-phone img { height: auto; max-height: min(62svh, 500px); }
+  [data-case="vinyl"] .vinyl-catalog-pair { gap: 12px; }
+  [data-case="vinyl"] .case-visual-steps:has([value="phone"]:checked) .case-visual-desktop,
+  [data-case="vinyl"] .case-visual-steps:has([value="desktop"]:checked) .case-visual-phone { display: none; }
 }

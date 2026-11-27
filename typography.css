@@ -100,13 +100,25 @@
 @media (max-width: 374px) {
   :root { --type-hero: 40px; --type-hero-action: 32px; --type-intro: 22px; --portfolio-tab: 22px; }
 }
+@media (max-width: 344px) {
+  :root { --type-hero: 36px; --type-intro: 20px; --type-mobile-action: 24px; --type-mobile-bracket: 28px; }
+}
+@media (min-width: 390px) and (max-width: 540px) {
+  :root { --type-hero: 46px; }
+}
+@media (min-width: 410px) and (max-width: 540px) {
+  :root { --type-hero: 48px; }
+}
 @media (max-width: 600px) and (max-height: 740px) {
-  :root { --type-hero: 36px; --type-hero-action: 30px; --type-intro: 20px; --type-cv: 28px; }
+  :root { --type-hero-action: 30px; --type-cv: 28px; }
+}
+@media (max-width: 600px) and (max-height: 660px) {
+  :root { --type-intro: 20px; }
 }
 @media (max-width: 600px) and (max-height: 620px) {
-  :root { --type-hero: 32px; --type-hero-action: 28px; --type-intro: 18px; }
+  :root { --type-hero-action: 28px; --type-intro: 18px; }
 }
-@media (max-width: 600px) and (max-height: 740px) {
+@media (max-width: 600px) and (max-height: 660px) {
   .home-screen .home-intro { top: calc(360 * var(--u)); width: 56%; }
   .home-screen .home-philosophy { margin-top: 16px; margin-left: 16px; }
   .home-screen .home-philosophy::before { height: 42px; }
@@ -317,8 +329,8 @@ body.home-page, .home-screen, .work-screen, .about-screen,
   .home-screen .home-nav { left: 16px; }
   .home-screen .home-cv { left: auto; right: 16px; }
   .home-screen .home-profile { left: 16px; }
-  .home-screen .home-line-digital { left: 19px; top: calc(92 * var(--u)); }
-  .home-screen .home-line-web { left: 19px; top: calc(151.72 * var(--u)); }
+  .home-screen .home-line-digital { left: 16px; top: calc(92 * var(--u)); }
+  .home-screen .home-line-web { left: 16px; top: calc(151.72 * var(--u)); }
   .home-screen .home-line-visual { left: 16px; top: calc(210.72 * var(--u)); }
   .home-screen .home-portrait { left: calc((100% - var(--frame-width)) / 2 + 66 * var(--u)); }
   .home-screen .home-intro { left: 16px; width: min(188px, calc(55% - 16px)); }
@@ -333,7 +345,21 @@ body.home-page, .home-screen, .work-screen, .about-screen,
   .home-screen .home-cta::before { inset: 11px; height: 30px; filter: blur(30.05px); }
 }
 
-@media (max-width: 600px) and (max-height: 740px) {
+@media (max-width: 540px) {
+  .home-screen {
+    min-height: 100vh;
+    min-height: 100lvh;
+    -webkit-text-size-adjust: 100%;
+    text-size-adjust: 100%;
+  }
+  .home-screen .home-stage { --hero-line-step: calc(60 * var(--u)); }
+  .home-screen .home-title { line-height: var(--hero-line-step); }
+  .home-screen .home-line-web { top: calc(92 * var(--u) + var(--hero-line-step)); }
+  .home-screen .home-line-visual { top: calc(92 * var(--u) + 2 * var(--hero-line-step)); }
+  .home-screen .home-gem-slot { left: calc(100% + 14px); top: 0; }
+}
+
+@media (max-width: 600px) and (max-height: 660px) {
  .home-screen { --type-home-body: 14px; }
  .home-screen .home-intro { width: min(156px, calc(50% - 16px)); }
 }
@@ -395,4 +421,10 @@ html[lang] #pricing .pricing-cta { height: 54px; min-height: 54px; }
   .work-screen .work-tab:has(.work-gem)::before { right: calc(.52em + 10px); }
   .home-screen .home-cta .home-cta-bracket,
   #pricing .pricing-cta .home-cta-bracket { font-size: var(--type-mobile-bracket); }
+}
+
+@media (max-width: 344px) {
+  .work-screen .work-tabs { gap: 4px; }
+  .work-screen .work-tab .home-cta-bracket { margin-inline: 0; }
+  .work-screen .work-tab .work-gem { margin-left: 0; }
 }

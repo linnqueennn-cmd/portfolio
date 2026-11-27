@@ -2,7 +2,7 @@ const params = new URLSearchParams(location.search);
 const en = params.get('lang') === 'en';
 const t = (ru, english) => en ? english : ru;
 const app = document.querySelector('#app');
-const cv = 'assets/cv.pdf';
+const cv = t('assets/Lina_Khannanova_CV_RU.pdf', 'assets/Lina_Khannanova_CV_EN.pdf');
 const behance = 'https://www.behance.net/';
 const links = [
   ['work',t('Проекты','Work')], ['about',t('Обо мне','About')],
@@ -14,6 +14,11 @@ const caseId = params.get('case');
 document.documentElement.lang = t('ru','en');
 document.querySelector('nav').ariaLabel = t('Навигация','Navigation');
 document.querySelector('.logo').href = home;
+const headerCV = document.querySelector('#header-cv');
+const headerCVView = document.querySelector('#header-cv-view');
+headerCV.href = headerCVView.href = cv;
+headerCV.ariaLabel = t('Скачать резюме (PDF)', 'Download CV (PDF)');
+headerCVView.ariaLabel = t('Открыть резюме (PDF)', 'View CV (PDF)');
 document.querySelector('#nav').innerHTML = links.map(([id,label]) => `<a href="${caseId ? home : ''}#${id}">${label}</a>`).join('');
 const language = document.querySelector('#language');
 language.textContent = t('EN','RU');
@@ -26,7 +31,7 @@ language.onclick = () => {
 const projects = [
   ['roma','Mama Roma',t('HR-сайт · коммерческий проект','Careers website · Client project'),t('Карьерный сайт сети ресторанов. От исследования и структуры до адаптивного дизайна и запуска на Tilda. Форму отклика вынесла на первый экран, а фотографии команды помогли передать атмосферу работы.','A careers site for a restaurant group, from research and structure through responsive design and launch on Tilda. The application form sits above the fold, and photos of the team give a sense of the workplace.'),'251797875/HR-website'],
   ['choreo','Choreo Kids',t('Сайт танцевальной студии · превью готовится','Dance studio website · Preview pending'),t('Сайт студии танцев со страницами возрастных групп, тарифами и адаптивными версиями. Название и обложка предварительные.','A responsive dance studio site with age-group pages and pricing. The name and cover are provisional.')],
-  ['vinyl','Vinyl Record Store',t('Интернет-магазин · концепт','E-commerce · Concept'),t('Концепция интернет-магазина винила с каталогом пластинок и визуальным языком, вдохновлённым музыкальной культурой.','An online record store concept with a vinyl catalogue and a visual language inspired by music culture.'),'177871633/dizajn-sajta-magazina-plastinok'],
+  ['vinyl','Vinyl Record Store',t('Интернет-магазин','E-commerce'),t('Интернет-магазин виниловых пластинок с каталогом и визуальным языком, вдохновлённым музыкальной культурой.','An online record shop with a catalogue and a visual language inspired by music culture.'),'177871633/dizajn-sajta-magazina-plastinok'],
   ['retail',t('Реклама и кампании','Retail & Campaign Design'),t('Подборка в подготовке','Collection in progress'),t('Рекламные кампании, товарная графика и промоматериалы.','Campaign design, product graphics and promotional materials.')],
   ['social',t('Графика для соцсетей','Social Media & Digital Graphics'),t('Подборка в подготовке','Collection in progress'),t('Digital-графика и визуальные системы для социальных сетей.','Digital graphics and visual systems for social media.')],
   ['brand',t('Айдентика и печать','Brand & Print Design'),t('Подборка в подготовке','Collection in progress'),t('Айдентика, печатные носители и коммерческая графика.','Visual identity, print and commercial graphics.')]
@@ -35,17 +40,24 @@ const cover = ([id,name]) => id === 'choreo'
   ? `<div class="cover mock">${name}<br>${t('Обложка готовится','Cover pending')}</div>`
   : `<img class="cover" src="assets/${id}.jpg" alt="" loading="lazy">`;
 const caseUrl = id => './?case=' + id + (en ? '&lang=en' : '');
+const workIndexUrl = id => {
+  const query = new URLSearchParams();
+  if (en) query.set('lang', 'en');
+  if (['dixon', 'retail', 'social', 'brand'].includes(id)) query.set('work', 'graphic');
+  const search = query.toString();
+  return (search ? './?' + search : './') + '#work';
+};
 const arrow = '<span class="arrow" aria-hidden="true">↗</span>';
 const person = t('Лина Ханнанова','Lina Khannanova');
 document.title = 'linqueenn — ' + person;
-document.querySelector('meta[name=description]').content = t('Лина Хананова — UX/UI, веб- и графический дизайнер.','Lina Khannanova — UX/UI, web and graphic designer.');
+document.querySelector('meta[name=description]').content = t('Лина Ханнанова — UX/UI, веб- и графический дизайнер.','Lina Khannanova — UX/UI, web and graphic designer.');
 
 function renderHome() {
   document.body.classList.add('home-page');
   app.innerHTML = `
   ${homeScreen(t, person, cv)}
   ${projectsScreen(t, caseUrl)}
-  ${aboutScreen(t, person)}
+  ${aboutScreen(t, person, cv)}
   ${remainingSections(t)}
   `;
 
@@ -55,7 +67,7 @@ function renderHome() {
   setupPortraitArrival(setupHomeScramble());
   setupAboutScreen();
   setupMotion();
-  const loadCrystal = () => import('./crystal.js?v=20261127-desktop-crystal-restore').catch(error => console.warn('3D crystal unavailable', error));
+  const loadCrystal = () => import('./crystal.js?v=20261128-tablet-fit').catch(error => console.warn('3D crystal unavailable', error));
   if ('requestIdleCallback' in window) requestIdleCallback(loadCrystal, {timeout: 1400});
   else setTimeout(loadCrystal, 500);
 }
@@ -71,45 +83,25 @@ function setupMotion() {
   document.querySelectorAll('[data-reveal], #contacts .remaining-actions, #pricing .pricing-bottom').forEach(el => observer.observe(el));
 }
 
-const zen = webProjects(t)[1];
-const project = projects.find(item => item[0] === caseId) || (caseId === 'zen' ? zen : null);
-if (caseId === 'roma') {
+const casePages = {roma: mamaRomaCase, zen: zenSocialCase, vinyl: vinylStoreCase, choreo: choreoKidsCase, dixon: dixonDanceCase};
+const hasCaseStudy = Object.hasOwn(casePages, caseId);
+const project = projects.find(item => item[0] === caseId);
+if (hasCaseStudy) {
+  const data = casePages[caseId](t);
+  const name = caseId === 'roma' ? t('Мама Рома', 'Mama Roma') : data.title || 'ZenSocial';
+  const category = caseId === 'dixon' ? t('Айдентика', 'Visual identity') : t('UX/UI-кейс', 'UX/UI case study');
   document.body.classList.add('case-page');
-  document.documentElement.lang = 'ru';
-  document.title = 'Мама Рома — UX/UI-кейс | linqueenn';
-  document.querySelector('meta[name=description]').content = mamaRomaCase.summary;
-  app.innerHTML = caseStudyPage(mamaRomaCase);
-} else if (caseId === 'zen') {
-  document.body.classList.add('case-page');
-  document.documentElement.lang = 'ru';
-  document.title = 'ZenSocial — UX/UI-кейс | linqueenn';
-  document.querySelector('meta[name=description]').content = zenSocialCase.summary;
-  app.innerHTML = zenSocialCasePage();
-  setupZenSocialCase();
-} else if (caseId === 'vinyl') {
-  document.body.classList.add('case-page');
-  document.documentElement.lang = 'ru';
-  document.title = 'Vinyl Store — UX/UI-кейс | linqueenn';
-  document.querySelector('meta[name=description]').content = vinylStoreCase.summary;
-  app.innerHTML = caseStudyPage(vinylStoreCase);
-} else if (caseId === 'choreo') {
-  document.body.classList.add('case-page');
-  document.documentElement.lang = 'ru';
-  document.title = 'XoreoKids — UX/UI-кейс | linqueenn';
-  document.querySelector('meta[name=description]').content = choreoKidsCase.summary;
-  app.innerHTML = caseStudyPage(choreoKidsCase);
-} else if (caseId === 'dixon') {
-  document.body.classList.add('case-page');
-  document.documentElement.lang = 'ru';
-  document.title = 'Dixon Dance — айдентика | linqueenn';
-  document.querySelector('meta[name=description]').content = dixonDanceCase.summary;
-  app.innerHTML = caseStudyPage(dixonDanceCase);
+  document.title = name + ' — ' + category + ' | linqueenn';
+  document.querySelector('meta[name=description]').content = data.summary;
+  app.innerHTML = caseId === 'zen' ? zenSocialCasePage(data) : caseStudyPage(data);
+  if (caseId === 'zen') setupZenSocialCase();
 } else if (project) {
-  const back = './?' + (en ? 'lang=en&' : '') + (projects.indexOf(project) > 2 ? 'work=graphic' : '') + '#work';
+  const back = workIndexUrl(caseId);
   document.title = project[1] + ' — linqueenn';
   document.querySelector('meta[name=description]').content = project[3];
-  app.innerHTML = `<section class="section case"><a class="note" href="${back}">← ${t('Все проекты','All projects')}</a><h1 class="heading">${project[1]}</h1><p class="meta">${project[2]}</p>${caseId === 'zen' ? '' : cover(project)}<p>${project[3]}</p>${project[4] ? `<a class="cta" href="${behance}gallery/${project[4]}">${t('Смотреть на Behance','View on Behance')} ↗</a>` : ''}</section>`;
+  app.innerHTML = `<section class="section case"><a class="note" href="${back}">← ${t('Все проекты','All projects')}</a><h1 class="heading">${joinRussianShortWords(project[1])}</h1><p class="meta">${joinRussianShortWords(project[2])}</p>${cover(project)}<p>${joinRussianShortWords(project[3])}</p>${project[4] ? `<a class="cta" href="${behance}gallery/${project[4]}">${t('Смотреть на Behance','View on Behance')} ↗</a>` : ''}</section>`;
 } else renderHome();
-if (['roma', 'zen', 'vinyl', 'choreo', 'dixon'].includes(caseId)) setupCasePage();
+if (hasCaseStudy) setupCasePage();
+if (hasCaseStudy || project) app.insertAdjacentHTML('beforeend', contactFooter(t));
 setupBackToTop();
 if (location.hash) requestAnimationFrame(() => document.getElementById(location.hash.slice(1))?.scrollIntoView({behavior:'instant'}));

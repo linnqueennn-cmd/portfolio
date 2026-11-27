@@ -193,6 +193,7 @@
   text-transform: lowercase;
 }
 .home-cv img, .home-resume-note img { zoom: calc(tan(atan2(100cqw, 1440px))); }
+.cv-controls > a { display: grid; place-items: center; min-height: 44px; }
 .home-resume-note {
   top: calc(67 * var(--u)); right: calc(82 * var(--u));
   display: flex; align-items: end; gap: calc(4 * var(--u));

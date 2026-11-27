@@ -1,12 +1,6 @@
 .zen-case { --zen-type-12: 12px; --zen-type-14: 14px; --zen-type-18: 18px; --zen-type-20: 20px; --zen-type-32: 32px; --zen-type-40: 40px; }
 .zen-case { --app: #faf9f7; --app-line: #e5e0d9; --espresso: #2f1d13; --coffee: #4b3021; }
 .zen-case .mini-tag,.zen-case .persona-id,.zen-case .persona-lead>small{font-family:ui-monospace,'SFMono-Regular',Consolas,'Liberation Mono',monospace;letter-spacing:-.018em}
-.zen-case .hero-visual{position:relative;overflow:hidden;min-height:720px}
-.zen-case .phone{border:8px solid #261a13;border-radius:38px;background:white;box-shadow:0 22px 55px #2c201731;overflow:hidden;aspect-ratio:946/2048}
-.zen-case .phone img{display:block;width:100%;height:100%;object-fit:cover}
-.zen-case .hero-phone{position:absolute;top:104px;width:230px;box-shadow:0 35px 70px #2e241d38}
-.zen-case .hero-phone-back{left:60px;top:145px;transform:rotate(-8deg);z-index:2}
-.zen-case .hero-phone-front{left:270px;transform:rotate(8deg);z-index:3}
 .zen-case .muted-research{color:#aba198;font-size:var(--zen-type-12);font-family:ui-monospace,monospace}
 .zen-case .persona-card{background:#fff;border:1px solid var(--app-line);border-radius:23px;display:grid;grid-template-columns:40% 60%;overflow:hidden;box-shadow:0 8px 26px #4f3b2710}
 .zen-case .persona-lead{background:#f0ece7;padding:34px 32px 25px;display:flex;align-items:flex-start;flex-direction:column}
@@ -40,16 +34,19 @@
 
 /* Page structure reuses the existing case template and its responsive tokens. */
 .zen-case .case-summary { max-width: 80ch; }
-.zen-case .zen-facts { display: grid; grid-template-columns: repeat(4, minmax(0, 1fr)); gap: 24px 32px; margin: 32px 0 0; }
+.zen-case .zen-facts { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)) minmax(max-content, 1fr); gap: 24px 32px; margin: 32px 0 0; }
 .zen-case .zen-facts dt { font-size: var(--case-caption-size); color: #666; margin-bottom: 8px; }
 .zen-case .zen-facts dd { margin: 0; }
 .zen-case .zen-product-artifact { font-family: Inter, 'Helvetica Neue', Arial, sans-serif; margin: 32px 0 48px; min-width: 0; }
 .zen-case .zen-product-artifact h3, .zen-case .zen-product-artifact h4 { font-family: inherit; text-transform: none; }
-.zen-case .phone { aspect-ratio: auto; }
-.zen-case .phone img { height: auto; object-fit: contain; }
-.zen-case .hero-visual { width: min(640px, 100%); min-height: 0; height: 660px; margin: 32px auto 0; }
-.zen-case .hero-phone-front { top: 64px; }
-.zen-case .hero-phone-back { top: 108px; }
+.zen-case .hero-visual { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 16px; margin-top: 32px; }
+.zen-case .zen-cover-mockup img { display: block; width: var(--mockup-width, 94%); height: auto; margin: var(--mockup-top, 21%) auto 0; }
+/* Match the device bodies across artwork with different annotation margins. */
+.zen-case .zen-cover-chats { --mockup-width: 91%; --mockup-top: 23%; }
+.zen-case .zen-cover-suggestions { --mockup-width: 85%; }
+.zen-case .zen-cover-ads { --mockup-width: 87%; }
+.zen-case .zen-cover-ads img { translate: -4%; }
+.zen-case .zen-cover-stories { --mockup-top: 6%; }
 .zen-case .zen-persona-photo { width: 140px; height: auto; border-radius: 12px; margin-bottom: 24px; }
 .zen-case .persona-id { margin-bottom: 12px; }
 .zen-case .persona-block h4 { line-height: var(--type-leading-title); }
@@ -71,22 +68,31 @@
 .zen-case .zen-hypothesis h3 { margin: 0; }
 .zen-case .zen-solution { display: grid; grid-template-columns: minmax(0, 1fr) minmax(0, 1fr); gap: 64px; align-items: center; }
 .zen-case .zen-solution + .zen-solution { margin-top: 48px; }
-.zen-case .zen-solution .zen-product-artifact { margin: 0; padding-block: 24px; display: flex; justify-content: center; }
-.zen-case .decision-phone { width: 235px; max-width: 100%; border-width: 7px; border-radius: 35px; box-shadow: 0 25px 56px #3c2a1c2e; }
+.zen-case .zen-solution .zen-product-artifact { margin: 0; padding-block: 24px; }
+.zen-case .decision-phone { width: min(235px, 100%); padding: 0; border: 7px solid #261a13; border-radius: 35px; background: white; box-shadow: 0 25px 56px #3c2a1c2e; overflow: hidden; }
+.zen-case .decision-phone img { display: block; width: 100%; height: auto; }
 .zen-case .color-system { max-width: 100%; }
 .zen-case .swatches { gap: 20px; }
 .zen-case .swatches i { height: 72px; }
 .zen-case .zen-comparison { margin-top: 40px; }
+.zen-case .zen-gallery-header { display: flex; align-items: center; justify-content: space-between; gap: 16px; }
+.zen-case .zen-gallery-header h3 { margin: 0; }
+.zen-case .zen-gallery-nav { display: flex; gap: 8px; }
+.zen-case .zen-gallery-nav button { width: 44px; height: 44px; padding: 0; border: 1px solid #8f735f; border-radius: 5px; background: transparent; color: inherit; font: inherit; }
+.zen-case .zen-gallery-nav button:disabled { opacity: .4; cursor: default; }
 .zen-case .zen-gallery-hint { font-size: var(--case-caption-size); color: #666; margin-bottom: 20px; }
 .zen-case .zen-gallery { display: grid; grid-template-columns: repeat(5, minmax(0, 1fr)); gap: 28px 18px; }
+.zen-case .zen-gallery-before { display: flex; overflow-x: auto; padding-bottom: 16px; scroll-snap-type: x proximity; overscroll-behavior-inline: contain; scrollbar-color: #8f735f #e5e0d9; scrollbar-width: thin; }
+.zen-case .zen-gallery-before .zen-screen { flex: 0 0 200px; scroll-snap-align: start; }
 .zen-case .zen-screen { min-width: 0; display: flex; flex-direction: column; align-items: center; gap: 12px; padding: 0; border: 0; background: transparent; font: inherit; color: inherit; text-align: center; }
 .zen-case .zen-screen img { width: min(100%, 200px); height: auto; border-radius: 12px; }
 .zen-case .zen-gallery-after img { max-width: 173px; }
 .zen-case .zen-screen > span { font-size: var(--case-caption-size); color: #666; }
-.zen-case .zen-results { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; margin-top: 40px; align-items: center; }
+.zen-case .zen-results { display: grid; grid-template-columns: repeat(3, minmax(0, 1fr)); gap: 32px; margin-top: 40px; }
+.zen-case .zen-solution figure,
 .zen-case .zen-results > figure { min-width: 0; margin: 0; display: flex; flex-direction: column; align-items: center; gap: 20px; }
+.zen-case .zen-solution figcaption,
 .zen-case .zen-results figcaption { font-family: var(--type-font); font-size: var(--case-caption-size); text-align: center; }
-.zen-case .zen-placeholder > div { width: min(235px, 100%); aspect-ratio: 946 / 2048; border: 1px dashed #999; border-radius: 5px; display: grid; place-items: center; padding: 24px; text-align: center; font-size: var(--case-caption-size); color: #666; }
 .zen-case .zen-lightbox { width: min(620px, calc(100vw - 32px)); max-height: calc(100svh - 32px); padding: 52px 20px 20px; border: 1px solid #777; border-radius: 5px; color: #282828; background: var(--site-background); }
 .zen-case .zen-lightbox::backdrop { background: #191a17b8; }
 .zen-case .zen-lightbox figure { margin: 0; }
@@ -94,7 +100,7 @@
 .zen-case .zen-lightbox figcaption { text-align: center; margin-top: 16px; font-size: var(--case-caption-size); }
 .zen-case .zen-lightbox-close { position: absolute; top: 4px; right: 4px; min-width: 44px; min-height: 44px; border: 0; background: transparent; font-size: var(--case-subheading-size); }
 @media (max-width: 1100px) {
- .zen-case .zen-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); }
+ .zen-case .zen-facts { grid-template-columns: minmax(0, 1fr) minmax(max-content, 1fr); }
  .zen-case .zen-hypotheses { grid-template-columns: repeat(2, minmax(0, 1fr)); }
  .zen-case .persona-card { grid-template-columns: 1fr; }
  .zen-case .persona-lead { display: grid; grid-template-columns: 140px minmax(0, 1fr); gap: 12px 24px; align-items: start; }
@@ -106,12 +112,20 @@
  .zen-case .zen-results { gap: 24px; }
 }
 @media (max-width: 600px) {
- .zen-case .zen-facts { gap: 20px 16px; margin-top: 28px; }
+ .zen-case .zen-facts { grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 20px 16px; margin-top: 28px; }
  .zen-case .zen-facts > :last-child { grid-column: 1 / -1; }
- .zen-case .hero-visual { height: 430px; margin-top: 24px; }
- .zen-case .hero-phone { width: calc(50% - 30px); border-width: 5px; border-radius: 26px; }
- .zen-case .hero-phone-back { left: 20px; top: 72px; }
- .zen-case .hero-phone-front { left: calc(50% - 8px); top: 32px; }
+ .zen-case .hero-visual {
+   display: flex;
+   gap: 16px;
+   margin-top: 24px;
+   padding-bottom: 8px;
+   overflow-x: auto;
+   overscroll-behavior-x: contain;
+   scroll-snap-type: x mandatory;
+   scrollbar-color: #8f735f transparent;
+   scrollbar-width: thin;
+ }
+ .zen-case .zen-cover-mockup { flex: 0 0 min(60%, 220px); scroll-snap-align: start; }
  .zen-case .zen-product-artifact { margin: 24px 0 32px; }
  .zen-case .persona-lead { display: flex; padding: 24px; }
  .zen-case .zen-persona-photo { width: 120px; margin-bottom: 16px; }
@@ -134,10 +148,10 @@
  .zen-case .swatches { flex-wrap: wrap; gap: 20px 12px; margin-top: 20px; }
  .zen-case .swatches > div { flex: 0 0 calc((100% - 24px) / 3); }
  .zen-case .swatches i { height: 52px; }
- .zen-case .zen-gallery { display: flex; overflow-x: auto; gap: 16px; padding-bottom: 16px; scroll-snap-type: x proximity; overscroll-behavior-x: contain; scrollbar-color: #8f735f #e5e0d9; scrollbar-width: thin; }
- .zen-case .zen-screen { flex: 0 0 148px; scroll-snap-align: start; }
+ .zen-case .zen-gallery { gap: 16px; }
+ .zen-case .zen-gallery-after { display: flex; overflow-x: auto; padding-bottom: 16px; scroll-snap-type: x proximity; overscroll-behavior-inline: contain; scrollbar-color: #8f735f #e5e0d9; scrollbar-width: thin; }
+ .zen-case .zen-gallery .zen-screen { flex: 0 0 148px; scroll-snap-align: start; }
  .zen-case .zen-results { grid-template-columns: 1fr; gap: 32px; }
- .zen-case .zen-placeholder > div { height: 200px; aspect-ratio: auto; }
 }
 
 .zen-case #zen-cjm, .zen-case #zen-persona { scroll-margin-top: 88px; }

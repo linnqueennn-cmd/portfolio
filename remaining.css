@@ -215,11 +215,13 @@ body.home-page { background: #efefef; font-family: "Ubuntu Sans Mono", monospace
 .compact-crystal-slot { display: none; position: relative; }
 .crystal-local canvas, .crystal-local-enabled .crystal-journey canvas { pointer-events: none; touch-action: auto; }
 @media (max-width: 600px) {
-  #contacts-title { display: block; line-height: 1.08; }
-  .contact-title-copy { display: flex; position: relative; width: max-content; max-width: 100%; flex-direction: column; align-items: flex-start; gap: .16em; }
+  .rate-mobile-line { display: block; white-space: nowrap; }
+  #contacts-title { display: block; line-height: var(--type-leading-title); }
+  .contact-title-copy { display: grid; position: relative; width: max-content; max-width: 100%; grid-template-columns: max-content 1fr; align-items: center; row-gap: .16em; }
   .contact-title-line { display: block; white-space: nowrap; }
+  .contact-title-line:first-child { grid-column: 1 / -1; }
   .contact-title-line + .contact-title-line { margin-left: 0; }
-  .contact-title-line-secondary { font-size: 1em; line-height: 1.08; }
+  .contact-title-line-secondary { font-size: 1em; }
   .crystal-local-enabled .about-gem { overflow: visible; }
   .crystal-local-enabled #services .service-option h3 { position: relative; }
   .crystal-local-enabled #contacts-title { position: relative; padding-right: 0; }
@@ -231,6 +233,17 @@ body.home-page { background: #efefef; font-family: "Ubuntu Sans Mono", monospace
   .crystal-local-enabled .compact-crystal-slot {
     display: block; position: absolute; right: 0; bottom: -5px;
     width: 24px; height: 42px; margin: 0;
+  }
+}
+@media (max-width: 600px) {
+  .crystal-local-enabled .compact-crystal-slot {
+    position: relative;
+    inset: auto;
+    grid-area: 2 / 2;
+    justify-self: start;
+    width: 14px;
+    height: 26px;
+    margin-left: 8px;
   }
 }
 @media (max-width: 899px) {
@@ -343,7 +356,7 @@ body.home-page { background: #efefef; font-family: "Ubuntu Sans Mono", monospace
 #contacts .remaining-footer { justify-content: start; align-items: center; gap: 20px; }
 #contacts .remaining-footer p { max-width: 44ch; }
 #contacts .sims-like { flex: none; }
-body.home-page #contacts > .page-top-row { padding: 0; margin-top: clamp(44px, 6vw, 86px); }
+#contacts > .page-top-row { justify-content: start; padding: 0; margin-top: clamp(44px, 6vw, 86px); }
 body.home-page #contacts > .page-top-row + .remaining-footer { margin-top: 28px; }
 @media (min-width: 901px) {
   html[lang] #contacts .remaining-heading { font-size: var(--portfolio-case-title); }
@@ -388,3 +401,69 @@ body.home-page #contacts > .page-top-row + .remaining-footer { margin-top: 28px;
  .process-track > .process-step.step { width: 100%; }
 }
 #process { scroll-margin-top: max(80px, calc((100svh - var(--process-pin-height, 400px)) / 2)); }
+
+@media (min-width: 541px) and (max-width: 1100px) and (orientation: portrait),
+       (min-width: 601px) and (max-width: 1366px) and (orientation: landscape) and (pointer: coarse) {
+  #process .process-top,
+  #pricing .pricing-top {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 12px;
+  }
+  #process .process-top .remaining-heading { margin-bottom: 0; }
+  #process .process-note,
+  #pricing .pricing-top .remaining-note { justify-self: start; max-width: 64ch; text-align: left; }
+  #process .process-track { grid-template-columns: var(--process-card-width); }
+}
+
+@media (min-width: 541px) and (max-width: 1100px) and (orientation: portrait) {
+  #services .service-media {
+    align-self: center;
+    width: min(100%, 680px);
+    aspect-ratio: var(--collage-aspect, 1.25);
+    max-height: min(41svh, 440px);
+  }
+}
+
+@media (min-width: 601px) and (max-width: 1100px) and (orientation: landscape) and (pointer: fine) {
+  #process .process-top,
+  #pricing .pricing-top { grid-template-columns: minmax(0, 1fr) minmax(0, 44%); }
+}
+
+@media (min-width: 601px) and (max-width: 1100px) and (orientation: portrait) {
+  .crystal-local-enabled #contacts .contact-title-copy {
+    position: relative;
+    display: block;
+    min-width: 0;
+    padding-inline-end: 48px;
+  }
+  .crystal-local-enabled #contacts .compact-crystal-slot {
+    inset: 50% 0 auto auto;
+    translate: 0 -50%;
+    width: 32px;
+    height: 48px;
+  }
+}
+
+@media (min-width: 601px) and (max-width: 1366px) and (orientation: landscape) and (pointer: coarse) {
+  .crystal-journey-enabled #contacts .contact-title-copy { margin-inline-end: 52px; }
+}
+
+@media (min-width: 760px) and (max-width: 1366px) and (orientation: landscape) and (pointer: coarse) {
+  #services .service-story { display: grid; grid-template-columns: minmax(0, .9fr) minmax(0, 1.1fr); gap: 32px; }
+  #services .service-media { display: block; }
+}
+
+@media (prefers-reduced-motion: no-preference) {
+  @media (min-width: 541px) and (max-width: 1100px) and (orientation: portrait),
+         (min-width: 601px) and (max-width: 1366px) and (orientation: landscape) and (pointer: coarse) {
+    #process .process-track { display: grid; height: auto; }
+    #process .process-track > .process-step { position: relative; grid-area: 1 / 1; }
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  @media (min-width: 541px) and (max-width: 1100px) and (orientation: portrait),
+         (min-width: 601px) and (max-width: 1366px) and (orientation: landscape) and (pointer: coarse) {
+    #process .process-rail { grid-auto-rows: 1fr; }
+  }
+}

@@ -82,10 +82,15 @@ async function setupCrystal(host) {
 
   renderer.domElement.setAttribute('aria-hidden', 'true');
   host.append(renderer.domElement);
+  const tiltLimit = .18;
+  const horizontalRadius = Math.hypot(size.x, size.z) / size.y;
+  const uprightHalfHeight = 1 + horizontalRadius * Math.sin(tiltLimit);
   function render() {
     const {width, height} = host.getBoundingClientRect();
     if (!width || !height || host.hidden) return;
-    const halfHeight = Math.max(1.02, (size.x / size.y) * height / width * 1.02);
+    // Give the crystal room to rotate on the narrow phone canvas.
+    const framePadding = innerWidth <= 600 ? 1.08 : 1.04;
+    const halfHeight = Math.max(uprightHalfHeight, (size.x / size.y) * height / width) * framePadding;
     camera.left = -halfHeight * width / height;
     camera.right = halfHeight * width / height;
     camera.top = halfHeight;
@@ -129,7 +134,7 @@ async function setupCrystal(host) {
   canvas.addEventListener('pointermove', event => {
     if (!pointer || event.pointerId !== pointer.id) return;
     pivot.rotation.y += (event.clientX - pointer.x) * .015;
-    pivot.rotation.x = THREE.MathUtils.clamp(pivot.rotation.x + (event.clientY - pointer.y) * .006, -.18, .18);
+    pivot.rotation.x = THREE.MathUtils.clamp(pivot.rotation.x + (event.clientY - pointer.y) * .006, -tiltLimit, tiltLimit);
     pointer.x = event.clientX;
     pointer.y = event.clientY;
     render();
@@ -196,6 +201,7 @@ function setupCrystalJourney(host, canvas) {
   const passed = element => box(element).top <= innerHeight * (current === element ? .66 : .58);
   function update(now, elapsed) {
     const mobile = compact.matches;
+    const phone = mobile && innerWidth <= 600;
     const enabled = (desktop.matches || mobile) && !reduced.matches && !!contacts;
     if (enabled !== active || mobile !== compactMode) {
       active = enabled;
@@ -230,8 +236,16 @@ function setupCrystalJourney(host, canvas) {
     } else if (scrollY > 0 && scrollY < tabEnd) {
       // A soft right-hand bend connects the hero to the selected work tab.
       const t = ease(clamp(scrollY / tabEnd));
-      target.x += (tabRect.left + tabRect.width / 2 - target.x) * t + Math.sin(Math.PI * t) * (mobile ? innerWidth <= 600 ? 0 : 24 : 150);
-      target.y += (tabRect.top + tabRect.height / 2 - target.y) * t;
+      const tabY = tabRect.top + tabRect.height / 2;
+      target.x += (tabRect.left + tabRect.width / 2 - target.x) * t + Math.sin(Math.PI * t) * (phone ? 0 : mobile ? 24 : 150);
+      if (phone) {
+        // Interpolate toward the tab's viewport position at landing.
+        const startY = target.y + scrollY;
+        const landingY = tabY + scrollY - tabEnd;
+        target.y = Math.min(tabY, startY + (landingY - startY) * t);
+      } else {
+        target.y += (tabY - target.y) * t;
+      }
       target.height += (tabRect.height - target.height) * t;
       continuous = true;
     } else if (scrollY >= tabEnd) {
@@ -258,7 +272,7 @@ function setupCrystalJourney(host, canvas) {
         key = pricing; spinning = true;
       }
       if (passed(contacts)) {
-        const text = footerRange.getBoundingClientRect();
+        const text = [...footerRange.getClientRects()].at(-1) || footerRange.getBoundingClientRect();
         target = {x: text.right + 34, y: text.top + text.height / 2, height: 56};
         key = contacts; spinning = true;
       }
@@ -293,7 +307,7 @@ function setupCrystalJourney(host, canvas) {
       started = now - (mobile ? 620 : 400);
       settled = true;
       appearing = false;
-    } else if (workPinned) {
+    } else if (workPinned || (phone && !continuous)) {
       current = key;
       position = {...target};
       from = null;
@@ -324,7 +338,7 @@ function setupCrystalJourney(host, canvas) {
       from.y -= scrollDelta;
       const blend = ease(t);
       position = {x: from.x + (target.x - from.x) * blend,
-        y: from.y + (target.y - from.y) * blend - Math.sin(Math.PI * t) * (mobile ? innerWidth <= 600 ? 0 : 8 : 6),
+        y: from.y + (target.y - from.y) * blend - Math.sin(Math.PI * t) * (mobile ? 8 : 6),
         height: from.height + (target.height - from.height) * blend};
     }
     // Scale the same canvas instead of reallocating the WebGL drawing buffer.
@@ -355,7 +369,7 @@ function setupCrystalJourney(host, canvas) {
     const moving = continuous || t < 1;
     previousMotion = {active, spinning, moving, speed: moving ? 1.35 + Math.min(1, Math.abs(scrollDelta) / Math.max(1, elapsed * 1600)) : spinning ? 1 : 0};
     if (!mobile) previousMotion.speed = moving ? 1.15 : spinning ? 1 : 0;
-    if (mobile && innerWidth <= 600) previousMotion.speed = 1;
+    if (phone) previousMotion.speed = 1;
     if (mobile) {
       const mainVisible = position.y + position.height / 2 > 0 && position.y - position.height / 2 < innerHeight;
       layer.hidden = !mainVisible;

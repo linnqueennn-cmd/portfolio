@@ -1,3 +1,10 @@
+function cvControls(t, cv, className, {animated = false} = {}) {
+  return `<div class="${className} cv-controls">
+    <a href="${cv}" target="_blank" rel="noopener" aria-label="${t('Открыть резюме (PDF)', 'View CV (PDF)')}">${animated ? '<span class="home-scramble" data-scramble>CV</span>' : 'CV'}</a>
+    <a href="${cv}" download aria-label="${t('Скачать резюме (PDF)', 'Download CV (PDF)')}"><img src="assets/home/download.svg" alt=""></a>
+  </div>`;
+}
+
 function homeScreen(t, person, cv) {
   const art = 'assets/home/';
   const scramble = text => `<span class="home-scramble" data-scramble>${text}</span>`;
@@ -14,7 +21,7 @@ function homeScreen(t, person, cv) {
         <button type="button" id="home-language" aria-label="${t('English version', 'Русская версия')}">${scramble(t('[en]', '[ru]'))}</button>
         <nav aria-label="${t('Навигация', 'Navigation')}">${items.map(([id, label]) =>
           `<a href="#${id}">${scramble('[' + label + ']')}</a>`).join('')}</nav>
-        <a class="home-menu-handle" href="./">${scramble('[linqueenn]')}</a>
+        <a class="home-menu-handle" href="${t('./', './?lang=en')}">${scramble('[linqueenn]')}</a>
         <a class="home-menu-resume" href="${cv}" download><span>${t('скачать резюме', 'download résumé')}</span><img src="${art}download.svg" alt=""></a>
         </div>
       </header>
@@ -32,16 +39,16 @@ function homeScreen(t, person, cv) {
       </div>
       <div class="home-profile">
         <a href="https://t.me/linqueenn">${scramble('@linqueenn')}</a>
-        <p><img src="${art}status.svg" alt="">${t('открыта к проектам', 'open for projects')}</p>
+        <p><img src="${art}status.svg" alt="">${t('открыта к проектам', 'open for projects')}</p>
       </div>
-      <a class="home-cv" href="${cv}" download>${scramble('CV')}<img src="${art}download.svg" alt=""></a>
+      ${cvControls(t, cv, 'home-cv', {animated: true})}
       <div class="home-resume-note"><span>${t('моё резюме тут', 'my résumé is here')}</span><img src="${art}resume.svg" alt=""></div>
       <a class="home-cta" href="https://t.me/linqueenn" aria-label="${t('Обсудить проект', 'Discuss a project')}"><span class="home-cta-bracket home-cta-bracket-left" aria-hidden="true">[</span>${scramble(t('Обсудить проект', 'Discuss a project'))}<span class="home-cta-bracket home-cta-bracket-right" aria-hidden="true">]</span></a>
       <div class="home-intro">
-        <h2>${scramble(t('привет, я Лина', 'hi, I’m Lina'))}</h2>
+        <h2>${scramble(t('привет, я Лина', 'hi, I’m Lina'))}</h2>
         <p>${t('создаю сайты, цифровые интерфейсы и&nbsp;визуальные решения для&nbsp;брендов.', 'I design websites, digital interfaces and visual systems for brands.')}</p>
         <div class="home-philosophy">
-          <span>${t('создаю дизайн, который приносит людям деньги', 'I love design and helping people make money')}</span>
+          <span>${t('создаю дизайн, который приносит людям деньги', 'I design to help businesses make money')}</span>
         </div>
       </div>
     </div>
@@ -442,7 +449,7 @@ function createScrambleJobs(root) {
     if (element.closest('.home-menu-handle')) return () => {};
     if (scrambleJobCache.has(element)) return scrambleJobCache.get(element);
     const glyphs = [...element.textContent];
-    const menuItem = element.closest('.home-nav a, .home-nav button, .home-cv, .about-resume, .work-tab, #contacts .remaining-action');
+    const menuItem = element.closest('.home-nav a, .home-nav button, .home-cv a, .about-resume, .work-tab, #contacts .remaining-action');
     const letters = glyphs.filter(glyph => /[\p{L}\p{N}]/u.test(glyph)).length;
     let duration = menuItem || letters <= 4 ? Math.min(550, 200 + letters * 38) : 760;
     if (element.closest('.home-title')) duration = 1800 - 3 * homeScrambleStagger;

@@ -52,6 +52,7 @@ body.case-page { background: var(--site-background); color: #282828; font-family
 .case-block > * { grid-column: 1 / -1; min-width: 0; }
 .case-block p { max-width: 80ch; }
 .case-block p + p { margin-top: 16px; }
+.case-visual-note { margin-top: 24px; color: #777; font-size: var(--case-caption-size); }
 .case-list { max-width: 80ch; margin-top: 18px; padding-left: 1.25em; }
 .case-list li + li { margin-top: 8px; }
 .case-block > .case-picture, .case-comparison, .case-interface { margin-top: 32px; }
@@ -111,6 +112,8 @@ body.case-page { background: var(--site-background); color: #282828; font-family
   .case-comparison, .case-block { grid-template-columns: minmax(0, 1fr); gap: 0; }
   .case-comparison { row-gap: 28px; }
   .case-comparison > :nth-child(n), .case-block > .case-picture { grid-column: 1 / -1; }
+  .case-comparison-duo { grid-template-columns: repeat(2, minmax(0, 1fr)); column-gap: 12px; row-gap: 0; }
+  .case-comparison-duo > :nth-child(n) { grid-column: auto; }
   .case-comparison .case-picture img { width: 100%; max-height: none; }
   .case-block > .case-picture, .case-comparison, .case-interface { margin-top: 24px; }
   .case-interface { gap: 28px; }
