@@ -158,10 +158,27 @@
   .work-case-more .work-label h3 { padding-right: 0; }
 }
 .work-case-arrow { display: none; }
+.work-behance-icon { display: none; }
 .work-case-more .work-label { position: relative; }
 .work-case-more .work-case-arrow {
   display: block; position: absolute; left: calc(100% + 16px); top: 50%;
   translate: 0 -50%; width: var(--portfolio-case-title); height: var(--portfolio-case-title); color: #282828;
+}
+@media (min-width: 960px) and (hover: hover) and (pointer: fine) {
+  .work-case-more .work-behance-icon {
+    display: block;
+    position: absolute;
+    left: calc(100% + var(--portfolio-case-title) + 28px);
+    top: 50%;
+    width: clamp(44px, 4vw, 58px);
+    height: auto;
+    border-radius: 50%;
+    opacity: 0;
+    translate: 0 -50%;
+    scale: .92;
+    transition: opacity .18s ease, scale .18s ease;
+  }
+  .work-case-more:is(:hover, :focus-visible) .work-behance-icon { opacity: 1; scale: 1; }
 }
 [data-project="metro"] .work-label h3 {
   font-size: var(--portfolio-case-title);

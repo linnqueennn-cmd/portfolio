@@ -46,7 +46,8 @@ const files = [
         : name === 'plumbob-reflective' ? 'glb' : name === 'plumbob-reflections' ? 'hdr' : 'svg';
       return `assets/home/${name}.${extension}`;
     }),
-  ...['roma', 'vinyl', 'zen', 'choreo'].map(name => `assets/work/${name}.gif`),
+  ...['roma', 'vinyl', 'zen', 'choreo', 'dixon', 'getbrand', 'metro'].map(name => `assets/work/${name}.gif`),
+  'assets/work/behance.png',
   'assets/work/left.svg', 'assets/work/right.svg',
   ...['three.module.js', 'three.core.js', 'GLTFLoader.js', 'HDRLoader.js',
     'BufferGeometryUtils.js', 'LICENSE'].map(name => `assets/vendor/three/${name}`)

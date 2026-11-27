@@ -25,16 +25,16 @@ function workPhrase(value) {
 
 function graphicProjects(t) {
   return [
-    {id: 'dixon', name: 'Dixon Dance', meta: 'branding / visual identity', href: null, preview: 'assets/cases/dixon/page-01.webp', description: t(
-      'айдентика современной онлайн-платформы о танце и движении. логотип, цветовая система, типографика и правила применения.',
+    {id: 'dixon', name: 'Dixon Dance', meta: 'branding / visual identity', href: null, preview: 'assets/work/dixon.gif', description: t(
+      'айдентика танцевальной онлайн-платформы: логотип, цветовая палитра, типографика и фирменная графика.',
       'A visual identity for a modern dance and movement platform: logo, colour system, typography and usage guidelines.'
     )},
-    {id: 'getbrand', name: 'Get Brand', meta: 'social media / graphic design', href: 'https://www.behance.net/gallery/216916181/dizajn-lenty-dlja-Getbrand', external: true, description: t(
-      'концепция и дизайн ленты instagram: визуальная система, композиция публикаций и единый характер коммуникации.',
+    {id: 'getbrand', name: 'Getbrand', meta: 'social media / graphic design', href: 'https://www.behance.net/gallery/216916181/dizajn-lenty-dlja-Getbrand', external: true, preview: 'assets/work/getbrand.gif', description: t(
+      'визуальная концепция instagram-ленты: оформление публикаций, композиция и единый стиль контента.',
       'An Instagram feed concept and design: visual system, post composition and a consistent communication style.'
     )},
-    {id: 'metro', name: 'Metro Advertising', meta: 'advertising / graphic design', href: 'https://www.behance.net/gallery/177874527/maket-reklamy-v-metro', external: true, description: t(
-      'акционный баннер в метро для магазина косметики: заметная композиция и понятная подача предложения.',
+    {id: 'metro', name: 'Metro Advertising', meta: 'advertising / graphic design', href: 'https://www.behance.net/gallery/177874527/maket-reklamy-v-metro', external: true, preview: 'assets/work/metro.gif', description: t(
+      'рекламный макет для магазина косметики: акцент на предложении, контрастная композиция и читаемость.',
       'A promotional metro banner for a cosmetics store, with a bold composition and a clear offer.'
     )},
     {id: 'behance', name: 'BEHANCE', meta: '', href: 'https://www.behance.net/linnqueenn', external: true, special: true, description: t(
@@ -54,7 +54,7 @@ function workProjectsMarkup(projects, caseUrl) {
     const preview = item.preview || (!item.external ? `assets/work/${item.id}.gif` : '');
     return `<div class="work-slot scroll-window-slot" data-project="${item.id}"><a class="work-case scroll-window${item.special ? ' work-case-more' : ''}" href="${href}"${external}>
       <img class="work-bracket work-bracket-left" src="assets/work/left.svg" alt="">
-      <div class="work-label">${item.meta ? `<p>${workPhrase(item.meta)}</p>` : ''}<h3><span class="home-scramble" data-scramble>${item.name}</span></h3><svg class="work-case-arrow" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M6 26 26 6M6 6h20v20" stroke="currentColor" stroke-width="2"/></svg></div>
+      <div class="work-label">${item.meta ? `<p>${workPhrase(item.meta)}</p>` : ''}<h3><span class="home-scramble" data-scramble>${item.name}</span></h3><svg class="work-case-arrow" viewBox="0 0 32 32" fill="none" aria-hidden="true"><path d="M6 26 26 6M6 6h20v20" stroke="currentColor" stroke-width="2"/></svg>${item.special ? '<img class="work-behance-icon" src="assets/work/behance.png" width="512" height="512" loading="lazy" decoding="async" alt="">' : ''}</div>
       <span class="work-preview"${preview ? ` data-gif="${preview}"` : ''} aria-hidden="true"></span>
       <p class="work-description">${workPhrase(item.description)}</p>
       <img class="work-bracket work-bracket-right" src="assets/work/right.svg" alt="">
